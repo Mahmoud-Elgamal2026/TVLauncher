@@ -117,6 +117,16 @@ const MT = {
     tgOn: "Bot is running"
   }
 };
+MT.ar.xPhone = "📱 ربط الهاتف";
+MT.en.xPhone = "📱 Phone link";
+MT.ar.xRadio = "📻 الإذاعة";
+MT.en.xRadio = "📻 Radio";
+MT.ar.xAll = "كل التطبيقات ←";
+MT.en.xAll = "All apps →";
+MT.ar.xSrc = "المصادر";
+MT.en.xSrc = "Sources";
+MT.ar.noSrc = "الجهاز ده مفيهوش مداخل HDMI";
+MT.en.noSrc = "This box has no HDMI inputs";
 Object.keys(MT).forEach((l) => Object.assign(T[l], MT[l]));
 const VIDEO = /\.(mp4|m4v|mkv|webm|ts|m2ts|avi|mov|wmv|flv|mpg|mpeg|3gp)$/i, AUDIO = /\.(mp3|m4a|aac|flac|wav|ogg|opus)$/i, IMAGE = /\.(jpe?g|png|webp|gif|bmp)$/i;
 const fmtSize = (b) => b > 1073741824 ? (b / 1073741824).toFixed(1) + " GB" : b > 1048576 ? (b / 1048576).toFixed(0) + " MB" : b > 1024 ? (b / 1024).toFixed(0) + " KB" : b ? b + " B" : "";
@@ -549,3 +559,32 @@ setTimeout(() => {
   tgInit();
   bootResume();
 }, 1500);
+const SRC_PKGS = ["com.droidlogic.tvsource", "com.android.tv", "com.mediatek.wwtv.tvcenter", "com.google.android.tv", "com.android.tv.settings"];
+function runXtab(a) {
+  if (a === "wifi") A.openSettings("android.settings.WIFI_SETTINGS");
+  else if (a === "phone") {
+    if (window.phoneDialog) phoneDialog();
+  } else if (a === "lang") {
+    S.lang = S.lang === "ar" ? "en" : "ar";
+    applyLang();
+    renderHome();
+    if (window.renderGroups) renderGroups();
+  } else if (a === "radio") {
+    if (window.radioMenu) radioMenu();
+  }
+}
+window.runXtab = runXtab;
+activators.push((el) => {
+  if (el.id === "xAllApps") {
+    showPage("apps");
+    focus(document.querySelector("#appGrid .f") || document.querySelector(".tab.on"));
+    return true;
+  }
+  if (el.id === "xSources") {
+    const p = SRC_PKGS.find((x) => A.isInstalled(x));
+    if (p) launch(p);
+    else A.toast(L("noSrc"));
+    return true;
+  }
+  return false;
+});

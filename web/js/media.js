@@ -13,6 +13,7 @@ const MT={
     rec:"Record",recNow:"Record this channel",recFor:"Record for",recUntil:"Until I stop it",recStarted:"Recording started",recStop:"Stop recording",recNext:"Record next show",recProg:"Record this show",recSched:"Recording scheduled",recDir:"Save recordings to",recActive:"Recording now",recUpcoming:"Upcoming recordings",min:"min",
     sBoot:"Start-up",bootPlay:"Open the last channel when the box turns on",bootResume:"Resuming last channel",
     sTg:"Telegram control",tgToken:"Bot token",tgHow:"1. In Telegram, message @BotFather and send /newbot\n2. Paste the token it gives you here\n3. Open your bot and send the pairing code",tgCode:"Pairing code",tgLinked:"Linked with",tgUnlink:"Unlink",tgOff:"Bot is off",tgOn:"Bot is running"}};
+MT.ar.xPhone="📱 ربط الهاتف";MT.en.xPhone="📱 Phone link";MT.ar.xRadio="📻 الإذاعة";MT.en.xRadio="📻 Radio";MT.ar.xAll="كل التطبيقات ←";MT.en.xAll="All apps →";MT.ar.xSrc="المصادر";MT.en.xSrc="Sources";MT.ar.noSrc="الجهاز ده مفيهوش مداخل HDMI";MT.en.noSrc="This box has no HDMI inputs";
 Object.keys(MT).forEach(l=>Object.assign(T[l],MT[l]));
 
 const VIDEO=/\.(mp4|m4v|mkv|webm|ts|m2ts|avi|mov|wmv|flv|mpg|mpeg|3gp)$/i, AUDIO=/\.(mp3|m4a|aac|flac|wav|ogg|opus)$/i, IMAGE=/\.(jpe?g|png|webp|gif|bmp)$/i;
@@ -195,3 +196,17 @@ activators.push(el=>{
     case "tgUnlink": S.tgChat=""; S.tgCode=""; tgInit(); renderSettings(); return true;
   } return false });
 setTimeout(()=>{ nat("setBootPlay",!!S.bootPlay); tgInit(); bootResume() },1500);
+
+// ---------- Dock theme extras: shortcut pills, sources card, all-apps button ----------
+const SRC_PKGS=["com.droidlogic.tvsource","com.android.tv","com.mediatek.wwtv.tvcenter","com.google.android.tv","com.android.tv.settings"];
+function runXtab(a){
+  if(a==="wifi") A.openSettings("android.settings.WIFI_SETTINGS");
+  else if(a==="phone"){ if(window.phoneDialog) phoneDialog() }
+  else if(a==="lang"){ S.lang=S.lang==="ar"?"en":"ar"; applyLang(); renderHome(); if(window.renderGroups) renderGroups() }
+  else if(a==="radio"){ if(window.radioMenu) radioMenu() }
+}
+window.runXtab=runXtab;
+activators.push(el=>{
+  if(el.id==="xAllApps"){ showPage("apps"); focus(document.querySelector("#appGrid .f")||document.querySelector(".tab.on")); return true }
+  if(el.id==="xSources"){ const p=SRC_PKGS.find(x=>A.isInstalled(x)); if(p) launch(p); else A.toast(L("noSrc")); return true }
+  return false });

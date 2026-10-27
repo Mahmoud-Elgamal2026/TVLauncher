@@ -489,3 +489,5 @@ body.lite .app.f.focus,body.lite .it.f.focus{transform:scale(1.05)}
 #filesMain .fitem .fs{opacity:.6;font-size:1.6vh;direction:ltr}
 .fpath{opacity:.55;font-size:1.5vh;margin:0 1vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:60%;vertical-align:middle}
 #filesSrc .it.sel{background:var(--sel);color:var(--selText,#000)}
+
+.xtab,.dockx{display:none}

@@ -440,7 +440,7 @@ function focus(el) {
   el.focus({ preventScroll: true });
   el.scrollIntoView({ block: "nearest", inline: "nearest", behavior: S.lite ? "auto" : "smooth" });
   if (el.classList.contains("tab")) {
-    showPage(el.dataset.page);
+    if (el.dataset.page) showPage(el.dataset.page);
     return;
   }
   focusHooks.forEach((h) => h(el));
@@ -498,6 +498,10 @@ function activate(el) {
     if (!it) return;
     if (!it.keep) closeDialog();
     it.fn();
+    return;
+  }
+  if (el.classList.contains("tab") && el.dataset.act) {
+    runXtab(el.dataset.act);
     return;
   }
   if (el.classList.contains("tab")) {

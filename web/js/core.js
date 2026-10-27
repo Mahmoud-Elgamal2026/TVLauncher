@@ -174,7 +174,7 @@ function focus(el){
   if(focused) focused.classList.remove("focus");
   focused=el; el.classList.add("focus"); el.focus({preventScroll:true});
   el.scrollIntoView({block:"nearest",inline:"nearest",behavior:S.lite?"auto":"smooth"});
-  if(el.classList.contains("tab")){ showPage(el.dataset.page); return }
+  if(el.classList.contains("tab")){ if(el.dataset.page) showPage(el.dataset.page); return }
   focusHooks.forEach(h=>h(el));
 }
 function move(dir){
@@ -206,6 +206,7 @@ const activators=[], optionHandlers=[];
 function activate(el){
   if(!el) return;
   if(el.dataset.di!==undefined&&el.closest("#dbox")){ const it=$("dbox")._items[+el.dataset.di]; if(!it) return; if(!it.keep) closeDialog(); it.fn(); return }
+  if(el.classList.contains("tab")&&el.dataset.act){ runXtab(el.dataset.act); return }
   if(el.classList.contains("tab")){ const p=document.querySelector(".page.on .f"); if(p) focus(p); return }
   if(el.tagName==="INPUT"){ el.focus(); return }
   for(const a of activators) if(a(el)) return;
