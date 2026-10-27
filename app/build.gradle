@@ -7,7 +7,7 @@ android {
     compileSdk 34
     defaultConfig {
         applicationId "com.mahmoud.tvlauncher"
-        minSdk 23
+        minSdk 24
         targetSdk 34
         versionCode runNo
         versionName "1.${runNo}"
