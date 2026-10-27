@@ -164,6 +164,10 @@ function renderStore() {
 }
 function storeAction(app) {
   return __async(this, null, function* () {
+    if (app && app.id === "shizuku" && !pinfo(app.pkg) && nat("hasBundled", "shizuku.apk")) {
+      nat("installBundled", "shizuku.apk", "st:Shizuku");
+      return;
+    }
     const st = appStatus(app), items = [];
     banner("⏳", app.name, L("loading"), 1500);
     const r = yield resolveSrc(app), st2 = appStatus(app);
@@ -614,7 +618,7 @@ activators.push((el) => {
       loadCustomCatalog().then(renderStore);
       return true;
     case "szInstall":
-      storeAction(CATALOG.find((a) => a.id === "shizuku"));
+      installShizuku();
       return true;
     case "szOpen":
       nat("openShizuku");
@@ -843,3 +847,10 @@ function defaultHomeKeep() {
     return "";
   }
 }
+function installShizuku() {
+  if (nat("hasBundled", "shizuku.apk")) {
+    banner("🔑", "Shizuku", L("updReady"), 3e3);
+    nat("installBundled", "shizuku.apk", "st:Shizuku");
+  } else storeAction(CATALOG.find((a) => a.id === "shizuku"));
+}
+window.installShizuku = installShizuku;

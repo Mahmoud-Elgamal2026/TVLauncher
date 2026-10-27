@@ -21,6 +21,11 @@ jobs:
       - name: Restore signing key
         env: { KEYSTORE_B64: "${{ secrets.KEYSTORE_B64 }}" }
         run: if [ -n "$KEYSTORE_B64" ]; then echo "$KEYSTORE_B64" | base64 -d > app/tvlauncher.jks; fi
+      - name: Bundle Shizuku (latest official release)
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          url=$(curl -sfL -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/RikkaApps/Shizuku/releases/latest | python3 -c "import json,sys;a=[x['browser_download_url'] for x in json.load(sys.stdin)['assets'] if x['name'].endswith('.apk')];print(a[0] if a else '')")
+          if [ -n "$url" ]; then curl -sfL -o app/src/main/assets/shizuku.apk "$url" && ls -l app/src/main/assets/shizuku.apk; else echo "::warning::Shizuku not bundled"; fi
       - name: Build APK
         shell: bash
         env: { KEYSTORE_PASS: "${{ secrets.KEYSTORE_PASS }}" }

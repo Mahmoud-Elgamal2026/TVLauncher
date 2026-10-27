@@ -87,6 +87,7 @@ function renderStore(){
   list.forEach(a=>{ if(!resolved[a.id]&&a.src.some(s=>/^(fdroid|github):/.test(s))&&pinfo(a.pkg)) resolveSrc(a).then(()=>{ const el=box.querySelector(`[data-store="${cssq(a.id)}"]`); if(el&&el.isConnected){ const f=focused===el; el.outerHTML=storeCard(a); if(f) focus(box.querySelector(`[data-store="${cssq(a.id)}"]`)) } }) });
 }
 async function storeAction(app){
+  if(app&&app.id==="shizuku"&&!pinfo(app.pkg)&&nat("hasBundled","shizuku.apk")){ nat("installBundled","shizuku.apk","st:Shizuku"); return }
   const st=appStatus(app), items=[];
   banner("⏳",app.name,L("loading"),1500);
   const r=await resolveSrc(app), st2=appStatus(app);
@@ -275,7 +276,7 @@ activators.push(el=>{
       S.myCodes=(S.myCodes||[]).filter(c=>c.n!==n).concat([{n,url:u,name:nm}]); renderStore(); A.toast(L("saved")); return true }
     case "apkGo": { const u=($("apkUrl").value||"").trim(); if(u) installFrom(u.split("/").pop()||"APK",u); return true }
     case "catSave": S.catalogUrl=($("catUrl").value||"").trim(); loadCustomCatalog().then(renderStore); return true;
-    case "szInstall": storeAction(CATALOG.find(a=>a.id==="shizuku")); return true;
+    case "szInstall": installShizuku(); return true;
     case "szOpen": nat("openShizuku"); return true;
     case "szAllow": nat("shizukuRequest"); return true;
     case "szHelp": szHelp(); return true;
@@ -334,3 +335,7 @@ activators.push(el=>{
   return false });
 // keep one stock launcher so the box always has a way back (unless the user removes it by hand)
 function defaultHomeKeep(){ try{ return (JSON.parse(nat("homePackages")||"[]")[0])||"" }catch(e){ return "" } }
+
+// Shizuku ships inside the launcher: install it offline in one tap (falls back to the store entry)
+function installShizuku(){ if(nat("hasBundled","shizuku.apk")){ banner("🔑","Shizuku",L("updReady"),3000); nat("installBundled","shizuku.apk","st:Shizuku") } else storeAction(CATALOG.find(a=>a.id==="shizuku")) }
+window.installShizuku=installShizuku;

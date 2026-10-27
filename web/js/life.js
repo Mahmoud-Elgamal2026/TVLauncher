@@ -226,6 +226,7 @@ function setupWizard(){
     [yes(home),L("suHome"),home?"":L("suHomeBtn"),"suHome"],
     [yes(guard),L("suGuard"),guard?"":L("guardEnable"),"suGuard"],
     [yes(wvOk),L("suWv")+(wv?" · Chrome "+wv:""),wvOk?"":L("suWvBtn"),"suWv"],
+    [yes(!NA||shz()!=="none"),"Shizuku",(!NA||shz()!=="none")?"":L("stInstall"),"suShz"],
     [yes(bk),L("suBackup"),L("suBackupBtn"),"suBackup"],
     ["🧪",L("suTest"),L("suTestBtn"),"suTest"]];
   const items=rows.map(r=>({fn:()=>setupAct(r[3])})).concat([{fn:()=>{S.setupSeen=true}}]);
@@ -236,6 +237,7 @@ function setupAct(k){
   else if(k==="suGuard") nat("openAccessibility");
   else if(k==="suWv"){ nat("openUri","market://details?id=com.google.android.webview"); }
   else if(k==="suBackup"){ exportBackup(); S.lastBackup=Date.now() }
+  else if(k==="suShz") installShizuku();
   else if(k==="suTest") setTimeout(selfTest,30);
 }
 async function selfTest(){

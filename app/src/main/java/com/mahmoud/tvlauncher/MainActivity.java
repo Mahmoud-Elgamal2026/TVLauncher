@@ -675,6 +675,35 @@ public class MainActivity extends Activity {
             }).start();
         }
 
+
+        @JavascriptInterface
+        public boolean hasBundled(String name) {
+            try { getAssets().open(name).close(); return true; } catch (Throwable t) { return false; }
+        }
+
+        /** Installs an APK shipped inside this launcher's assets (e.g. Shizuku). */
+        @JavascriptInterface
+        public void installBundled(final String name, final String id) {
+            if (android.os.Build.VERSION.SDK_INT >= 26 && !getPackageManager().canRequestPackageInstalls()) {
+                ui.post(() -> { try { startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName()))); } catch (Exception ignored) {} });
+                apkProgress(id, -2); return;
+            }
+            new Thread(() -> {
+                try {
+                    File dir = new File(getCacheDir(), "update"); dir.mkdirs();
+                    File f = new File(dir, "update.apk");
+                    try (InputStream in = getAssets().open(name); OutputStream out = new java.io.FileOutputStream(f)) {
+                        byte[] buf = new byte[65536]; int n; while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+                    }
+                    Uri uri = UpdateProvider.uriFor(MainActivity.this, f);
+                    Intent i = new Intent(Intent.ACTION_VIEW).setDataAndType(uri, "application/vnd.android.package-archive")
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    ui.post(() -> { try { startActivity(i); } catch (Exception e) { toast("Install failed"); } });
+                    apkProgress(id, 100);
+                } catch (Throwable t) { apkProgress(id, -1); }
+            }).start();
+        }
+
         @JavascriptInterface
         public void installUpdate(String url) { installApk(url, "update"); }
 
