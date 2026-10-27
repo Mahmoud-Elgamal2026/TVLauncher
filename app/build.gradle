@@ -30,11 +30,14 @@ android {
     }
     compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8; coreLibraryDesugaringEnabled true }
     lint { abortOnError false; checkReleaseBuilds false }
+    packaging { resources { excludes += ['META-INF/BCKEY.DSA','META-INF/BCKEY.SF','META-INF/versions/**','META-INF/*.SF','META-INF/*.DSA','META-INF/*.RSA'] } }
 }
 
 dependencies {
     // Shizuku: lets the launcher run "pm" commands (remove/restore system apps) without root
     implementation "dev.rikka.shizuku:api:13.1.5"
     implementation "dev.rikka.shizuku:provider:13.1.5"
+    // SMB (Windows / NAS shared folders) for the file player
+    implementation("eu.agno3.jcifs:jcifs-ng:2.1.10")
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"
 }

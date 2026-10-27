@@ -58,6 +58,7 @@ function renderSettings(){
   sec(L("sProfiles"),`<div class="inline">${S.profiles.map(p=>`<button class="btn f${p.id===S.cur?" pri":""}" data-prof="${esc(p.id)}">${esc(p.emoji)} ${esc(p.name)}${p.kids?" 👶":""}</button>`).join("")}<button class="btn f" id="addProfile">➕ ${L("addProfile")}</button></div>`)+
   (window.lifeSettings?lifeSettings():"")+
   (window.phaseFourSettings?phaseFourSettings():"")+
+  (window.mediaSettings?mediaSettings():"")+
   sec(L("sSecurity"),field(S.pin?"🔒 "+L("pinOn"):"🔓 "+L("pinNone"),`<div class="inline"><button class="btn f" id="pinSet">${L("pinSet")}</button><button class="btn f" id="pinOff">${L("pinOff")}</button></div>`)+field("",seg("lockSettings",[[0,L("lockSetNo")],[1,L("lockSetYes")]])))+
   sec(L("sBackup"),`<div class="inline"><button class="btn f" id="bkExport">${L("bkExport")}</button><button class="btn f" id="bkImport">${L("bkImport")}</button><button class="btn f" id="clearCache">${L("clearCache")}</button><button class="btn f" id="sysSet">${L("system")}</button></div>`);
   $("setScroll").innerHTML=h; markSettings();

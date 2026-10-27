@@ -72,6 +72,7 @@ public class MainActivity extends Activity {
     private String imagePurpose = "wall";
     private volatile boolean learningKey = false;
     private SharedPreferences prefs;
+    private TelegramBot tg;
     private WebView web;
     private final Map<String, String> iconCache = new HashMap<>();
     private final Handler ui = new Handler(Looper.getMainLooper());
@@ -150,7 +151,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        stopRadioMp(); if (remote != null) remote.stop(); if (instance == this) instance = null; super.onDestroy(); }
+        stopRadioMp(); if (tg != null) tg.stop(); if (remote != null) remote.stop(); if (instance == this) instance = null; super.onDestroy(); }
 
     private static boolean isCoreKey(int c) {
         return c == KeyEvent.KEYCODE_DPAD_UP || c == KeyEvent.KEYCODE_DPAD_DOWN || c == KeyEvent.KEYCODE_DPAD_LEFT
@@ -542,6 +543,148 @@ public class MainActivity extends Activity {
             return c;
         }
 
+
+
+        // ---------- start-up: resume last channel ----------
+        /** True once per boot, for the first launcher start within 10 minutes of the box turning on. */
+        @JavascriptInterface
+        public boolean bootFresh() {
+            long up = android.os.SystemClock.elapsedRealtime();
+            long bootAt = (System.currentTimeMillis() - up) / 60000;
+            if (up > 10 * 60000 || Math.abs(prefs.getLong("bootSeen", 0) - bootAt) <= 1) return false;
+            prefs.edit().putLong("bootSeen", bootAt).apply();
+            return true;
+        }
+        @JavascriptInterface
+        public void setBootPlay(boolean on) { prefs.edit().putBoolean("bootPlay", on).apply(); }
+
+        // ---------- files: USB drives, internal storage, network (SMB) ----------
+        @JavascriptInterface
+        public String storageRoots() {
+            JSONArray a = new JSONArray();
+            HashSet<String> seen = new HashSet<>();
+            try {
+                File ext = Environment.getExternalStorageDirectory();
+                a.put(new JSONObject().put("path", ext.getPath()).put("label", "internal")); seen.add(ext.getPath());
+                String[] bases = {"/storage", "/mnt/usb_storage", "/mnt/media_rw", "/mnt/usb"};
+                for (String b : bases) {
+                    File[] l = new File(b).listFiles();
+                    if (l == null) continue;
+                    for (File f : l) {
+                        String n = f.getName();
+                        if (!f.isDirectory() || n.equals("emulated") || n.equals("self") || n.equals("sdcard0") || !f.canRead() || !seen.add(f.getCanonicalPath())) continue;
+                        String[] kids = f.list(); if (kids == null) continue;
+                        a.put(new JSONObject().put("path", f.getPath()).put("label", "usb").put("name", n));
+                    }
+                }
+            } catch (Throwable ignored) {}
+            return a.toString();
+        }
+
+        @JavascriptInterface
+        public void listDir(final String path, final String id) {
+            new Thread(() -> {
+                try {
+                    JSONArray a = new JSONArray();
+                    if (path.startsWith("smb://")) {
+                        String p = path.endsWith("/") ? path : path + "/";
+                        jcifs.smb.SmbFile d = new jcifs.smb.SmbFile(p, MediaServer.Smb.ctx(p));
+                        for (jcifs.smb.SmbFile f : d.listFiles()) {
+                            String n = f.getName(); boolean dir = n.endsWith("/");
+                            if (n.endsWith("$/") || n.startsWith(".")) continue;
+                            a.put(new JSONObject().put("name", dir ? n.substring(0, n.length() - 1) : n).put("dir", dir)
+                                .put("path", f.getPath()).put("size", dir ? 0 : f.length()));
+                        }
+                    } else {
+                        File[] l = new File(path).listFiles();
+                        if (l == null) throw new Exception("denied");
+                        for (File f : l) if (!f.getName().startsWith("."))
+                            a.put(new JSONObject().put("name", f.getName()).put("dir", f.isDirectory()).put("path", f.getPath()).put("size", f.isDirectory() ? 0 : f.length()).put("time", f.lastModified()));
+                    }
+                    callback(id, true, a.toString());
+                } catch (Throwable t) { callback(id, false, String.valueOf(t.getMessage())); }
+            }).start();
+        }
+
+        @JavascriptInterface
+        public String mediaUrl(String path) { MediaServer.get(); return MediaServer.urlFor(path); }
+
+        @JavascriptInterface
+        public void smbLogin(String host, String user, String pass, String domain) {
+            MediaServer.Smb.creds.put(host.toLowerCase(Locale.US), new String[]{user, pass, domain});
+        }
+
+        /** Finds computers on the home network that share files (SMB port 445 open). */
+        @JavascriptInterface
+        public void smbScan(final String id) {
+            new Thread(() -> {
+                try {
+                    String ip = RemoteServer.localIp();
+                    if (ip.isEmpty()) throw new Exception("no network");
+                    final String base = ip.substring(0, ip.lastIndexOf('.') + 1);
+                    final JSONArray out = new JSONArray();
+                    ExecutorService pool = Executors.newFixedThreadPool(48);
+                    for (int i = 1; i < 255; i++) {
+                        final String h = base + i;
+                        if (h.equals(ip)) continue;
+                        pool.execute(() -> {
+                            try (java.net.Socket so = new java.net.Socket()) {
+                                so.connect(new java.net.InetSocketAddress(h, 445), 350);
+                                String name = h;
+                                try { String cn = java.net.InetAddress.getByName(h).getCanonicalHostName(); if (cn != null && !cn.equals(h)) name = cn; } catch (Throwable ignored) {}
+                                synchronized (out) { out.put(new JSONObject().put("host", h).put("name", name)); }
+                            } catch (Throwable ignored) {}
+                        });
+                    }
+                    pool.shutdown(); pool.awaitTermination(20, java.util.concurrent.TimeUnit.SECONDS);
+                    callback(id, true, out.toString());
+                } catch (Throwable t) { callback(id, false, String.valueOf(t.getMessage())); }
+            }).start();
+        }
+
+        // ---------- recording ----------
+        @JavascriptInterface
+        public void recStart(String url, String name, int minutes) { RecService.start(MainActivity.this, url, name, minutes); }
+        @JavascriptInterface
+        public void recStop(String rid) {
+            Intent i = new Intent(MainActivity.this, RecService.class).setAction("stop").putExtra("id", rid);
+            try { startService(i); } catch (Throwable t) { RecService.Job j = RecService.jobs.get(rid); if (j != null) j.stop = true; }
+        }
+        @JavascriptInterface
+        public void recAt(String url, String name, double startMs, double endMs) { RecService.schedule(MainActivity.this, url, name, (long) startMs, (long) endMs); }
+        @JavascriptInterface
+        public String recState() {
+            JSONObject o = new JSONObject();
+            try {
+                o.put("active", RecService.state()).put("dir", RecService.dir(MainActivity.this).getPath()).put("dirs", RecService.dirs(MainActivity.this));
+                o.put("scheduled", new JSONArray(prefs.getString("recSched", "[]")));
+            } catch (Exception ignored) {}
+            return o.toString();
+        }
+        @JavascriptInterface
+        public void recSetDir(String d) { prefs.edit().putString("recDir", d == null ? "" : d).apply(); }
+        @JavascriptInterface
+        public boolean deleteFile(String path) {
+            File f = new File(path);
+            File rec = RecService.dir(MainActivity.this);
+            try { if (!f.getCanonicalPath().startsWith(rec.getCanonicalPath())) return false; } catch (Exception e) { return false; }
+            return f.delete();
+        }
+
+        // ---------- Telegram control ----------
+        @JavascriptInterface
+        public void tgStart(String token) {
+            if (tg != null) tg.stop();
+            tg = null;
+            if (token == null || !token.matches("\\d+:[A-Za-z0-9_-]{20,}")) return;
+            tg = new TelegramBot(token, (chat, from, text) ->
+                js("window.onTg&&onTg(" + JSONObject.quote(String.valueOf(chat)) + "," + JSONObject.quote(from) + "," + JSONObject.quote(text) + ")"));
+            tg.start();
+        }
+        @JavascriptInterface
+        public void tgSend(String chat, String text, String buttons) {
+            try { if (tg != null) tg.send(Long.parseLong(chat), text, buttons); } catch (Throwable ignored) {}
+        }
 
         // ---------- setup wizard ----------
         @JavascriptInterface
