@@ -217,6 +217,7 @@ const RED = [
   /^com\.android\.(systemui|settings|phone|shell|providers\..*|packageinstaller|permissioncontroller|externalstorage|inputdevices|location\.fused|networkstack.*|bluetooth|wifi.*|se|server\.telecom|keychain|certinstaller|documentsui|tv\.settings|webview|media.*|ext\..*|localtransport|sharedstoragebackup|vpndialogs|captiveportallogin|cellbroadcast.*|dynsystem|statementservice|proxyhandler|emergency|mtp)$/,
   /^com\.google\.android\.(webview|gms|gsf|ext\..*|packageinstaller|permissioncontroller|tv\.frameworkpackagestubs|leanback\.ime|inputmethod\..*|tvlauncher|apps\.tv\.launcherx|networkstack.*|modulemetadata|tv\.remote\.service)$/,
   /^com\.mahmoud\.tvlauncher$/,
+  /launcher|homescreen|\.home$|\.tvhome/i,
   /^moe\.shizuku\.privileged\.api$/,
   /ime$|keyboard|inputmethod/i,
   /^com\.(amlogic|droidlogic|mediatek|rockchip|realtek|hisilicon)\./

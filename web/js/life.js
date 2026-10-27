@@ -215,3 +215,43 @@ async function bingToday(force){
 }
 setTimeout(()=>bingToday(false),4000); setInterval(()=>bingToday(false),3600000);
 activators.push(el=>{ if(el.id==="wall4k"){ wallMenu(); return true } return false });
+
+// ================= setup wizard + self-test =================
+DEF.setupSeen=false; DEF.lastBackup=0;
+const yes=b=>b?"✅":"⚠️";
+function setupWizard(){
+  const home=NA&&NA.isDefaultHome?nat("isDefaultHome"):true, guard=NA?!!nat("guardService"):true;
+  const wv=window.__chromeVer||0, wvOk=!wv||wv>=70, bk=S.lastBackup>0;
+  const rows=[
+    [yes(home),L("suHome"),home?"":L("suHomeBtn"),"suHome"],
+    [yes(guard),L("suGuard"),guard?"":L("guardEnable"),"suGuard"],
+    [yes(wvOk),L("suWv")+(wv?" · Chrome "+wv:""),wvOk?"":L("suWvBtn"),"suWv"],
+    [yes(bk),L("suBackup"),L("suBackupBtn"),"suBackup"],
+    ["🧪",L("suTest"),L("suTestBtn"),"suTest"]];
+  const items=rows.map(r=>({fn:()=>setupAct(r[3])})).concat([{fn:()=>{S.setupSeen=true}}]);
+  dialog("🧭 "+L("setup"),items,{html:`<div class="sub">${esc(L("setupSub"))}</div><div class="dlist">${rows.map((r,i)=>`<button class="btn f${r[2]&&r[0]!=="✅"?" pri":""}" data-di="${i}"><b>${r[0]}</b>${esc(r[1])}${r[2]?` — ${esc(r[2])}`:""}</button>`).join("")}<div class="empty">🛡 ${esc(L("suStock"))}</div><button class="btn f" data-di="${rows.length}">${esc(L("ok"))}</button></div>`});
+}
+function setupAct(k){
+  if(k==="suHome"){ A.toast(L("suHomeHint")); nat("askHome") }
+  else if(k==="suGuard") nat("openAccessibility");
+  else if(k==="suWv"){ nat("openUri","market://details?id=com.google.android.webview"); }
+  else if(k==="suBackup"){ exportBackup(); S.lastBackup=Date.now() }
+  else if(k==="suTest") setTimeout(selfTest,30);
+}
+async function selfTest(){
+  const res=[]; const show=done=>dialog("🧪 "+L("suTest"),[{label:L("ok"),pri:1,fn:()=>{}}],{html:`<div class="dlist">${res.map(r=>`<div class="btn" style="text-align:start"><b>${r[0]}</b>${esc(r[1])}${r[2]?` <span style="opacity:.6">· ${esc(r[2])}</span>`:""}</div>`).join("")}${done?"":`<div class="empty">⏳ ${esc(L("suTesting"))}</div>`}<button class="btn pri f" data-di="0">${esc(L("ok"))}</button></div>`});
+  const t=async(name,fn)=>{ show(false); let r; try{ r=await Promise.race([fn(),new Promise((_,j)=>setTimeout(()=>j(new Error("timeout")),20000))]) }catch(e){ r=[false,String(e.message||e).slice(0,60)] } res.push([r[0]===null?"➖":r[0]?"✅":"❌",name,r[1]||""]) };
+  await t(L("tNet"),async()=>{ await A.fetchText("https://www.google.com/generate_204"); return [true] });
+  await t(L("tLists"),async()=>{ if(!(S.lists||[]).length) return [null,L("tSkip")]; return [channels.length>0,channels.length+" "+L("channelsS")] });
+  await t(L("tChan"),async()=>{ const c=channels[0]; if(!c) return [null,L("tSkip")]; const r=await A.checkStreams([c.url]); return [!!r[c.url],c.name] });
+  await t(L("tEpg"),async()=>{ if(typeof epgUrl!=="function"||!epgUrl()) return [null,L("tSkip")]; return [Object.keys(epg).length>0,Object.keys(epg).length+""] });
+  await t(L("tRadio"),async()=>{ const r=JSON.parse(await natAsync("resolveUrl",RADIO_FB[0].url)); return [!!r.url,RADIO_FB[0].name] });
+  await t(L("tWeather"),async()=>{ const w=await A.fetchJSON("https://api.open-meteo.com/v1/forecast?latitude=30.04&longitude=31.24&current=temperature_2m"); return [!!w.current,w.current?w.current.temperature_2m+"°":""] });
+  await t(L("tMatches"),async()=>{ const r=await A.fetchJSON("https://www.thesportsdb.com/api/v1/json/123/all_leagues.php"); return [!!(r&&r.leagues)] });
+  await t(L("tWall"),async()=>{ const r=await A.fetchJSON("https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US"); return [!!(r.images&&r.images.length)] });
+  await t(L("tCodes"),async()=>{ await natAsync("resolveUrl","https://aftv.news/"); return [true] });
+  await t(L("tUpd"),async()=>{ if(!S.repo) return [null,L("tSkip")]; await natAsync("checkUpdate",S.repo); return [true,S.repo] });
+  show(true);
+}
+activators.push(el=>{ if(el.id==="setupBtn"){ setupWizard(); return true } return false });
+setTimeout(()=>{ if(!S.setupSeen&&NA&&NA.isDefaultHome&&!nat("isDefaultHome")) setupWizard() },6000);

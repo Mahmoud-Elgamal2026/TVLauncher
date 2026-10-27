@@ -542,6 +542,46 @@ public class MainActivity extends Activity {
             return c;
         }
 
+
+        // ---------- setup wizard ----------
+        @JavascriptInterface
+        public boolean isDefaultHome() {
+            try {
+                ResolveInfo ri = getPackageManager().resolveActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME), PackageManager.MATCH_DEFAULT_ONLY);
+                return ri != null && ri.activityInfo != null && getPackageName().equals(ri.activityInfo.packageName);
+            } catch (Throwable t) { return false; }
+        }
+
+        @JavascriptInterface
+        public String homePackages() {
+            JSONArray a = new JSONArray();
+            try {
+                for (ResolveInfo ri : getPackageManager().queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME), 0))
+                    if (!getPackageName().equals(ri.activityInfo.packageName)) a.put(ri.activityInfo.packageName);
+            } catch (Throwable ignored) {}
+            return a.toString();
+        }
+
+        @JavascriptInterface
+        public void openHomeSettings() {
+            ui.post(() -> {
+                String[] acts = {"android.settings.HOME_SETTINGS", Settings.ACTION_SETTINGS};
+                for (String a : acts) { try { startActivity(new Intent(a).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return; } catch (Throwable ignored) {} }
+            });
+        }
+
+        @JavascriptInterface
+        public void askHome() {
+            ui.post(() -> {
+                try {
+                    // pressing Home with no default shows the system chooser; clearing our own default first makes it appear
+                    getPackageManager().clearPackagePreferredActivities(getPackageName());
+                    Intent i = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(Intent.createChooser(i, "Home"));
+                } catch (Throwable t) { openHomeSettings(); }
+            });
+        }
+
         // ---------- home guard (accessibility helper) ----------
         @JavascriptInterface
         public boolean guardService() {

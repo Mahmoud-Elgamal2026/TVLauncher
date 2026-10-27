@@ -19,6 +19,7 @@ function renderSettings(){
       `<div style="margin-top:1.2vh">${inputRow("wallUrl",S.wallImg&&!S.wallImg.startsWith("data:")?S.wallImg:"",L("wUrl"),"wallUrlSave")}</div>`)+
     field(L("hour"),seg("h24",[[0,"12h"],[1,"24h"]]))+
     field(L("perf"),seg("lite",[[0,L("perfFull")],[1,L("perfLite")]]))+
+    field(L("setup"),`<div class="inline"><button class="btn pri f" id="setupBtn">🧭 ${L("setup")}</button></div>`)+
     field(L("webview"),`<div class="inline"><span class="btn sm">Chrome ${window.__chromeVer||"?"}</span>${(window.__chromeVer||99)<70?`<span class="btn sm">⚠️ ${L("webviewOld")}</span>`:""}</div>`))+
   sec(L("sFrame"),
     field(L("frameAfter"),seg("frameMin",[[0,L("off")],[5,"5 "+L("min")],[10,"10 "+L("min")],[30,"30 "+L("min")]]).replace(/<\/div>$/,`<button class="btn f" id="framePrev">▶ ${L("preview")}</button></div>`))+
