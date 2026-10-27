@@ -328,12 +328,12 @@ pre.code{background:rgba(0,0,0,.45);color:#cfe;padding:1.4vh 1.2vw;border-radius
 .cgroup{margin:1.6vh 0 .8vh}
 .sysrow.csel{box-shadow:inset 0 0 0 .25vh #43a047}
 /* ---- All apps redesign v4 ---- */
-#apps .grid{grid-template-columns:repeat(var(--acols,6),1fr);gap:2.6vh 1.4vw;padding:3vh 1vw 6vh}
-body[data-size=s] #apps .grid{--acols:8}body[data-size=l] #apps .grid{--acols:5}
-#apps .app{aspect-ratio:1/1;flex-direction:column;justify-content:center;background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.08);border-radius:calc(var(--r) * 1.4);padding:1.6vh .6vw 1.2vh;overflow:hidden}
-#apps .app img{width:52%;height:52%;max-width:none;max-height:none;object-fit:contain;filter:drop-shadow(0 .6vh 1.2vh rgba(0,0,0,.45))}
+#apps .grid{grid-template-columns:repeat(var(--acols,8),1fr);gap:2vh 1vw;padding:3vh 1vw 6vh}
+body[data-size=s] #apps .grid{--acols:10}body[data-size=l] #apps .grid{--acols:6}
+#apps .app{aspect-ratio:1/0.9;max-height:21vh;flex-direction:column;justify-content:center;background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.08);border-radius:calc(var(--r) * 1.4);padding:1.6vh .6vw 1.2vh;overflow:hidden}
+#apps .app img{width:46%;height:46%;max-width:none;max-height:none;object-fit:contain;filter:drop-shadow(0 .6vh 1.2vh rgba(0,0,0,.45))}
 #apps .app img.banner{position:static;width:100%;height:62%;border-radius:calc(var(--r) * .8);object-fit:contain;filter:none}
-#apps .app .nm{position:static;margin-top:1.4vh;font-size:1.75vh;font-weight:600;opacity:.85;max-width:100%;padding:0 .3vw}
+#apps .app .nm{position:static;margin-top:1.4vh;font-size:1.6vh;font-weight:600;opacity:.85;max-width:100%;padding:0 .3vw}
 #apps .app.focus .nm{opacity:1}
 #apps .app.focus{background:linear-gradient(160deg,rgba(255,255,255,.22),rgba(255,255,255,.08))}
 #apps .app .badge{top:.8vh;inset-inline-end:.6vw}
