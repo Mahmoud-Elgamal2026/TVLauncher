@@ -242,6 +242,7 @@ function applyLook() {
   {
     const th = typeof THEMES !== "undefined" && THEMES.find((t) => t.id === S.theme);
     b.classList.toggle("lighttheme", S.theme === "light" || !!(th && th.light));
+    b.dataset.lay = th && th.lay || (th && th.classicAtv ? "classic" : "");
   }
   b.classList.toggle("kids", isKids());
   const img = S.wall === "image" && S.wallImg;

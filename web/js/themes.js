@@ -4,41 +4,41 @@
 const THEMES=[
  // ---- Apple ----
  {id:"apple",g:"Apple TV",n:"tvOS 17 · Dark",builtIn:1,dot:"#ffffff"},
- {id:"tvos-light",g:"Apple TV",n:"tvOS · Light",light:1,bg:"linear-gradient(135deg,#f4f4f8,#dcdce6)",card:"linear-gradient(160deg,#fff,#e8e8ee)",sel:"#1c1c1e",selText:"#fff",glass:"rgba(0,0,0,.07)",r:"2vh",tabs:"pill",focus:"lift",dot:"#e8e8ee"},
- {id:"tvos-2012",g:"Apple TV",n:"Apple TV · 2012",bg:"radial-gradient(ellipse at 50% 0,#4a4a4a,#141414 70%)",card:"linear-gradient(180deg,#6a6a6a,#2c2c2c)",sel:"#fff",selText:"#000",glass:"rgba(255,255,255,.08)",r:".8vh",tabs:"plain",focus:"ring",ring:"0 0 0 .35vh #fff",dot:"#6a6a6a"},
+ {id:"tvos-light",g:"Apple TV",n:"tvOS · Light",light:1,bg:"linear-gradient(135deg,#f4f4f8,#dcdce6)",card:"linear-gradient(160deg,#fff,#e8e8ee)",sel:"#1c1c1e",selText:"#fff",glass:"rgba(0,0,0,.07)",r:"2vh",tabs:"pill",focus:"lift",dot:"#e8e8ee",lay:"hero"},
+ {id:"tvos-2012",g:"Apple TV",n:"Apple TV · 2012",bg:"radial-gradient(ellipse at 50% 0,#4a4a4a,#141414 70%)",card:"linear-gradient(180deg,#6a6a6a,#2c2c2c)",sel:"#fff",selText:"#000",glass:"rgba(255,255,255,.08)",r:".8vh",tabs:"plain",focus:"ring",ring:"0 0 0 .35vh #fff",dot:"#6a6a6a",lay:"hero"},
  // ---- Google / Android TV ----
- {id:"google",g:"Google / Android TV",n:"Google TV",builtIn:1,dot:"#8ab4f8"},
- {id:"gtv-you",g:"Google / Android TV",n:"Google TV 2024 · Material You",bg:"linear-gradient(135deg,#1d1b22,#141218)",card:"#2b2930",sel:"#d0bcff",selText:"#381e72",glass:"#2b2930",r:"2.6vh",tabs:"underline",focus:"ring",ring:"0 0 0 .45vh #d0bcff",accent:"#d0bcff",dot:"#d0bcff"},
- {id:"atv-oreo",g:"Google / Android TV",n:"Android TV 8–11",bg:"linear-gradient(180deg,#212121,#121212)",card:"#303030",sel:"#fff",selText:"#000",glass:"#2a2a2a",r:".6vh",tabs:"plain",focus:"scale",ring:"0 0 0 .3vh #fff",dot:"#303030"},
- {id:"atv-leanback",g:"Google / Android TV",n:"Android TV 5–7 · Leanback",bg:"linear-gradient(135deg,#37474f,#1c262b)",card:"#546e7a",sel:"#26a69a",selText:"#fff",glass:"rgba(255,255,255,.08)",r:".3vh",tabs:"plain",focus:"scale",ring:"0 0 0 .35vh #fff",dot:"#26a69a"},
+ {id:"google",g:"Google / Android TV",n:"Google TV",builtIn:1,dot:"#8ab4f8",lay:"gtv"},
+ {id:"gtv-you",g:"Google / Android TV",n:"Google TV 2024 · Material You",bg:"linear-gradient(135deg,#1d1b22,#141218)",card:"#2b2930",sel:"#d0bcff",selText:"#381e72",glass:"#2b2930",r:"2.6vh",tabs:"underline",focus:"ring",ring:"0 0 0 .45vh #d0bcff",accent:"#d0bcff",dot:"#d0bcff",lay:"gtv"},
+ {id:"atv-oreo",g:"Google / Android TV",n:"Android TV 8–11",bg:"linear-gradient(180deg,#212121,#121212)",card:"#303030",sel:"#fff",selText:"#000",glass:"#2a2a2a",r:".6vh",tabs:"plain",focus:"scale",ring:"0 0 0 .3vh #fff",dot:"#303030",classicAtv:1},
+ {id:"atv-leanback",g:"Google / Android TV",n:"Android TV 5–7 · Leanback",bg:"linear-gradient(135deg,#37474f,#1c262b)",card:"#546e7a",sel:"#26a69a",selText:"#fff",glass:"rgba(255,255,255,.08)",r:".3vh",tabs:"plain",focus:"scale",ring:"0 0 0 .35vh #fff",dot:"#26a69a",classicAtv:1},
  {id:"atv-2017",g:"Google / Android TV",n:"Android TV · Classic home",bg:"linear-gradient(115deg,#1f2a55 0%,#2c2f63 40%,#4a2d62 70%,#7a2f5a 100%)",card:"#f2f2f2",sel:"#fff",selText:"#202124",glass:"rgba(255,255,255,.1)",r:".4vh",tabs:"plain",focus:"scale",ring:"0 0 0 .3vh #fff",dot:"#e53935",classicAtv:1},
  {id:"gtv-round",g:"Google / Android TV",n:"Google TV · Round apps",bg:"radial-gradient(ellipse at 70% 0,#2a3140 0,#14161b 60%,#0d0e11 100%)",card:"#262a31",sel:"#e8eaed",selText:"#202124",glass:"rgba(255,255,255,.08)",r:"1.2vh",tabs:"plain",focus:"ring",ring:"0 0 0 .35vh #fff",dot:"#8ab4f8",roundApps:1},
- {id:"shield",g:"Google / Android TV",n:"NVIDIA Shield",bg:"radial-gradient(circle at 80% 0,#203314,#0a0a0a 60%)",card:"#1f1f1f",sel:"#76b900",selText:"#000",glass:"#1c1c1c",r:".6vh",tabs:"underline",focus:"ring",ring:"0 0 0 .4vh #76b900",accent:"#76b900",dot:"#76b900"},
- {id:"bravia",g:"Google / Android TV",n:"Sony Bravia",bg:"linear-gradient(135deg,#1b2129,#0b0e12)",card:"#2a313b",sel:"#e6e6e6",selText:"#111",glass:"rgba(255,255,255,.07)",r:".5vh",tabs:"plain",focus:"ring",ring:"0 0 0 .35vh #e6e6e6",dot:"#2a313b"},
+ {id:"shield",g:"Google / Android TV",n:"NVIDIA Shield",bg:"radial-gradient(circle at 80% 0,#203314,#0a0a0a 60%)",card:"#1f1f1f",sel:"#76b900",selText:"#000",glass:"#1c1c1c",r:".6vh",tabs:"underline",focus:"ring",ring:"0 0 0 .4vh #76b900",accent:"#76b900",dot:"#76b900",lay:"poster"},
+ {id:"bravia",g:"Google / Android TV",n:"Sony Bravia",bg:"linear-gradient(135deg,#1b2129,#0b0e12)",card:"#2a313b",sel:"#e6e6e6",selText:"#111",glass:"rgba(255,255,255,.07)",r:".5vh",tabs:"plain",focus:"ring",ring:"0 0 0 .35vh #e6e6e6",dot:"#2a313b",lay:"poster"},
  // ---- Samsung ----
- {id:"tizen",g:"Samsung",n:"Tizen · One UI",bg:"linear-gradient(160deg,#0c1f45,#050a18 70%)",card:"rgba(255,255,255,.09)",sel:"#fff",selText:"#0c1f45",glass:"rgba(255,255,255,.1)",r:"1.6vh",tabs:"bottom",focus:"lift",ring:"0 0 0 .35vh #fff",dot:"#1d4ed8"},
- {id:"smarthub",g:"Samsung",n:"Smart Hub · 2016",bg:"radial-gradient(ellipse at 50% 100%,#1b2a52,#000 70%)",card:"linear-gradient(180deg,#2f4a85,#16264d)",sel:"#5ab0ff",selText:"#001",glass:"rgba(255,255,255,.08)",r:".4vh",tabs:"bottom",focus:"glow",ring:"0 0 0 .3vh #5ab0ff",accent:"#5ab0ff",dot:"#2f4a85"},
+ {id:"tizen",g:"Samsung",n:"Tizen · One UI",bg:"linear-gradient(160deg,#0c1f45,#050a18 70%)",card:"rgba(255,255,255,.09)",sel:"#fff",selText:"#0c1f45",glass:"rgba(255,255,255,.1)",r:"1.6vh",tabs:"bottom",focus:"lift",ring:"0 0 0 .35vh #fff",dot:"#1d4ed8",lay:"bar"},
+ {id:"smarthub",g:"Samsung",n:"Smart Hub · 2016",bg:"radial-gradient(ellipse at 50% 100%,#1b2a52,#000 70%)",card:"linear-gradient(180deg,#2f4a85,#16264d)",sel:"#5ab0ff",selText:"#001",glass:"rgba(255,255,255,.08)",r:".4vh",tabs:"bottom",focus:"glow",ring:"0 0 0 .3vh #5ab0ff",accent:"#5ab0ff",dot:"#2f4a85",lay:"bar"},
  // ---- LG ----
- {id:"webos",g:"LG",n:"webOS · Launcher bar",bg:"linear-gradient(135deg,#2b0d3f,#0f1238)",card:"linear-gradient(160deg,#3a1d5c,#1d1440)",sel:"#ff3d8b",selText:"#fff",glass:"rgba(255,255,255,.1)",r:"1vh",tabs:"bottom",focus:"lift",ring:"0 0 0 .4vh #ff3d8b",accent:"#ff3d8b",dot:"#ff3d8b"},
- {id:"webos22",g:"LG",n:"webOS 22+",bg:"linear-gradient(180deg,#1c1c1c,#0d0d0d)",card:"#2a2a2a",sel:"#c4024f",selText:"#fff",glass:"#262626",r:"2vh",tabs:"pill",focus:"ring",ring:"0 0 0 .4vh #fff",dot:"#c4024f"},
+ {id:"webos",g:"LG",n:"webOS · Launcher bar",bg:"linear-gradient(135deg,#2b0d3f,#0f1238)",card:"linear-gradient(160deg,#3a1d5c,#1d1440)",sel:"#ff3d8b",selText:"#fff",glass:"rgba(255,255,255,.1)",r:"1vh",tabs:"bottom",focus:"lift",ring:"0 0 0 .4vh #ff3d8b",accent:"#ff3d8b",dot:"#ff3d8b",lay:"bar"},
+ {id:"webos22",g:"LG",n:"webOS 22+",bg:"linear-gradient(180deg,#1c1c1c,#0d0d0d)",card:"#2a2a2a",sel:"#c4024f",selText:"#fff",glass:"#262626",r:"2vh",tabs:"pill",focus:"ring",ring:"0 0 0 .4vh #fff",dot:"#c4024f",lay:"bar"},
  // ---- Amazon / Roku / Xiaomi ----
- {id:"firetv",g:"Amazon · Roku · Xiaomi",n:"Fire TV",bg:"linear-gradient(180deg,#13233b,#0a1424)",card:"#1d2f4a",sel:"#ff9900",selText:"#111",glass:"#18273e",r:"1vh",tabs:"underline",focus:"ring",ring:"0 0 0 .4vh #fff",accent:"#ff9900",dot:"#ff9900"},
- {id:"roku",g:"Amazon · Roku · Xiaomi",n:"Roku",bg:"linear-gradient(135deg,#3b0d63,#1c0533)",card:"#4a1a75",sel:"#fff",selText:"#4a0d6b",glass:"rgba(255,255,255,.1)",r:"1vh",tabs:"plain",focus:"ring",ring:"0 0 0 .45vh #fff",dot:"#6c2bd9"},
- {id:"patchwall",g:"Amazon · Roku · Xiaomi",n:"Xiaomi PatchWall",light:1,bg:"linear-gradient(180deg,#fafafa,#ececf0)",card:"#ffffff",sel:"#ff6900",selText:"#fff",glass:"rgba(0,0,0,.06)",r:"1.4vh",tabs:"underline",focus:"ring",ring:"0 0 0 .4vh #ff6900",accent:"#ff6900",dot:"#ff6900"},
+ {id:"firetv",g:"Amazon · Roku · Xiaomi",n:"Fire TV",bg:"linear-gradient(180deg,#13233b,#0a1424)",card:"#1d2f4a",sel:"#ff9900",selText:"#111",glass:"#18273e",r:"1vh",tabs:"underline",focus:"ring",ring:"0 0 0 .4vh #fff",accent:"#ff9900",dot:"#ff9900",lay:"grid"},
+ {id:"roku",g:"Amazon · Roku · Xiaomi",n:"Roku",bg:"linear-gradient(135deg,#3b0d63,#1c0533)",card:"#4a1a75",sel:"#fff",selText:"#4a0d6b",glass:"rgba(255,255,255,.1)",r:"1vh",tabs:"plain",focus:"ring",ring:"0 0 0 .45vh #fff",dot:"#6c2bd9",lay:"grid"},
+ {id:"patchwall",g:"Amazon · Roku · Xiaomi",n:"Xiaomi PatchWall",light:1,bg:"linear-gradient(180deg,#fafafa,#ececf0)",card:"#ffffff",sel:"#ff6900",selText:"#fff",glass:"rgba(0,0,0,.06)",r:"1.4vh",tabs:"underline",focus:"ring",ring:"0 0 0 .4vh #ff6900",accent:"#ff6900",dot:"#ff6900",lay:"poster"},
  // ---- Consoles & media centers ----
- {id:"xbox",g:"Consoles · Media centers",n:"Xbox",bg:"radial-gradient(circle at 75% 15%,#1d5a26,#0b0b0b 60%)",card:"#1f1f1f",sel:"#107c10",selText:"#fff",glass:"#1a1a1a",r:".3vh",tabs:"plain",focus:"ring",ring:"0 0 0 .45vh #fff",dot:"#107c10"},
- {id:"ps5",g:"Consoles · Media centers",n:"PlayStation 5",bg:"radial-gradient(circle at 70% -10%,#1d3f80,#05070f 65%)",card:"rgba(255,255,255,.08)",sel:"#fff",selText:"#000",glass:"rgba(255,255,255,.08)",r:"1.8vh",tabs:"plain",focus:"lift",ring:"0 0 0 .3vh #fff",dot:"#1d3f80"},
- {id:"wmc",g:"Consoles · Media centers",n:"Windows Media Center",bg:"radial-gradient(ellipse at 30% 20%,#2a7fd4,#062a5a 70%)",card:"linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.05))",sel:"#7cd651",selText:"#04210a",glass:"rgba(255,255,255,.1)",r:".6vh",tabs:"plain",focus:"glow",ring:"0 0 0 .3vh #b6ff8f",accent:"#7cd651",dot:"#2a7fd4"},
- {id:"plex",g:"Consoles · Media centers",n:"Plex",bg:"radial-gradient(ellipse at 75% 0,#3a3325 0,#1f1f1f 55%,#141414 100%)",card:"#2b2b2b",sel:"#e5a00d",selText:"#000",glass:"rgba(255,255,255,.07)",r:".5vh",tabs:"underline",focus:"ring",ring:"0 0 0 .35vh #e5a00d",accent:"#e5a00d",dot:"#e5a00d"},
- {id:"kodi",g:"Consoles · Media centers",n:"Kodi · Estuary",bg:"linear-gradient(135deg,#132835,#0a141b)",card:"#1b3442",sel:"#12a0c7",selText:"#fff",glass:"#16303d",r:".4vh",tabs:"plain",focus:"ring",ring:"0 0 0 .35vh #12a0c7",accent:"#12a0c7",dot:"#12a0c7"},
+ {id:"xbox",g:"Consoles · Media centers",n:"Xbox",bg:"radial-gradient(circle at 75% 15%,#1d5a26,#0b0b0b 60%)",card:"#1f1f1f",sel:"#107c10",selText:"#fff",glass:"#1a1a1a",r:".3vh",tabs:"plain",focus:"ring",ring:"0 0 0 .45vh #fff",dot:"#107c10",lay:"xbox"},
+ {id:"ps5",g:"Consoles · Media centers",n:"PlayStation 5",bg:"radial-gradient(circle at 70% -10%,#1d3f80,#05070f 65%)",card:"rgba(255,255,255,.08)",sel:"#fff",selText:"#000",glass:"rgba(255,255,255,.08)",r:"1.8vh",tabs:"plain",focus:"lift",ring:"0 0 0 .3vh #fff",dot:"#1d3f80",lay:"psrow"},
+ {id:"wmc",g:"Consoles · Media centers",n:"Windows Media Center",bg:"radial-gradient(ellipse at 30% 20%,#2a7fd4,#062a5a 70%)",card:"linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.05))",sel:"#7cd651",selText:"#04210a",glass:"rgba(255,255,255,.1)",r:".6vh",tabs:"plain",focus:"glow",ring:"0 0 0 .3vh #b6ff8f",accent:"#7cd651",dot:"#2a7fd4",lay:"sidelist"},
+ {id:"plex",g:"Consoles · Media centers",n:"Plex",bg:"radial-gradient(ellipse at 75% 0,#3a3325 0,#1f1f1f 55%,#141414 100%)",card:"#2b2b2b",sel:"#e5a00d",selText:"#000",glass:"rgba(255,255,255,.07)",r:".5vh",tabs:"underline",focus:"ring",ring:"0 0 0 .35vh #e5a00d",accent:"#e5a00d",dot:"#e5a00d",lay:"sidelist"},
+ {id:"kodi",g:"Consoles · Media centers",n:"Kodi · Estuary",bg:"linear-gradient(135deg,#132835,#0a141b)",card:"#1b3442",sel:"#12a0c7",selText:"#fff",glass:"#16303d",r:".4vh",tabs:"plain",focus:"ring",ring:"0 0 0 .35vh #12a0c7",accent:"#12a0c7",dot:"#12a0c7",lay:"sidelist"},
  // ---- Launcher originals ----
- {id:"classic",g:"Originals",n:"Classic",builtIn:1,dot:"#4f7cff"},
+ {id:"classic",g:"Originals",n:"Classic",builtIn:1,dot:"#4f7cff",lay:"grid"},
  {id:"light",g:"Originals",n:"Light",builtIn:1,light:1,dot:"#eeeeee"},
- {id:"neon",g:"Originals",n:"Neon",builtIn:1,dot:"#b14bff"},
+ {id:"neon",g:"Originals",n:"Neon",builtIn:1,dot:"#b14bff",lay:"psrow"},
  {id:"startpage",g:"Originals",n:"Start page · صفحة البداية",bg:"linear-gradient(110deg,#0d3b55 0%,#1d2a33 30%,#24262b 55%,#5a2f1a 85%,#7a3a17 100%)",card:"rgba(255,255,255,.06)",sel:"#e8eaed",selText:"#111",glass:"rgba(255,255,255,.07)",r:"1.6vh",tabs:"underline",focus:"ring",ring:"0 0 0 .3vh rgba(255,255,255,.85)",dot:"#7a3a17",startPage:1},
  {id:"dock",g:"Originals",n:"Dock · لوحات جانبية",bg:"radial-gradient(ellipse at 60% 30%,#16263f 0,#070b14 70%)",card:"rgba(20,24,36,.72)",sel:"#8b8cff",selText:"#fff",glass:"rgba(12,16,26,.62)",r:"1.6vh",tabs:"plain",focus:"ring",ring:"0 0 0 .35vh #fff",dot:"#8b8cff",dock:1},
- {id:"amoled",g:"Originals",n:"AMOLED Black",bg:"#000",card:"#0c0c0c",sel:"#fff",selText:"#000",glass:"#111",r:"1.4vh",tabs:"pill",focus:"ring",ring:"0 0 0 .3vh #fff",dot:"#000"},
- {id:"ramadan",g:"Originals",n:"رمضاني · Ramadan",bg:"radial-gradient(circle at 80% 10%,#16305c,#070d1e 65%)",card:"linear-gradient(160deg,#1b2b52,#0d1630)",sel:"#d9b25c",selText:"#1a1203",glass:"rgba(217,178,92,.12)",r:"1.6vh",tabs:"pill",focus:"glow",ring:"0 0 0 .3vh #d9b25c",accent:"#d9b25c",dot:"#d9b25c"},
+ {id:"amoled",g:"Originals",n:"AMOLED Black",bg:"#000",card:"#0c0c0c",sel:"#fff",selText:"#000",glass:"#111",r:"1.4vh",tabs:"pill",focus:"ring",ring:"0 0 0 .3vh #fff",dot:"#000",lay:"bar"},
+ {id:"ramadan",g:"Originals",n:"رمضاني · Ramadan",bg:"radial-gradient(circle at 80% 10%,#16305c,#070d1e 65%)",card:"linear-gradient(160deg,#1b2b52,#0d1630)",sel:"#d9b25c",selText:"#1a1203",glass:"rgba(217,178,92,.12)",r:"1.6vh",tabs:"pill",focus:"glow",ring:"0 0 0 .3vh #d9b25c",accent:"#d9b25c",dot:"#d9b25c",lay:"poster"},
  {id:"vidaa",g:"Hisense · Others",n:"Hisense VIDAA",bg:"linear-gradient(120deg,#1a0b3d 0%,#3a136e 45%,#7b1fa2 75%,#b0326e 100%)",card:"#ffffff",sel:"#fff",selText:"#3a136e",glass:"rgba(255,255,255,.1)",r:".5vh",tabs:"plain",focus:"ring",ring:"0 0 0 .35vh #fff",dot:"#7b1fa2",vidaa:1},
 ];
 function themeCss(t){
@@ -75,6 +75,48 @@ ${b} h2{color:#fff;font-weight:700;font-size:2.3vh;letter-spacing:.02em}
 ${b} .app{border:1px solid rgba(255,255,255,.06)}
 ${b} .app .nm{color:#bbb}${b} .app.focus .nm{color:#e5a00d}
 ${b} .btn.pri,${b} .it.sel{background:#e5a00d;color:#000}`;
+  if(t.lay==="gtv") c+=`
+${b}[data-page=home] #shelf{height:44vh}${b}[data-page=home] #shelfTitle{font-size:6.4vh;font-weight:500}
+${b}[data-page=home] #home .scroll{display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column}
+${b}[data-page=home] #home h2[data-row=recentRow]{-webkit-order:1;order:1}${b}[data-page=home] #recentRow{-webkit-order:2;order:2}${b}[data-page=home] #home h2[data-i18n=favorites]{-webkit-order:3;order:3}${b}[data-page=home] #favRow{-webkit-order:4;order:4}${b}[data-page=home] #watchRow,${b}[data-page=home] #folderRow,${b}[data-page=home] #matchRow,${b}[data-page=home] #favChRow,${b}[data-page=home] #quickRow,${b}[data-page=home] h2[data-row=watchRow],${b}[data-page=home] h2[data-row=folderRow],${b}[data-page=home] h2[data-row=matchRow],${b}[data-page=home] h2[data-row=favChRow],${b}[data-page=home] h2[data-row=quickRow],${b}[data-page=home] .dockx{-webkit-order:5;order:5}${b}[data-page=home] #home h2[data-row=watchRow],${b}[data-page=home] #watchRow{-webkit-order:6;order:6}${b}[data-page=home] #shelf{-webkit-order:0;order:0}${b}[data-page=home] #home .scroll>.row{margin-bottom:0}${b}[data-page=home] #home .scroll>*{-webkit-flex-shrink:0;flex-shrink:0}
+${b}[data-page=home] #home .row .app{width:calc(var(--tile,16vw) * .78)}`;
+  if(t.lay==="bar") c+=`
+${b}[data-page=home] #shelf{height:58vh;padding-bottom:4vh}${b}[data-page=home] #shelfTitle{font-size:8vh}
+${b}[data-page=home] #home .scroll>h2,${b}[data-page=home] #watchRow,${b}[data-page=home] #folderRow,${b}[data-page=home] #matchRow,${b}[data-page=home] #favChRow,${b}[data-page=home] #quickRow,${b}[data-page=home] #recentRow{display:none}
+${b}[data-page=home] #favRow{position:fixed;left:0;right:0;bottom:12vh;padding:2.4vh 4vw 3vh;background:linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,0));gap:1.2vw;z-index:5}
+${b}[data-page=home] #favRow .app{width:11.5vw;border-radius:1vh}${b}[data-page=home] #favRow .app .nm{opacity:1}`;
+  if(t.lay==="grid") c+=`
+${b}[data-page=home] #shelf{height:4vh}${b}[data-page=home] #shelfTitle,${b}[data-page=home] #shelfSub{display:none}
+${b}[data-page=home] #favRow{-webkit-flex-wrap:wrap;flex-wrap:wrap;overflow:visible;gap:2.6vh 1.6vw;padding-bottom:4vh}
+${b}[data-page=home] #favRow .app{width:20vw}${b}[data-page=home] #favRow .app .nm{opacity:1;position:static;margin-top:0}
+${b}[data-page=home] #favRow .app{-webkit-flex-direction:column;flex-direction:column}`;
+  if(t.lay==="xbox") c+=`
+${b}[data-page=home] #shelf{height:20vh}
+${b}[data-page=home] #favRow{-webkit-flex-wrap:wrap;flex-wrap:wrap;overflow:visible;gap:1vw;padding-bottom:3vh;max-height:52vh}
+${b}[data-page=home] #favRow .app{width:14vw;border-radius:.4vh}
+${b}[data-page=home] #favRow .app:first-child{width:29vw;height:calc(28vw * 9.6 / 16 + 1vw)}
+${b}[data-page=home] #favRow .app .nm{position:absolute;top:auto;bottom:.8vh;margin:0;opacity:1;font-size:1.5vh;text-shadow:0 .2vh .6vh #000}`;
+  if(t.lay==="psrow") c+=`
+${b}[data-page=home] #shelf{height:50vh;padding-top:22vh}${b}[data-page=home] #shelfTitle{font-size:6vh}
+${b}[data-page=home] #home h2[data-i18n=favorites]{display:none}
+${b}[data-page=home] #favRow{position:fixed;top:12vh;inset-inline-start:3vw;inset-inline-end:3vw;padding:1vh 1vw;gap:1vw;z-index:5;overflow:visible}
+${b}[data-page=home] #favRow .app{width:8.6vh!important;height:8.6vh!important;aspect-ratio:1/1;border-radius:1.6vh}
+${b}[data-page=home] #favRow .app.f.focus{width:15vh!important;height:15vh!important;transform:none}
+${b}[data-page=home] #favRow .app img{max-width:62%;max-height:62%}${b}[data-page=home] #favRow .app .nm{opacity:0}${b}[data-page=home] #favRow .app.focus .nm{opacity:1}`;
+  if(t.lay==="sidelist") c+=`
+${b}[data-page=home] #shelf{margin-inline-start:26vw;height:40vh}
+${b}[data-page=home] #home h2[data-i18n=favorites]{position:fixed;top:13vh;inset-inline-start:3vw;width:22vw;z-index:5;font-size:2.2vh;color:var(--text)}
+${b}[data-page=home] #favRow{position:fixed;top:18vh;inset-inline-start:3vw;width:22vw;bottom:6vh;display:block;overflow:hidden;padding:0;z-index:5}
+${b}[data-page=home] #favRow .app{width:100%!important;height:7.4vh!important;aspect-ratio:auto;margin-bottom:.9vh;-webkit-flex-direction:row;flex-direction:row;-webkit-justify-content:flex-start;justify-content:flex-start;padding:0 1vw}
+${b}[data-page=home] #favRow .app img{position:static!important;width:4.6vh!important;height:4.6vh!important;max-width:none;max-height:none;border-radius:1vh;object-fit:contain}
+${b}[data-page=home] #favRow .app .nm{position:static;opacity:1!important;margin:0 1vw;font-size:2vh;font-weight:600;text-align:start}
+${b}[data-page=home] #favRow .app.f.focus{transform:scale(1.04)}
+${b}[data-page=home] #home .scroll>h2:not([data-i18n=favorites]),${b}[data-page=home] #home .scroll>.row:not(#favRow){margin-inline-start:26vw}`;
+  if(t.lay==="poster") c+=`
+${b}[data-page=home] #shelf{height:30vh}
+${b}[data-page=home] #favRow .app{width:12vw;aspect-ratio:2/3;border-radius:1.2vh}
+${b}[data-page=home] #favRow .app img{max-width:64%;max-height:40%}
+${b}[data-page=home] #favRow .app .nm{opacity:1;top:auto;bottom:1.2vh;margin:0;position:absolute;font-weight:600}`;
   if(t.vidaa) c+=`
 ${b} #shade{background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(10,4,30,.75) 100%)}
 ${b} #favRow .app,${b} #recentRow .app{background:#fff;width:calc(var(--tile,16vw) * .78)}

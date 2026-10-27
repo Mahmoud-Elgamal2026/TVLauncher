@@ -38,11 +38,15 @@
         for(var j=0;j<els.length;j++){ var el=els[j]; if(el.__ar) continue; var wd=el.offsetWidth; if(wd) el.style.height=(wd/RATIOS[i][1])+"px" } }
       // .app.match must not be overwritten by the generic .app rule
       var ms=d.querySelectorAll(".app.match"); for(var k=0;k<ms.length;k++){ ms[k].style.height=(ms[k].offsetWidth/(16/7))+"px" }
+      // theme layouts with their own tile shapes (applied last so they win)
+      var SPEC=[['body[data-lay=poster][data-page=home] #favRow .app',2/3],['body[data-lay=grid][data-page=home] #favRow .app',16/9.6],['body[data-lay=bar][data-page=home] #favRow .app',16/9.6]];
+      for(var q=0;q<SPEC.length;q++){ var se=d.querySelectorAll(SPEC[q][0]); for(var z=0;z<se.length;z++){ if(se[z].offsetWidth) se[z].style.height=(se[z].offsetWidth/SPEC[q][1])+"px" } }
+      var xb=d.querySelector('body[data-lay=xbox][data-page=home] #favRow .app:first-child'); if(xb) xb.style.height="";
     };
     var later=function(){ if(!busy){ busy=true; setTimeout(fix,30) } };
     w.__fixAspect=later;
     d.addEventListener("DOMContentLoaded",function(){
-      new MutationObserver(later).observe(d.body,{childList:true,subtree:true,attributes:true,attributeFilter:["data-theme","data-size","class"]});
+      new MutationObserver(later).observe(d.body,{childList:true,subtree:true,attributes:true,attributeFilter:["data-theme","data-size","class","data-page","data-lay"]});
       w.addEventListener("resize",later); later();
     });
   }
