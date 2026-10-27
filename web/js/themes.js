@@ -35,8 +35,10 @@ const THEMES=[
  {id:"classic",g:"Originals",n:"Classic",builtIn:1,dot:"#4f7cff"},
  {id:"light",g:"Originals",n:"Light",builtIn:1,light:1,dot:"#eeeeee"},
  {id:"neon",g:"Originals",n:"Neon",builtIn:1,dot:"#b14bff"},
+ {id:"startpage",g:"Originals",n:"Start page · صفحة البداية",bg:"linear-gradient(110deg,#0d3b55 0%,#1d2a33 30%,#24262b 55%,#5a2f1a 85%,#7a3a17 100%)",card:"rgba(255,255,255,.06)",sel:"#e8eaed",selText:"#111",glass:"rgba(255,255,255,.07)",r:"1.6vh",tabs:"underline",focus:"ring",ring:"0 0 0 .3vh rgba(255,255,255,.85)",dot:"#7a3a17",startPage:1},
  {id:"amoled",g:"Originals",n:"AMOLED Black",bg:"#000",card:"#0c0c0c",sel:"#fff",selText:"#000",glass:"#111",r:"1.4vh",tabs:"pill",focus:"ring",ring:"0 0 0 .3vh #fff",dot:"#000"},
- {id:"ramadan",g:"Originals",n:"رمضاني · Ramadan",bg:"radial-gradient(circle at 80% 10%,#16305c,#070d1e 65%)",card:"linear-gradient(160deg,#1b2b52,#0d1630)",sel:"#d9b25c",selText:"#1a1203",glass:"rgba(217,178,92,.12)",r:"1.6vh",tabs:"pill",focus:"glow",ring:"0 0 0 .3vh #d9b25c",accent:"#d9b25c",dot:"#d9b25c"}
+ {id:"ramadan",g:"Originals",n:"رمضاني · Ramadan",bg:"radial-gradient(circle at 80% 10%,#16305c,#070d1e 65%)",card:"linear-gradient(160deg,#1b2b52,#0d1630)",sel:"#d9b25c",selText:"#1a1203",glass:"rgba(217,178,92,.12)",r:"1.6vh",tabs:"pill",focus:"glow",ring:"0 0 0 .3vh #d9b25c",accent:"#d9b25c",dot:"#d9b25c"},
+ {id:"vidaa",g:"Hisense · Others",n:"Hisense VIDAA",bg:"linear-gradient(120deg,#1a0b3d 0%,#3a136e 45%,#7b1fa2 75%,#b0326e 100%)",card:"#ffffff",sel:"#fff",selText:"#3a136e",glass:"rgba(255,255,255,.1)",r:".5vh",tabs:"plain",focus:"ring",ring:"0 0 0 .35vh #fff",dot:"#7b1fa2",vidaa:1},
 ];
 function themeCss(t){
   const b=`body[data-theme="${t.id}"]`;
@@ -72,6 +74,30 @@ ${b} h2{color:#fff;font-weight:700;font-size:2.3vh;letter-spacing:.02em}
 ${b} .app{border:1px solid rgba(255,255,255,.06)}
 ${b} .app .nm{color:#bbb}${b} .app.focus .nm{color:#e5a00d}
 ${b} .btn.pri,${b} .it.sel{background:#e5a00d;color:#000}`;
+  if(t.vidaa) c+=`
+${b} #shade{background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(10,4,30,.75) 100%)}
+${b} #favRow .app,${b} #recentRow .app{background:#fff;width:calc(var(--tile,16vw) * .78)}
+${b} #favRow .app .nm,${b} #recentRow .app .nm{color:#fff}
+${b} #shelfTitle{font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+${b} .tab.on{color:#fff!important}${b} h2{color:#fff}
+${b} .app .lbl{color:#3a136e;text-shadow:none}`;
+  if(t.startPage) c+=`
+${b} #shelfImg,${b} #shelfTitle,${b} #shelfSub{display:none}
+${b} #shade{background:transparent}
+${b} #shelf{height:24vh}
+${b} .top .clock{position:fixed;top:9vh;left:0;right:0;text-align:center;pointer-events:none;z-index:4}
+${b} .top .clock #time{font-size:9.5vh;font-weight:200;letter-spacing:-.02em;line-height:1}
+${b} .top .clock #date{font-size:1.8vh;opacity:.55;margin-top:1.2vh}
+${b} #home h2{text-align:center;color:#e8eaed;font-weight:600;font-size:1.9vh}
+${b} #home .row{-webkit-justify-content:center;justify-content:center;-webkit-flex-wrap:wrap;flex-wrap:wrap;overflow:visible;gap:2.2vh 1.6vw}
+${b} #home .row .app{width:8.4vh!important;height:8.4vh!important;aspect-ratio:1/1;border-radius:1.8vh;border:1px solid rgba(255,255,255,.08);margin-bottom:3.4vh}
+${b} #home .row .app img{max-width:52%;max-height:52%}
+${b} #home .row .app img.banner,${b} #home .row .app img.cover{border-radius:1.8vh}
+${b} #home .row .app .nm{opacity:.85!important;font-size:1.55vh;margin-top:.9vh}
+${b} #home .row .app .badge{display:none}
+${b} #home .row .app.f.focus{transform:scale(1.1);box-shadow:0 0 0 .3vh rgba(255,255,255,.85),0 1vh 2.4vh rgba(0,0,0,.5)}
+${b} #favRow .app:nth-child(7n+1),${b} #recentRow .app:nth-child(7n+1),${b} #folderRow .app:nth-child(7n+1){background:#0f3d33;border-color:#2ed3a055}${b} #favRow .app:nth-child(7n+2),${b} #recentRow .app:nth-child(7n+2),${b} #folderRow .app:nth-child(7n+2){background:#16294d;border-color:#5b8cff55}${b} #favRow .app:nth-child(7n+3),${b} #recentRow .app:nth-child(7n+3),${b} #folderRow .app:nth-child(7n+3){background:#2a2154;border-color:#a98bff55}${b} #favRow .app:nth-child(7n+4),${b} #recentRow .app:nth-child(7n+4),${b} #folderRow .app:nth-child(7n+4){background:#3d1a22;border-color:#ff6b8155}${b} #favRow .app:nth-child(7n+5),${b} #recentRow .app:nth-child(7n+5),${b} #folderRow .app:nth-child(7n+5){background:#3d2a14;border-color:#ffa94d55}${b} #favRow .app:nth-child(7n+6),${b} #recentRow .app:nth-child(7n+6),${b} #folderRow .app:nth-child(7n+6){background:#123842;border-color:#3cc8e655}${b} #favRow .app:nth-child(7n+7),${b} #recentRow .app:nth-child(7n+7),${b} #folderRow .app:nth-child(7n+7){background:#3a1838;border-color:#e66bd155}
+${b} .tabs{background:transparent}`;
   if(t.roundApps) c+=`
 ${b} .tab{border-radius:99px;padding:.8vh 1.4vw}${b} .tab.on{background:rgba(255,255,255,.14)!important;color:#fff}
 ${b} .tab.f.focus{background:#e8eaed!important;color:#202124!important}
