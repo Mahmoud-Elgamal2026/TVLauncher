@@ -103,7 +103,7 @@ function renderHome() {
   }).filter(Boolean);
   setRow("quickRow", q.map(tile).join(""));
   setRow("recentRow", S.recent.map(byPkg).filter((a) => a && !isHidden(a.pkg) && allowed(a.pkg)).map(tile).join(""));
-  $("appGrid").innerHTML = visibleApps().map(tile).join("");
+  $("appGrid").innerHTML = visibleApps().slice().sort((a, b) => appName(a).localeCompare(appName(b))).map(tile).join("");
   if (focused && !document.body.contains(focused)) focused = null;
 }
 function launch(pkg) {
