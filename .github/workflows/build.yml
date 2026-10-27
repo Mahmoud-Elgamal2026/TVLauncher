@@ -21,8 +21,19 @@ jobs:
       - name: Restore signing key
         env: { KEYSTORE_B64: "${{ secrets.KEYSTORE_B64 }}" }
         run: if [ -n "$KEYSTORE_B64" ]; then echo "$KEYSTORE_B64" | base64 -d > app/tvlauncher.jks; fi
-      - run: gradle assembleRelease --no-daemon
+      - name: Build APK
+        shell: bash
         env: { KEYSTORE_PASS: "${{ secrets.KEYSTORE_PASS }}" }
+        run: |
+          set -o pipefail
+          gradle assembleRelease --no-daemon --stacktrace 2>&1 | tee build.log
+      # Surface the real Gradle error as an annotation (readable from the run summary / API)
+      - name: Report build error
+        if: failure()
+        shell: bash
+        run: |
+          msg=$(grep -E -A12 "What went wrong|error:|e: |ERROR:|AAPT|Execution failed|Could not resolve|Cannot|Failed to" build.log | grep -v "^\s*at " | head -70 | sed ':a;N;$!ba;s/%/%25/g;s/\r//g;s/\n/%0A/g')
+          echo "::error title=Gradle::${msg}"
       - run: cp app/build/outputs/apk/release/app-release.apk TVLauncher-v${{ github.run_number }}.apk
       - uses: actions/upload-artifact@v4
         with: { name: TVLauncher-apk, path: TVLauncher-v*.apk }
