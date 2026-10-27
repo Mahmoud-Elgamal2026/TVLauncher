@@ -606,6 +606,35 @@ public class MainActivity extends Activity {
             }).start();
         }
 
+
+        /** Follows redirects (Downloader-style short codes) and reports {url,type,apk}. */
+        @JavascriptInterface
+        public void resolveUrl(final String url, final String id) {
+            new Thread(() -> {
+                HttpURLConnection c = null;
+                try {
+                    URL u = new URL(url);
+                    for (int hop = 0; hop < 8; hop++) {
+                        c = (HttpURLConnection) u.openConnection();
+                        c.setInstanceFollowRedirects(false);
+                        c.setConnectTimeout(12000); c.setReadTimeout(15000);
+                        c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android TV) TVLauncher");
+                        int code = c.getResponseCode();
+                        String loc = c.getHeaderField("Location");
+                        if (code >= 300 && code < 400 && loc != null) { u = new URL(u, loc); c.disconnect(); continue; }
+                        break;
+                    }
+                    String type = c == null ? "" : String.valueOf(c.getContentType());
+                    String disp = c == null ? "" : String.valueOf(c.getHeaderField("Content-Disposition"));
+                    String fu = u.toString();
+                    boolean apk = type.contains("android.package-archive") || fu.toLowerCase(Locale.US).matches(".*\\.apk([?#].*)?$") || disp.toLowerCase(Locale.US).contains(".apk");
+                    JSONObject o = new JSONObject(); o.put("url", fu); o.put("type", type); o.put("apk", apk);
+                    callback(id, true, o.toString());
+                } catch (Throwable t) { callback(id, false, String.valueOf(t.getMessage())); }
+                finally { if (c != null) c.disconnect(); }
+            }).start();
+        }
+
         @JavascriptInterface
         public void installUpdate(String url) { installApk(url, "update"); }
 

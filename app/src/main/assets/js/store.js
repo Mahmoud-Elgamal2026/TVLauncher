@@ -125,13 +125,20 @@ function storeCard(app) {
     <span class="sbadge${st.upd ? " upd" : st.inst ? " ok" : ""}">${st.upd ? "⬆️ " : st.inst ? "✓ " : ""}${esc(st.label)}</span></div>`;
 }
 function renderStore() {
-  const tools = [["boost", "✨", "stBoost"], ["clean", "🧽", "stClean"], ["sys", "🧹", "stSystem"], ["ram", "⚡", "stRam"], ["link", "🔗", "stLink"], ["custom", "📚", "stCustom"]];
+  const tools = [["boost", "✨", "stBoost"], ["clean", "🧽", "stClean"], ["sys", "🧹", "stSystem"], ["ram", "⚡", "stRam"], ["code", "🔢", "stCode"], ["link", "🔗", "stLink"], ["custom", "📚", "stCustom"]];
   $("storeCats").innerHTML = STORE_CATS.map(([k, i, l]) => `<div class="it f${storeCat === k ? " sel" : ""}" tabindex="0" data-scat="${k}">${i} ${L(l)}</div>`).join("") + `<div class="cath">${L("stTools2")}</div>` + tools.map(([k, i, l]) => `<div class="it f${storeCat === k ? " sel" : ""}" tabindex="0" data-scat="${k}">${i} ${L(l)}</div>`).join("");
   const box = $("storeMain");
   if (storeCat === "sys") return renderSysApps();
   if (storeCat === "ram") return renderRam();
   if (storeCat === "clean") return renderClean();
   if (storeCat === "boost") return renderBoost();
+  if (storeCat === "code") {
+    const mc = S.myCodes || [];
+    box.innerHTML = `<div class="sec"><h3>🔢 ${L("stCode")}</h3><div class="field"><label>${L("stCodeHint")}</label>${inputRow("codeIn", "", "12345", "codeGo", L("stInstall"))}</div><div id="dlState" class="field"></div></div>
+    <div class="sec"><h3>⭐ ${L("myCodes")}</h3><div class="field"><label>${L("myCodesHint")}</label><div class="inline"><input class="inp f" id="mcNum" placeholder="${L("codeNum")}" style="width:10vw"><input class="inp f" id="mcUrl" placeholder="https://..." dir="ltr" style="flex:1"><input class="inp f" id="mcName" placeholder="${L("codeName")}" style="width:14vw"><button class="btn pri f" id="mcAdd">${L("save")}</button></div></div>
+    ${mc.length ? `<div class="list">${mc.map((c, i) => `<div class="inline" style="margin-bottom:.8vh"><button class="btn f" data-mc="${i}" style="flex:1;text-align:start"><b dir="ltr">${esc(c.n)}</b> · ${esc(c.name || c.url)}</button><button class="btn f" data-mcdel="${i}">🗑</button></div>`).join("")}</div>` : ""}</div>`;
+    return;
+  }
   if (storeCat === "link") {
     box.innerHTML = `<div class="sec"><h3>🔗 ${L("stLink")}</h3><div class="field"><label>${L("stLinkHint")}</label>${inputRow("apkUrl", "", "https://.../app.apk", "apkGo", L("stInstall"))}</div><div id="dlState" class="field"></div></div>`;
     return;
@@ -579,6 +586,20 @@ activators.push((el) => {
     return true;
   }
   switch (el.id) {
+    case "codeGo":
+      goCode(($("codeIn").value || "").trim());
+      return true;
+    case "mcAdd": {
+      const n = ($("mcNum").value || "").trim(), u = ($("mcUrl").value || "").trim(), nm = ($("mcName").value || "").trim();
+      if (!n || !/^https?:\/\//.test(u)) {
+        A.toast(L("codeBad"));
+        return true;
+      }
+      S.myCodes = (S.myCodes || []).filter((c) => c.n !== n).concat([{ n, url: u, name: nm }]);
+      renderStore();
+      A.toast(L("saved"));
+      return true;
+    }
     case "apkGo": {
       const u = ($("apkUrl").value || "").trim();
       if (u) installFrom(u.split("/").pop() || "APK", u);
@@ -731,3 +752,50 @@ quickSettings = function() {
   g.innerHTML = items.map((it, i) => `<button class="btn f${it.pri ? " pri" : ""}" data-di="${i}">${it.icon ? `<b>${esc(it.icon)}</b>` : ""}${esc(it.label)}</button>`).join("");
   focus(g.querySelector(".f"));
 };
+DEF.myCodes = [];
+function goCode(code) {
+  return __async(this, null, function* () {
+    if (!code) {
+      return;
+    }
+    const d = $("dlState");
+    const mine = (S.myCodes || []).find((c) => c.n === code);
+    let url = mine ? mine.url : /^https?:\/\//.test(code) ? code : /^[0-9]{3,8}$/.test(code) ? "https://aftv.news/" + code : null;
+    if (!url) {
+      A.toast(L("codeBad"));
+      return;
+    }
+    if (d) d.textContent = "🔎 " + L("codeLooking");
+    if (!NA) {
+      A.toast(url);
+      return;
+    }
+    try {
+      const r = JSON.parse(yield natAsync("resolveUrl", url));
+      if (r.apk) {
+        installFrom(mine && mine.name || code, r.url);
+      } else {
+        if (d) d.textContent = "🌐 " + r.url;
+        nat("openUri", r.url);
+      }
+    } catch (e) {
+      if (d) d.textContent = "";
+      A.toast(L("codeNotFound"));
+    }
+  });
+}
+activators.push((el) => {
+  if (el.dataset && el.dataset.mc != null) {
+    const c = S.myCodes[+el.dataset.mc];
+    if (c) goCode(c.n);
+    return true;
+  }
+  if (el.dataset && el.dataset.mcdel != null) {
+    const a = S.myCodes.slice();
+    a.splice(+el.dataset.mcdel, 1);
+    S.myCodes = a;
+    renderStore();
+    return true;
+  }
+  return false;
+});
