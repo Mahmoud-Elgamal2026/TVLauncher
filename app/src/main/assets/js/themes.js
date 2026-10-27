@@ -109,7 +109,7 @@ ${b}[data-page=home] #favRow{position:fixed;top:18vh;inset-inline-start:3vw;widt
 ${b}[data-page=home] #favRow .app{width:100%!important;height:7.4vh!important;aspect-ratio:auto;margin-bottom:.9vh;-webkit-flex-direction:row;flex-direction:row;-webkit-justify-content:flex-start;justify-content:flex-start;padding:0 1vw}
 ${b}[data-page=home] #favRow .app img{position:static!important;width:4.6vh!important;height:4.6vh!important;max-width:none;max-height:none;border-radius:1vh;object-fit:contain}
 ${b}[data-page=home] #favRow .app .nm{position:static;opacity:1!important;margin:0 1vw;font-size:2vh;font-weight:600;text-align:start}
-${b}[data-page=home] #favRow .app.f.focus{transform:scale(1.04)}
+${b}[data-page=home] #favRow .app.f.focus{transform:scale(1.04);background:var(--sel)!important}${b}[data-page=home] #favRow .app.focus .nm{color:var(--selText)!important}
 ${b}[data-page=home] #home .scroll>h2:not([data-i18n=favorites]),${b}[data-page=home] #home .scroll>.row:not(#favRow){margin-inline-start:26vw}`;
   if (t.lay === "poster") c += `
 ${b}[data-page=home] #shelf{height:30vh}
