@@ -461,3 +461,17 @@ html.nogrid .chrow>:nth-child(3),html.nogrid .sysrow>:nth-child(2){-webkit-flex:
 html.nogrid .sysrow>:nth-child(1){width:2vh;-webkit-flex:none;flex:none}
 html.nogrid .sysrow>:nth-child(4){width:8vw;-webkit-flex:none;flex:none}
 html.nogrid .pv video{width:100%;height:100%}
+
+/* no backdrop-filter (old WebView): use solid panels instead of see-through ones */
+html.nobf .tabs{background:rgba(30,30,38,.92)}
+html.nobf .btn{background:rgba(255,255,255,.14)}
+html.nobf .overlay{background:rgba(0,0,0,.82)}
+html.nobf .mbox{background:rgba(40,40,48,.97)}
+html.nobf #search{background:rgba(0,0,0,.94)}
+html.nobf #pInfo{background:rgba(16,16,22,.94)}
+.wgrid{width:62vw;display:grid;grid-template-columns:repeat(4,1fr);grid-gap:1.4vh 1vw;gap:1.4vh 1vw;max-height:62vh;overflow:auto;padding:1vh .4vw}
+html.nogrid .wgrid{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap}
+html.nogrid .wgrid>*{width:calc(25% - 1vw);margin:0 .5vw 1.4vh}
+.wthumb{padding:0;height:13vh;overflow:hidden;border-radius:1.2vh}
+.wthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.wmore{display:flex;align-items:center;justify-content:center;font-weight:700}

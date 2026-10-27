@@ -62,6 +62,11 @@
   } catch (e) {
   }
   try {
+    if (!(w.CSS && CSS.supports && (CSS.supports("backdrop-filter", "blur(1px)") || CSS.supports("-webkit-backdrop-filter", "blur(1px)")))) d.documentElement.className += " nobf";
+  } catch (e) {
+    d.documentElement.className += " nobf";
+  }
+  try {
     var gt = d.createElement("div");
     gt.style.display = "grid";
     if (gt.style.display !== "grid") d.documentElement.className += " nogrid";

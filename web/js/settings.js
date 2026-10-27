@@ -15,7 +15,7 @@ function renderSettings(){
     field(L("language"),seg("lang",[["ar","العربية"],["en","English"]]))+
     field(L("theme"),themePicker())+
     field(L("size"),seg("size",[["s",L("small")],["m",L("medium")],["l",L("large")]]))+
-    field(L("wallpaper"),seg("wall",[["dynamic",L("wDynamic")],["daily",L("wDaily")]]).replace("</div>",`<button class="btn f${S.wall==="image"?" pri":""}" id="wallPick">${L("wPick")}</button></div>`)+
+    field(L("wallpaper"),seg("wall",[["dynamic",L("wDynamic")],["daily",L("wDaily")]]).replace("</div>",`<button class="btn f${S.wall==="image"?" pri":""}" id="wallPick">${L("wPick")}</button><button class="btn f" id="wall4k">🖼 ${L("w4k")}</button></div>`)+
       `<div style="margin-top:1.2vh">${inputRow("wallUrl",S.wallImg&&!S.wallImg.startsWith("data:")?S.wallImg:"",L("wUrl"),"wallUrlSave")}</div>`)+
     field(L("hour"),seg("h24",[[0,"12h"],[1,"24h"]]))+
     field(L("perf"),seg("lite",[[0,L("perfFull")],[1,L("perfLite")]]))+

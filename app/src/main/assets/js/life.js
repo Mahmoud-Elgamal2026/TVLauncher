@@ -487,3 +487,87 @@ weather = function() {
     loadForecast();
   });
 };
+DEF.wallAuto = "";
+const WALL_CATS = () => [["bing", "🌍", L("wBing")], ["nature", "🌳", L("wNature")], ["space", "🌌", L("wSpace")], ["city", "🏙", L("wCity")], ["mountains", "🏔", L("wMount")], ["ocean", "🌊", L("wSea")], ["cars", "🚗", L("wCars")], ["minimalism", "◻️", L("wMinimal")], ["islamic architecture", "🕌", L("wMosque")]];
+function wallMenu() {
+  const items = [{ icon: "🔄", label: L("wBingAuto") + (S.wallAuto === "bing" ? " ✓" : ""), pri: S.wallAuto === "bing" ? 1 : 0, fn: () => {
+    S.wallAuto = "bing";
+    bingToday(true);
+  } }].concat(WALL_CATS().map((c) => ({ icon: c[1], label: c[2], fn: () => setTimeout(() => wallBrowse(c[0], c[2], 1), 30) })));
+  dialog("🖼 " + L("w4k"), items, { grid: 3 });
+}
+function wallList(src, page) {
+  return __async(this, null, function* () {
+    if (src === "bing") {
+      const out = [];
+      for (const idx of [0, 7]) {
+        try {
+          const r2 = yield A.fetchJSON(`https://www.bing.com/HPImageArchive.aspx?format=js&idx=${idx}&n=8&mkt=en-US`);
+          (r2.images || []).forEach((i) => out.push({ full: "https://www.bing.com" + i.urlbase + "_UHD.jpg", thumb: "https://www.bing.com" + i.urlbase + "_400x240.jpg" }));
+        } catch (e) {
+        }
+      }
+      const seen = {};
+      return out.filter((x) => !seen[x.full] && (seen[x.full] = 1));
+    }
+    const r = yield A.fetchJSON(`https://wallhaven.cc/api/v1/search?q=${encodeURIComponent(src)}&categories=100&purity=100&atleast=3840x2160&ratios=16x9&sorting=toplist&page=${page}`);
+    return (r.data || []).map((d) => ({ full: d.path, thumb: d.thumbs && (d.thumbs.small || d.thumbs.original) }));
+  });
+}
+function wallBrowse(src, name, page) {
+  return __async(this, null, function* () {
+    banner("🖼", L("w4k"), "...", 2500);
+    let list = [];
+    try {
+      list = yield wallList(src, page);
+    } catch (e) {
+    }
+    if (!list.length) {
+      A.toast(L("loadErr"));
+      return;
+    }
+    const items = list.map((w) => ({ fn: () => {
+      S.wallAuto = "";
+      S.wallImg = w.full;
+      S.wall = "image";
+      applyLook();
+      if (window.renderSettings) renderSettings();
+      A.toast(L("saved"));
+    } }));
+    const more = src !== "bing";
+    if (more) items.push({ fn: () => setTimeout(() => wallBrowse(src, name, page + 1), 30) });
+    dialog("🖼 " + name + " · 4K", items, { html: `<div class="wgrid">${list.map((w, i) => `<button class="btn f wthumb" data-di="${i}"><img src="${esc(w.thumb)}" alt=""></button>`).join("")}${more ? `<button class="btn f wthumb wmore" data-di="${list.length}">${esc(L("more"))} ›</button>` : ""}</div>` });
+  });
+}
+function bingToday(force) {
+  return __async(this, null, function* () {
+    if (S.wallAuto !== "bing") return;
+    const d = (/* @__PURE__ */ new Date()).toDateString();
+    if (!force && S.wallDay === d) return;
+    try {
+      const r = yield A.fetchJSON("https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US");
+      const i = r.images && r.images[0];
+      if (i) {
+        S.wallImg = "https://www.bing.com" + i.urlbase + "_UHD.jpg";
+        S.wall = "image";
+        S.wallDay = d;
+        applyLook();
+        if (force) {
+          if (window.renderSettings) renderSettings();
+          A.toast(L("saved"));
+        }
+      }
+    } catch (e) {
+      if (force) A.toast(L("loadErr"));
+    }
+  });
+}
+setTimeout(() => bingToday(false), 4e3);
+setInterval(() => bingToday(false), 36e5);
+activators.push((el) => {
+  if (el.id === "wall4k") {
+    wallMenu();
+    return true;
+  }
+  return false;
+});

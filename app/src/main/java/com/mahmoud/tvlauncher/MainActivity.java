@@ -885,6 +885,133 @@ public class MainActivity extends Activity {
             });
         }
 
+
+        // ---------- network ----------
+        @JavascriptInterface
+        public void fetchText(final String url, final String id) {
+            new Thread(() -> {
+                try { callback(id, true, readAll(url)); }
+                catch (Throwable t) {
+                    if (url != null && url.startsWith("https://")) {
+                        try { callback(id, true, readAll("http://" + url.substring(8))); return; } catch (Throwable ignored) {}
+                    }
+                    callback(id, false, String.valueOf(t.getMessage()));
+                }
+            }).start();
+        }
+
+        @JavascriptInterface
+        public void fetchEpg(final String url, final String id) {
+            new Thread(() -> {
+                try (InputStream in = open(url)) {
+                    SimpleDateFormat z = new SimpleDateFormat("yyyyMMddHHmmss Z", Locale.US);
+                    SimpleDateFormat pl = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
+                    long now = System.currentTimeMillis(), min = now - 7L * 86400000, max = now + 2L * 86400000;
+                    org.xmlpull.v1.XmlPullParser x = android.util.Xml.newPullParser();
+                    x.setInput(in, null);
+                    JSONObject out = new JSONObject();
+                    String ch = null; long st = 0, en = 0; boolean inTitle = false; String title = null;
+                    for (int ev = x.getEventType(); ev != org.xmlpull.v1.XmlPullParser.END_DOCUMENT; ev = x.next()) {
+                        if (ev == org.xmlpull.v1.XmlPullParser.START_TAG) {
+                            String n = x.getName();
+                            if ("programme".equals(n)) {
+                                ch = x.getAttributeValue(null, "channel");
+                                st = parse(String.valueOf(x.getAttributeValue(null, "start")), z, pl);
+                                en = parse(String.valueOf(x.getAttributeValue(null, "stop")), z, pl);
+                                title = null;
+                            } else if ("title".equals(n) && ch != null && title == null) inTitle = true;
+                        } else if (ev == org.xmlpull.v1.XmlPullParser.TEXT && inTitle) {
+                            title = x.getText(); inTitle = false;
+                        } else if (ev == org.xmlpull.v1.XmlPullParser.END_TAG && "programme".equals(x.getName())) {
+                            if (ch != null && en > min && st < max) {
+                                JSONArray l = out.optJSONArray(ch); if (l == null) { l = new JSONArray(); out.put(ch, l); }
+                                l.put(new JSONArray().put(st).put(en).put(title == null ? "" : unescape(title)));
+                            }
+                            ch = null;
+                        }
+                    }
+                    callback(id, true, out.toString());
+                } catch (Throwable t) { callback(id, false, String.valueOf(t.getMessage())); }
+            }).start();
+        }
+
+        @JavascriptInterface
+        public void checkStreams(final String urlsJson, final String id) {
+            new Thread(() -> {
+                try {
+                    final JSONArray a = new JSONArray(urlsJson);
+                    final int n = a.length();
+                    final JSONObject out = new JSONObject();
+                    final AtomicInteger done = new AtomicInteger();
+                    ExecutorService pool = Executors.newFixedThreadPool(12);
+                    for (int i = 0; i < n; i++) {
+                        final String u = a.getString(i);
+                        pool.execute(() -> {
+                            boolean ok = probe(u);
+                            synchronized (out) { try { out.put(u, ok); } catch (Exception ignored) {} }
+                            int d = done.incrementAndGet();
+                            if (d % 25 == 0 || d == n) js("window.onCheckProgress&&onCheckProgress(" + d + "," + n + ")");
+                        });
+                    }
+                    pool.shutdown();
+                    pool.awaitTermination(30, java.util.concurrent.TimeUnit.MINUTES);
+                    callback(id, true, out.toString());
+                } catch (Throwable t) { callback(id, false, String.valueOf(t.getMessage())); }
+            }).start();
+        }
+
+        // ---------- backup ----------
+        @JavascriptInterface
+        public void exportBackup(final String json) {
+            pendingExport = json;
+            ui.post(() -> {
+                try {
+                    Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
+                        .setType("application/json").putExtra(Intent.EXTRA_TITLE, "tvlauncher-backup.json");
+                    startActivityForResult(i, REQ_EXPORT);
+                } catch (Throwable t) {
+                    try {
+                        File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "tvlauncher-backup.json");
+                        try (OutputStream o = new java.io.FileOutputStream(f)) { o.write(json.getBytes("UTF-8")); }
+                        pendingExport = null;
+                        js("window.onBackupDone&&onBackupDone(true)");
+                    } catch (Throwable t2) { js("window.A&&A.toast('Error')"); }
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void importBackup() {
+            ui.post(() -> {
+                try {
+                    Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");
+                    startActivityForResult(i, REQ_IMPORT);
+                } catch (Throwable t) {
+                    try {
+                        File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "tvlauncher-backup.json");
+                        StringBuilder sb = new StringBuilder();
+                        try (BufferedReader r = new BufferedReader(new InputStreamReader(new java.io.FileInputStream(f), "UTF-8"))) { String l; while ((l = r.readLine()) != null) sb.append(l).append('\n'); }
+                        js("window.onBackupLoaded&&onBackupLoaded(" + JSONObject.quote(sb.toString()) + ")");
+                    } catch (Throwable t2) { js("window.A&&A.toast('Error')"); }
+                }
+            });
+        }
+
+        // ---------- notification access ----------
+        @JavascriptInterface
+        public boolean notifAccess() {
+            String s = Settings.Secure.getString(getContentResolver(), "enabled_notification_listeners");
+            return s != null && s.contains(getPackageName());
+        }
+
+        @JavascriptInterface
+        public void openNotifAccess() {
+            ui.post(() -> {
+                try { startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); }
+                catch (Throwable t) { Toast.makeText(MainActivity.this, "Not supported on this device", Toast.LENGTH_LONG).show(); }
+            });
+        }
+
         /** Runs a pm/am command through Shizuku; answers {code,out} via window.__cb. Only pm and am are allowed. */
         @JavascriptInterface
         public void shell(String cmd, String id) {
@@ -908,6 +1035,14 @@ public class MainActivity extends Activity {
                     callback(id, false, String.valueOf(cause.getMessage()));
                 }
             }).start();
+        }
+    }
+
+    private static String readAll(String url) throws Exception {
+        try (InputStream in = open(url)) {
+            ByteArrayOutputStream b = new ByteArrayOutputStream(); byte[] buf = new byte[16384]; int r;
+            while ((r = in.read(buf)) > 0) b.write(buf, 0, r);
+            return b.toString("UTF-8");
         }
     }
 

@@ -327,7 +327,19 @@ function play(c) {
   const liveCfg = isLive(c) ? { liveDurationInfinity: true, liveSyncDurationCount: 3, liveMaxLatencyDurationCount: 1e5, maxBufferSize: 6e7 } : { maxBufferLength: 40 };
   hls = attach(v, c.url, hls, liveCfg);
   hls = hls || null;
-  if (!hls) v.onerror = () => A.toast(L("playErr"));
+  let failed = false;
+  const fail = () => {
+    if (failed || playing !== c) return;
+    failed = true;
+    dialog("⚠️ " + L("playErr"), [{ icon: "↗", label: L("external"), pri: 1, fn: () => {
+      A.playExternal(c.url);
+    } }, { icon: "🔄", label: L("retry"), fn: () => play(c) }]);
+  };
+  if (!hls) v.onerror = fail;
+  clearTimeout(window.__pwd);
+  window.__pwd = setTimeout(() => {
+    if (playing === c && v.readyState < 2 && !v.paused) fail();
+  }, 15e3);
   const w = S.watch.find((x) => x.key === "url:" + c.url);
   v.onloadedmetadata = () => {
     if (w && w.pos > 20 && isFinite(v.duration) && w.pos < v.duration - 30) {

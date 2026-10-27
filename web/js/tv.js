@@ -162,7 +162,10 @@ function play(c){
   const v=$("video"); $("player").classList.add("on"); $("plist").classList.remove("on"); applyAspect(); v.playbackRate=1; showInfo();
   const liveCfg=isLive(c)?{liveDurationInfinity:true,liveSyncDurationCount:3,liveMaxLatencyDurationCount:100000,maxBufferSize:60e6}:{maxBufferLength:40};
   hls=attach(v,c.url,hls,liveCfg); hls=hls||null;
-  if(!hls) v.onerror=()=>A.toast(L("playErr"));
+  let failed=false; const fail=()=>{ if(failed||playing!==c) return; failed=true;
+    dialog("⚠️ "+L("playErr"),[{icon:"↗",label:L("external"),pri:1,fn:()=>{ A.playExternal(c.url) }},{icon:"🔄",label:L("retry"),fn:()=>play(c)}]) };
+  if(!hls) v.onerror=fail;
+  clearTimeout(window.__pwd); window.__pwd=setTimeout(()=>{ if(playing===c&&v.readyState<2&&!v.paused) fail() },15000);
   const w=S.watch.find(x=>x.key==="url:"+c.url);
   v.onloadedmetadata=()=>{ if(w&&w.pos>20&&isFinite(v.duration)&&w.pos<v.duration-30){ v.currentTime=w.pos; banner("⏯️",L("resumed")+" "+fmtDur(w.pos)) } };
   v.ontimeupdate=()=>{
