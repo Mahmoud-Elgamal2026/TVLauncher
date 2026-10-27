@@ -85,7 +85,10 @@
           var el = els[j];
           if (el.__ar) continue;
           var wd = el.offsetWidth;
-          if (wd) el.style.height = wd / RATIOS[i][1] + "px";
+          if (wd && el.__w !== wd + "/" + RATIOS[i][1]) {
+            el.__w = wd + "/" + RATIOS[i][1];
+            el.style.height = wd / RATIOS[i][1] + "px";
+          }
         }
       }
       var ms = d.querySelectorAll(".app.match");
@@ -110,7 +113,8 @@
     };
     w.__fixAspect = later;
     d.addEventListener("DOMContentLoaded", function() {
-      new MutationObserver(later).observe(d.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-theme", "data-size", "class", "data-page", "data-lay"] });
+      new MutationObserver(later).observe(d.body, { childList: true, subtree: true });
+      new MutationObserver(later).observe(d.body, { attributes: true, attributeFilter: ["data-theme", "data-size", "data-page", "data-lay"] });
       w.addEventListener("resize", later);
       later();
     });
