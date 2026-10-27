@@ -24,11 +24,13 @@
     f.parentNode.removeChild(f);
   }catch(e){}
 
+  // ---- CSS grid arrived in Chrome 57: fall back to flex-wrap ----
+  try{ var gt=d.createElement("div"); gt.style.display="grid"; if(gt.style.display!=="grid") d.documentElement.className+=" nogrid" }catch(e){}
   // ---- `aspect-ratio` arrived in Chrome 88: size cards from their width ----
   var hasAR=w.CSS&&CSS.supports&&CSS.supports("aspect-ratio","1 / 1");
   if(!hasAR){
     d.documentElement.className+=" noar";
-    var RATIOS=[[".app.match",16/7],[".app",16/9.6],[".chgrid .it",16/10],[".pv",16/9],[".poster",2/3],["#dPoster",2/3],[".fgrid",1.6],[".ep img",16/9],[".ep .epn",16/9],[".sico",1]];
+    var RATIOS=[[".app.match",16/7],["#apps .app",1/0.9],[".app",16/9.6],[".chgrid .it",16/10],[".pv",16/9],[".poster",2/3],["#dPoster",2/3],[".fgrid",1.6],[".ep img",16/9],[".ep .epn",16/9],[".sico",1]];
     var busy=false;
     var fix=function(){ busy=false;
       for(var i=0;i<RATIOS.length;i++){ var els=d.querySelectorAll(RATIOS[i][0]);

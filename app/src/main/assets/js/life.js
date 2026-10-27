@@ -90,37 +90,56 @@ function imsakiya() {
     <div class="dlist"><button class="btn pri f" data-di="0">${L("done")}</button></div>` });
 }
 let radioAudio = null, radios = [];
+const RB = "https://backup.qurango.net/radio/";
+const RADIO_FB = [["مشاري العفاسي", "mishary_alafasi"], ["محمود خليل الحصري", "mahmoud_khalil_alhussary"], ["الحصري مجود", "mahmoud_khalil_alhussary_mojawwad"], ["عبدالباسط عبدالصمد", "abdulbasit_abdulsamad"], ["عبدالباسط مجود", "abdulbasit_abdulsamad_mojawwad"], ["المنشاوي", "mohammed_siddiq_alminshawi"], ["المنشاوي مجود", "mohammed_siddiq_alminshawi_mojawwad"], ["محمد الطبلاوي", "mohammad_altablaway"], ["ماهر المعيقلي", "maher"], ["عبدالرحمن السديس", "abdulrahman_alsudaes"], ["سعود الشريم", "saud_alshuraim"], ["ياسر الدوسري", "yasser_aldosari"], ["سعد الغامدي", "saad_alghamdi"], ["أحمد العجمي", "ahmad_alajmy"], ["أحمد نعينع", "ahmad_nauina"], ["تلاوات خاشعة", "salma"], ["تفسير القرآن", "tafseer"], ["المختصر في التفسير", "mukhtasartafsir"], ["الرقية الشرعية", "roqiah"], ["أذكار الصباح", "athkar_sabah"], ["أذكار المساء", "athkar_masa"]].map((x) => ({ name: x[0], url: RB + x[1] }));
 function radioMenu() {
   return __async(this, null, function* () {
-    try {
-      if (!radios.length) {
+    if (!radios.length) {
+      try {
         const r = yield A.fetchJSON(`https://mp3quran.net/api/v3/radios?language=${S.lang === "ar" ? "ar" : "eng"}`);
         radios = (r.radios || []).map((x) => ({ name: x.name, url: x.url }));
+      } catch (e) {
       }
-    } catch (e) {
-      A.toast(L("loadErr"));
-      return;
     }
     const items = [];
     if (radioAudio) items.push({ icon: "⏹", label: L("stopRadio"), pri: 1, fn: stopRadio });
-    const fav = ["الإذاعة العامة", "إذاعة", "الحصري", "المنشاوي", "عبدالباسط", "المعيقلي", "السديس", "العفاسي"];
-    const sorted = radios.slice().sort((a, b) => (fav.findIndex((f) => b.name.includes(f)) >= 0) - (fav.findIndex((f) => a.name.includes(f)) >= 0));
-    sorted.slice(0, 60).forEach((r) => items.push({ label: r.name, fn: () => playRadio(r) }));
+    const seen = {}, list = RADIO_FB.concat(radios).filter((r) => !seen[r.url] && (seen[r.url] = 1));
+    list.slice(0, 80).forEach((r) => items.push({ icon: "📻", label: r.name, fn: () => playRadio(r) }));
     dialog("📻 " + L("quranRadio"), items, { grid: 3 });
   });
 }
+window.onRadioErr = () => {
+  const r = S.radio;
+  if (r && r.url.indexOf("https:") === 0 && !r._h) {
+    playRadio({ name: r.name, url: "http:" + r.url.slice(6), _h: 1 });
+    return;
+  }
+  A.toast(L("playErr"));
+  stopRadio();
+};
 function playRadio(r) {
   stopRadio();
-  radioAudio = new Audio(r.url);
-  radioAudio.play().catch(() => A.toast(L("playErr")));
   S.radio = r;
+  if (NA && NA.playAudio) {
+    NA.playAudio(r.url);
+    radioAudio = { native: 1 };
+  } else {
+    radioAudio = new Audio(r.url);
+    radioAudio.onerror = onRadioErr;
+    radioAudio.play().catch(() => {
+    });
+  }
   banner("📻", L("quranRadio"), r.name);
   updateTicker();
 }
 function stopRadio() {
   if (radioAudio) {
-    radioAudio.pause();
-    radioAudio.src = "";
+    if (radioAudio.native) {
+      NA.stopAudio();
+    } else {
+      radioAudio.pause();
+      radioAudio.src = "";
+    }
     radioAudio = null;
   }
   S.radio = null;

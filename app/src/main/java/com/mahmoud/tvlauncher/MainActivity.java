@@ -149,7 +149,8 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onDestroy() { if (remote != null) remote.stop(); if (instance == this) instance = null; super.onDestroy(); }
+    protected void onDestroy() {
+        stopRadioMp(); if (remote != null) remote.stop(); if (instance == this) instance = null; super.onDestroy(); }
 
     private static boolean isCoreKey(int c) {
         return c == KeyEvent.KEYCODE_DPAD_UP || c == KeyEvent.KEYCODE_DPAD_DOWN || c == KeyEvent.KEYCODE_DPAD_LEFT
@@ -304,7 +305,28 @@ public class MainActivity extends Activity {
         return in;
     }
 
+    private android.media.MediaPlayer radioMp;
+    private void stopRadioMp(){ try{ if(radioMp!=null){ radioMp.release(); } }catch(Exception ignored){} radioMp=null; }
+
     class Bridge {
+        @JavascriptInterface
+        public void playAudio(final String url) {
+            runOnUiThread(() -> {
+                stopRadioMp();
+                try {
+                    android.media.MediaPlayer mp = new android.media.MediaPlayer();
+                    radioMp = mp;
+                    mp.setAudioStreamType(android.media.AudioManager.STREAM_MUSIC);
+                    mp.setDataSource(url);
+                    mp.setOnPreparedListener(m -> m.start());
+                    mp.setOnErrorListener((m, w, x) -> { web.evaluateJavascript("window.onRadioErr&&onRadioErr()", null); return true; });
+                    mp.prepareAsync();
+                } catch (Exception e) { web.evaluateJavascript("window.onRadioErr&&onRadioErr()", null); }
+            });
+        }
+        @JavascriptInterface
+        public void stopAudio() { runOnUiThread(MainActivity.this::stopRadioMp); }
+
         @JavascriptInterface
         public String getApps() {
             PackageManager pm = getPackageManager();

@@ -338,3 +338,31 @@ body[data-size=s] #apps .grid{--acols:10}body[data-size=l] #apps .grid{--acols:6
 #apps .app.focus{background:linear-gradient(160deg,rgba(255,255,255,.22),rgba(255,255,255,.08))}
 #apps .app .badge{top:.8vh;inset-inline-end:.6vw}
 html.noar #apps .app{height:auto}
+
+/* ---- no CSS grid (Chrome < 57): flex fallbacks ---- */
+html.nogrid .grid,html.nogrid .pgrid,html.nogrid .mgrid,html.nogrid .sgrid,html.nogrid .swatches,html.nogrid .keys,html.nogrid .fgrid{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;-webkit-align-content:flex-start;align-content:flex-start}
+html.nogrid .grid>*{width:calc(100% / var(--cols,5) - 2.4vw);margin:0 1.2vw 7vh}
+html.nogrid #apps .grid>*{width:calc(100% / var(--acols,8) - 1vw);margin:0 .5vw 2vh}
+html.nogrid .pgrid>*{width:calc(100% / 7 - 1.4vw);margin:0 .7vw 2.6vh}
+body[data-size=s] .pgrid{} html.nogrid body[data-size=s] .pgrid>*{width:calc(100% / 8 - 1.4vw)} html.nogrid body[data-size=l] .pgrid>*{width:calc(100% / 5 - 1.4vw)}
+html.nogrid .mgrid>*{width:calc(25% - 1vw);margin:0 .5vw 1.6vh}
+html.nogrid .sgrid>*{width:calc(100% / 3 - 1.4vw);margin:0 .7vw 1.8vh}
+html.nogrid .fgrid>*{width:calc(50% - .4vh);margin:.2vh}
+html.nogrid .swatches,html.nogrid .keys{-webkit-justify-content:center;justify-content:center}
+html.nogrid .swatches>*{width:6vh;margin:.6vh}
+html.nogrid .keys>*{width:7vw;margin:.6vh .5vw}
+html.nogrid .rcv,html.nogrid .vodw{display:-webkit-flex;display:flex}
+html.nogrid .rcv>*{margin-inline-end:1.8vw;min-width:0}
+html.nogrid .rcv>:nth-child(1){width:20vw;-webkit-flex:none;flex:none}
+html.nogrid .rcv>:nth-child(2){width:32vw;-webkit-flex:none;flex:none}
+html.nogrid .rcv>:nth-child(3){-webkit-flex:1;flex:1;margin-inline-end:0}
+html.nogrid .vodw>:nth-child(1){width:19vw;-webkit-flex:none;flex:none;margin-inline-end:1.8vw}
+html.nogrid .vodw>:nth-child(2){-webkit-flex:1;flex:1;min-width:0}
+html.nogrid .chrow,html.nogrid .sysrow{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center}
+html.nogrid .chrow>*,html.nogrid .sysrow>*{margin-inline-end:1vw}
+html.nogrid .chrow>:nth-child(1){width:4.4vw;-webkit-flex:none;flex:none}
+html.nogrid .chrow>:nth-child(2){width:6vh;-webkit-flex:none;flex:none}
+html.nogrid .chrow>:nth-child(3),html.nogrid .sysrow>:nth-child(2){-webkit-flex:1;flex:1;min-width:0}
+html.nogrid .sysrow>:nth-child(1){width:2vh;-webkit-flex:none;flex:none}
+html.nogrid .sysrow>:nth-child(4){width:8vw;-webkit-flex:none;flex:none}
+html.nogrid .pv video{width:100%;height:100%}
