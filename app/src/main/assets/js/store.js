@@ -235,7 +235,10 @@ const ADS = [
 ];
 const ADS_KEEP = [/^com\.google\.android\.adservices/, /^com\.android\.providers\./];
 const isAds = (p) => ADS.some((r) => r.test(p)) && !ADS_KEEP.some((r) => r.test(p));
-const tier = (p) => RED.some((r) => r.test(p)) ? "red" : isAds(p) ? "ads" : GREEN.some((r) => r.test(p)) ? "green" : "yellow";
+const CORE = [/^android$/, /^com\.android\.(systemui|shell|providers\.settings|webview)$/, /^com\.google\.android\.webview$/, /^com\.android\.chrome$/, /^com\.mahmoud\.tvlauncher$/, /^moe\.shizuku\.privileged\.api$/];
+DEF.sysExpert = false;
+const isCore = (p) => CORE.some((r) => r.test(p));
+const tier = (p) => isCore(p) ? "red" : S.sysExpert && RED.some((r) => r.test(p)) ? "yellow" : RED.some((r) => r.test(p)) ? "red" : isAds(p) ? "ads" : GREEN.some((r) => r.test(p)) ? "green" : "yellow";
 let pkgs = [], sysFilter = "sys";
 const TORDER = { ads: 0, green: 1, yellow: 2, red: 3 };
 function loadPkgs() {
@@ -261,7 +264,7 @@ function renderSysApps() {
   $("storeMain").innerHTML = `<div class="sec"><h3>🧹 ${L("stSystem")}</h3>${shizukuCard()}
     <div class="inline" style="margin:1.4vh 0">${fsel("sys", L("sysOnly"))}${fsel("ads", "📢 " + L("adsApps") + " (" + adsN + ")")}${fsel("all", L("allApps"))}${fsel("removed", L("removedApps"))}
       ${adsN ? `<button class="btn pri f" id="adsBulk">📢 ${L("removeAds")} (${adsN})</button>` : ""}
-      ${greens ? `<button class="btn f" id="sysBulk">🧹 ${L("removeSafe")} (${greens})</button>` : ""}<button class="btn f" id="sysAdb">💻 ${L("adbCmds")}</button></div>
+      ${greens ? `<button class="btn f" id="sysBulk">🧹 ${L("removeSafe")} (${greens})</button>` : ""}<button class="btn f${S.sysExpert ? " pri" : ""}" id="sysExpert">🧨 ${L("sysExpert")}: ${S.sysExpert ? L("on") : L("off")}</button>${S.sysExpert ? `<button class="btn f" id="sysAll">🧨 ${L("removeAll")}</button>` : ""}<button class="btn f" id="sysAdb">💻 ${L("adbCmds")}</button></div>
     <div class="legend">🟠 ${L("tAds")} · 🟢 ${L("tGreen")} · 🟡 ${L("tYellow")} · 🔴 ${L("tRed")}</div>
     <div class="syslist">${list.map((p) => {
     const t = tier(p.pkg);
@@ -800,3 +803,43 @@ activators.push((el) => {
   }
   return false;
 });
+activators.push((el) => {
+  if (el.id === "sysExpert") {
+    if (S.sysExpert) {
+      S.sysExpert = false;
+      loadPkgs();
+      renderSysApps();
+      return true;
+    }
+    dialog("🧨 " + L("sysExpert"), [{ label: L("sysExpertOn"), fn: () => {
+      S.sysExpert = true;
+      loadPkgs();
+      renderSysApps();
+    } }, { label: L("cancel"), pri: 1, fn: () => {
+    } }], { sub: L("sysExpertWarn") });
+    return true;
+  }
+  if (el.id === "sysAll") {
+    const g = pkgs.filter((p) => p.sys && p.inst && !isCore(p.pkg) && p.pkg !== defaultHomeKeep());
+    dialog(`🧨 ${L("removeAll")} (${g.length})`, [{ label: L("sRemoveAnyway"), fn: () => __async(this, null, function* () {
+      let n = 0;
+      for (const p of g) {
+        banner("🧹", p.name, `${++n}/${g.length}`, 1500);
+        yield sysDo("remove", p.pkg, true);
+      }
+      loadPkgs();
+      renderSysApps();
+      banner("✅", L("removeAll"), n + "", 6e3);
+    }) }, { label: L("cancel"), pri: 1, fn: () => {
+    } }], { sub: L("removeAllWarn") });
+    return true;
+  }
+  return false;
+});
+function defaultHomeKeep() {
+  try {
+    return JSON.parse(nat("homePackages") || "[]")[0] || "";
+  } catch (e) {
+    return "";
+  }
+}

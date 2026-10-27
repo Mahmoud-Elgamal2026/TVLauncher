@@ -61,7 +61,10 @@ const AFTER = {
   theme: applyLook,
   size: applyLook,
   wall: applyLook,
-  lite: applyLook,
+  lite: () => {
+    S.perfChosen = true;
+    applyLook();
+  },
   h24: tick,
   method: () => {
     computePrayers();
@@ -329,7 +332,31 @@ function multiSelect(title, opts, id, field2) {
   };
   draw(0);
 }
+function autoPerf() {
+  if (S.perfChosen) return;
+  let ram = 0;
+  try {
+    ram = (JSON.parse(nat("memInfo") || "{}").total || 0) / 1073741824;
+  } catch (e) {
+  }
+  if (window.__chromeVer && window.__chromeVer < 75 || ram && ram <= 2.2) S.lite = true;
+}
+let hlsLoading = null;
+function loadHls() {
+  if (window.Hls) return Promise.resolve();
+  if (hlsLoading) return hlsLoading;
+  hlsLoading = new Promise((res) => {
+    const s = document.createElement("script");
+    s.src = "js/lib-hls.min.js";
+    s.onload = s.onerror = () => res();
+    document.body.appendChild(s);
+  });
+  return hlsLoading;
+}
+window.loadHls = loadHls;
 function boot() {
+  autoPerf();
+  setTimeout(loadHls, 4e3);
   applyLook();
   applyLang();
   loadApps();

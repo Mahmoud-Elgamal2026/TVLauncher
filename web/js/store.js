@@ -120,7 +120,11 @@ const ADS=[/(^|\.)(ads?|adservice|adsdk|advert\w*|analytics|telemetry|tracking|t
   /^com\.(xiaomi|mitv|miui)\.\w*(ad|analytics|stat|track)\w*/i,/^com\.(tcl|hisense|skyworth|amlogic\.ota)\.\w*(ad|analytics|report|stat)\w*/i];
 const ADS_KEEP=[/^com\.google\.android\.adservices/, /^com\.android\.providers\./];
 const isAds=p=>ADS.some(r=>r.test(p))&&!ADS_KEEP.some(r=>r.test(p));
-const tier=p=>RED.some(r=>r.test(p))?"red":isAds(p)?"ads":GREEN.some(r=>r.test(p))?"green":"yellow";
+// the few packages that would brick the box or kill this launcher: never removable, even in expert mode
+const CORE=[/^android$/,/^com\.android\.(systemui|shell|providers\.settings|webview)$/,/^com\.google\.android\.webview$/,/^com\.android\.chrome$/,/^com\.mahmoud\.tvlauncher$/,/^moe\.shizuku\.privileged\.api$/];
+DEF.sysExpert=false;
+const isCore=p=>CORE.some(r=>r.test(p));
+const tier=p=>isCore(p)?"red":(S.sysExpert&&RED.some(r=>r.test(p)))?"yellow":RED.some(r=>r.test(p))?"red":isAds(p)?"ads":GREEN.some(r=>r.test(p))?"green":"yellow";
 let pkgs=[], sysFilter="sys";
 const TORDER={ads:0,green:1,yellow:2,red:3};
 function loadPkgs(){ try{ pkgs=JSON.parse(nat("listPackages")||"[]") }catch(e){ pkgs=[] } pkgs.sort((a,b)=>TORDER[tier(a.pkg)]-TORDER[tier(b.pkg)]||a.name.localeCompare(b.name)) }
@@ -139,7 +143,7 @@ function renderSysApps(){
   $("storeMain").innerHTML=`<div class="sec"><h3>🧹 ${L("stSystem")}</h3>${shizukuCard()}
     <div class="inline" style="margin:1.4vh 0">${fsel("sys",L("sysOnly"))}${fsel("ads","📢 "+L("adsApps")+" ("+adsN+")")}${fsel("all",L("allApps"))}${fsel("removed",L("removedApps"))}
       ${adsN?`<button class="btn pri f" id="adsBulk">📢 ${L("removeAds")} (${adsN})</button>`:""}
-      ${greens?`<button class="btn f" id="sysBulk">🧹 ${L("removeSafe")} (${greens})</button>`:""}<button class="btn f" id="sysAdb">💻 ${L("adbCmds")}</button></div>
+      ${greens?`<button class="btn f" id="sysBulk">🧹 ${L("removeSafe")} (${greens})</button>`:""}<button class="btn f${S.sysExpert?" pri":""}" id="sysExpert">🧨 ${L("sysExpert")}: ${S.sysExpert?L("on"):L("off")}</button>${S.sysExpert?`<button class="btn f" id="sysAll">🧨 ${L("removeAll")}</button>`:""}<button class="btn f" id="sysAdb">💻 ${L("adbCmds")}</button></div>
     <div class="legend">🟠 ${L("tAds")} · 🟢 ${L("tGreen")} · 🟡 ${L("tYellow")} · 🔴 ${L("tRed")}</div>
     <div class="syslist">${list.map(p=>{ const t=tier(p.pkg); return `<div class="sysrow f" tabindex="0" data-sys="${esc(p.pkg)}"><span class="tdot2 ${t}"></span>
       <span class="sn"><b>${esc(p.name)}</b><small dir="ltr">${esc(p.pkg)}</small></span><span class="ss">${!p.inst?"🗑 "+L("sRemoved"):p.on?"":"⏸ "+L("sDisabled")}</span><span class="sz">${(p.size/1048576).toFixed(1)} MB</span></div>` }).join("")||`<div class="empty">${L("noRes")}</div>`}</div></div>`;
@@ -320,3 +324,13 @@ async function goCode(code){
 }
 activators.push(el=>{ if(el.dataset&&el.dataset.mc!=null){ const c=S.myCodes[+el.dataset.mc]; if(c) goCode(c.n); return true }
   if(el.dataset&&el.dataset.mcdel!=null){ const a=S.myCodes.slice(); a.splice(+el.dataset.mcdel,1); S.myCodes=a; renderStore(); return true } return false });
+
+// ================= expert mode: remove everything that isn't core =================
+activators.push(el=>{
+  if(el.id==="sysExpert"){ if(S.sysExpert){ S.sysExpert=false; loadPkgs(); renderSysApps(); return true }
+    dialog("🧨 "+L("sysExpert"),[{label:L("sysExpertOn"),fn:()=>{ S.sysExpert=true; loadPkgs(); renderSysApps() }},{label:L("cancel"),pri:1,fn:()=>{}}],{sub:L("sysExpertWarn")}); return true }
+  if(el.id==="sysAll"){ const g=pkgs.filter(p=>p.sys&&p.inst&&!isCore(p.pkg)&&p.pkg!==defaultHomeKeep());
+    dialog(`🧨 ${L("removeAll")} (${g.length})`,[{label:L("sRemoveAnyway"),fn:async()=>{ let n=0; for(const p of g){ banner("🧹",p.name,`${++n}/${g.length}`,1500); await sysDo("remove",p.pkg,true) } loadPkgs(); renderSysApps(); banner("✅",L("removeAll"),n+"",6000) }},{label:L("cancel"),pri:1,fn:()=>{}}],{sub:L("removeAllWarn")}); return true }
+  return false });
+// keep one stock launcher so the box always has a way back (unless the user removes it by hand)
+function defaultHomeKeep(){ try{ return (JSON.parse(nat("homePackages")||"[]")[0])||"" }catch(e){ return "" } }

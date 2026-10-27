@@ -154,6 +154,7 @@ function playUrl(url){
 let saveT=0, nextT=null;
 const isLive=c=>!c.kind;
 function play(c){
+  if(!window.Hls&&/\.m3u8(\?|$)/i.test(c.url||"")&&window.loadHls){ loadHls().then(()=>play(c)); return }
   pvStop(); clearTimeout(nextT);
   playing=c;
   if(isLive(c)){ S.lastCh={name:c.name,url:c.url,logo:c.logo,group:c.group,id:c.id,no:c.no}; S.chHist=[c.url,...S.chHist.filter(u=>u!==c.url)].slice(0,30) }

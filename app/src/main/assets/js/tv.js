@@ -305,6 +305,10 @@ function playUrl(url) {
 let saveT = 0, nextT = null;
 const isLive = (c) => !c.kind;
 function play(c) {
+  if (!window.Hls && /\.m3u8(\?|$)/i.test(c.url || "") && window.loadHls) {
+    loadHls().then(() => play(c));
+    return;
+  }
   pvStop();
   clearTimeout(nextT);
   playing = c;

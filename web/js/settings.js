@@ -68,7 +68,7 @@ function markSettings(){
   document.querySelectorAll("#setScroll [data-set]").forEach(b=>{ const [k,v]=b.dataset.set.split(":"); if(k==="autoCheck") return; const cur=S[k];
     b.classList.toggle("pri", typeof cur==="boolean"? cur===(v==="1") : String(cur)===v) });
 }
-const AFTER={lang:()=>{applyLang();renderHome();renderGroups()},theme:applyLook,size:applyLook,wall:applyLook,lite:applyLook,h24:tick,
+const AFTER={lang:()=>{applyLang();renderHome();renderGroups()},theme:applyLook,size:applyLook,wall:applyLook,lite:()=>{S.perfChosen=true;applyLook()},h24:tick,
   method:()=>{computePrayers();updateTicker()},asrHanafi:()=>{computePrayers();updateTicker()},prayerOn:updateTicker,tickerOn:updateTicker,
   sportsOn:loadSports,showHidden:renderHome,hideDead:renderChannels,preview:pvStop};
 
@@ -147,7 +147,19 @@ function multiSelect(title,opts,id,field){
 }
 
 // ================= boot =================
+// auto "fast mode" on slow boxes (old WebView or 2 GB RAM or less) unless the user picked a mode
+function autoPerf(){
+  if(S.perfChosen) return;
+  let ram=0; try{ ram=(JSON.parse(nat("memInfo")||"{}").total||0)/1073741824 }catch(e){}
+  if((window.__chromeVer&&window.__chromeVer<75)||(ram&&ram<=2.2)) S.lite=true;
+}
+// hls.js is big: load it after the home screen is up, or right away when a stream needs it
+let hlsLoading=null;
+function loadHls(){ if(window.Hls) return Promise.resolve(); if(hlsLoading) return hlsLoading;
+  hlsLoading=new Promise(res=>{ const s=document.createElement("script"); s.src="js/lib-hls.min.js"; s.onload=s.onerror=()=>res(); document.body.appendChild(s) }); return hlsLoading }
+window.loadHls=loadHls;
 function boot(){
+  autoPerf(); setTimeout(loadHls,4000);
   // show the home screen first; network and heavy work follow once it is on screen
   applyLook(); applyLang(); loadApps(); syncKeyMap(); status(); tick();
   focus(document.querySelector(".tab.on")||document.querySelector(".tab"));

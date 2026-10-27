@@ -21,7 +21,7 @@ const A={
 window.A=A;
 
 // ================= storage: global + per-profile =================
-const DEF={lang:"ar",theme:"apple",size:"m",wall:"dynamic",wallImg:"",h24:false,lite:false,showHidden:false,
+const DEF={perfChosen:false,lang:"ar",theme:"apple",size:"m",wall:"dynamic",wallImg:"",h24:false,lite:false,showHidden:false,
   lists:[],epg:"",ext:false,preview:true,hideDead:false,autoCheck:true,chStatus:{},lastCheck:0,
   city:"Cairo",loc:null,pin:"",lockSettings:false,custom:{},keymap:{},
   frameMin:10,frameStyle:"gallery",frameSrc:"online",frameEvery:5,frames:[],fw:{clock:true,weather:true,prayer:true,match:true},

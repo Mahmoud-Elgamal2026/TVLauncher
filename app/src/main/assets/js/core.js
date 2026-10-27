@@ -95,6 +95,7 @@ const A = {
 };
 window.A = A;
 const DEF = {
+  perfChosen: false,
   lang: "ar",
   theme: "apple",
   size: "m",
