@@ -128,7 +128,7 @@ ${b}[data-page=home] #favRow .app .badge{display:none}
 ${b}[data-page=home] #favRow .app.f.focus{transform:scale(1.14) translateY(-1vh);background:#fff;box-shadow:0 0 0 .35vh #fff,0 1.4vh 3vh rgba(0,0,0,.6)}
 ${b}[data-page=home] .top .clock{inset-inline-end:auto;inset-inline-start:1.3vw;text-align:center}
 ${b}[data-page=home] .top .clock #time{font-size:5vh;font-weight:700}
-${b}[data-page=home] .ticker{inset-inline-end:auto;inset-inline-start:1.3vw;top:13vh;width:14vw;-webkit-flex-direction:column;flex-direction:column;gap:.6vh;padding:1.6vh 1vw;background:rgba(12,16,26,.62);border:1px solid rgba(255,255,255,.18);border-radius:1.8vh;color:#fff;text-align:center;font-size:1.9vh}
+${b}[data-page=home] .ticker{inset-inline-end:auto;inset-inline-start:1.3vw;top:15vh;width:14vw;-webkit-flex-direction:column;flex-direction:column;gap:.6vh;padding:1.6vh 1vw;background:rgba(12,16,26,.62);border:1px solid rgba(255,255,255,.18);border-radius:1.8vh;color:#fff;text-align:center;font-size:1.9vh}
 ${b}[data-page=home] .ticker span{border:0!important;background:transparent!important}
 ${b}[data-page=home] .top .left{display:none}
 ${b} .xtab{display:inline-block}
@@ -174,7 +174,20 @@ ${b} .top .tabs{background:rgba(255,255,255,.08)}
 ${b} .qbtn{background:rgba(255,255,255,.1)}`;
   return c;
 }
-(function(){ const st=document.createElement("style"); st.id="themeCss"; st.textContent=THEMES.filter(t=>!t.builtIn).map(themeCss).join("\n"); document.head.appendChild(st) })();
+// Old TV WebViews (Chrome < 87) ignore inset-inline-*/margin-inline-*/padding-inline-*: turn them into left/right per direction
+function physicalCss(css){
+  const map=(d,dir)=>{ const st=dir==="rtl"?"right":"left", en=dir==="rtl"?"left":"right";
+    return d.replace(/inset-inline-start/g,st).replace(/inset-inline-end/g,en)
+      .replace(/(margin|padding)-inline-start/g,"$1-"+st).replace(/(margin|padding)-inline-end/g,"$1-"+en)
+      .replace(/text-align:start/g,"text-align:"+st).replace(/text-align:end/g,"text-align:"+en) };
+  return css.replace(/([^{}]+)\{([^{}]*)\}/g,(m,sel,decl)=>{
+    if(!/inline-(start|end)|text-align:(start|end)/.test(decl)) return m;
+    const pre=dir=>sel.split(",").map(x=>`html[dir=${dir}] ${x.trim()}`).join(",");
+    // ltr/rtl copies first lose to nothing: keep the original too for new engines
+    return `${sel}{${decl}}${pre("ltr")}{${map(decl,"ltr")}}${pre("rtl")}{${map(decl,"rtl")}}`;
+  });
+}
+(function(){ const st=document.createElement("style"); st.id="themeCss"; st.textContent=physicalCss(THEMES.filter(t=>!t.builtIn).map(themeCss).join("\n")); document.head.appendChild(st) })();
 function themePicker(){
   const groups=[...new Set(THEMES.map(t=>t.g))];
   return groups.map(g=>`<div class="tgroup"><span class="tg">${esc(g==="Originals"?(S.lang==="ar"?"تصميمات اللانشر":"Launcher originals"):g)}</span><div class="inline">${THEMES.filter(t=>t.g===g).map(t=>
