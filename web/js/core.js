@@ -66,7 +66,7 @@ function tick(){ const d=new Date(); $("time").textContent=fmtTime(d); $("date")
 const DAILY=["linear-gradient(135deg,#0f2027,#2c5364)","linear-gradient(135deg,#3a1c71,#d76d77)","linear-gradient(135deg,#134e5e,#71b280)",
  "linear-gradient(135deg,#232526,#414345)","linear-gradient(135deg,#1e3c72,#2a5298)","linear-gradient(135deg,#42275a,#734b6d)","linear-gradient(135deg,#0b486b,#f56217)"];
 function applyLook(){
-  const b=document.body; b.dataset.theme=S.theme; b.dataset.size=S.size; b.classList.toggle("lite",!!S.lite); b.classList.toggle("kids",isKids());
+  const b=document.body; b.dataset.theme=S.theme; b.dataset.size=S.size; b.classList.toggle("lite",!!S.lite); { const th=typeof THEMES!=="undefined"&&THEMES.find(t=>t.id===S.theme); b.classList.toggle("lighttheme",S.theme==="light"||!!(th&&th.light)) } b.classList.toggle("kids",isKids());
   const img=S.wall==="image"&&S.wallImg;
   b.classList.toggle("wallimg",!!img);
   $("wall").style.backgroundImage=img?`url("${S.wallImg}")`:"";

@@ -70,7 +70,7 @@ ${b} .tab{padding:1.2vh 2vw}${b} .scroll{padding-bottom:16vh}${b} .hint{display:
   if(t.focus==="scale") c+=`\n${b} .app.f.focus,${b} .poster.f.focus{transform:scale(1.14);box-shadow:0 1.4vh 3vh rgba(0,0,0,.6)}${b} .app.f.focus::after{display:none}${b} .app .nm{opacity:1}`;
   if(t.focus==="glow") c+=`\n${b} .app.f.focus,${b} .poster.f.focus,${b} .chrow.f.focus,${b} .btn.f.focus,${b} .it.f.focus{transform:scale(1.06);box-shadow:var(--ring),0 0 4vh ${t.accent||t.sel}}`;
   if(t.id==="plex") c+=`
-${b} .tab.on{color:#e5a00d!important;box-shadow:inset 0 -.4vh 0 #e5a00d!important}
+${b} .tab.on:not(.focus){color:#e5a00d!important;box-shadow:inset 0 -.4vh 0 #e5a00d!important}
 ${b} h2{color:#fff;font-weight:700;font-size:2.3vh;letter-spacing:.02em}
 ${b} .app{border:1px solid rgba(255,255,255,.06)}
 ${b} .app .nm{color:#bbb}${b} .app.focus .nm{color:#e5a00d}
@@ -80,7 +80,7 @@ ${b} #shade{background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(10,4,30,.75
 ${b} #favRow .app,${b} #recentRow .app{background:#fff;width:calc(var(--tile,16vw) * .78)}
 ${b} #favRow .app .nm,${b} #recentRow .app .nm{color:#fff}
 ${b} #shelfTitle{font-weight:800;letter-spacing:.06em;text-transform:uppercase}
-${b} .tab.on{color:#fff!important}${b} h2{color:#fff}
+${b} .tab.on:not(.focus){color:#fff!important}${b} h2{color:#fff}
 ${b} .app .lbl{color:#3a136e;text-shadow:none}`;
   if(t.startPage) c+=`
 ${b} #shelfImg,${b} #shelfTitle,${b} #shelfSub{display:none}
@@ -103,7 +103,7 @@ ${b} .tabs{background:transparent}`;
 ${b} #shade{background:linear-gradient(90deg,rgba(0,0,0,.55) 0,rgba(0,0,0,0) 30%,rgba(0,0,0,0) 70%,rgba(0,0,0,.55) 100%),linear-gradient(0deg,rgba(0,0,0,.6) 0,rgba(0,0,0,0) 35%)}
 ${b} #shelfImg{opacity:.35}
 ${b} .tab{border:1px solid rgba(255,255,255,.22);border-radius:99px;margin:0 .25vw;background:rgba(10,14,24,.45)}
-${b} .tab.on{background:#8b8cff!important;color:#fff!important;border-color:transparent}
+${b} .tab.on:not(.focus){background:#8b8cff!important;color:#fff!important;border-color:transparent}
 ${b} .tabs{background:transparent}
 ${b}[data-page=home] #shelf{height:0;padding:0;overflow:hidden}
 ${b}[data-page=home] #home h2{display:none}
@@ -139,7 +139,7 @@ ${b}[data-page=home] #xSources{position:fixed;top:30vh;inset-inline-start:16.4vw
 ${b}[data-page=home] #xSources b{display:flex;align-items:center;justify-content:center;width:4.4vh;height:4.4vh;border-radius:1vh;background:#6b6ef0;font-size:2.2vh}
 ${b}[data-page=home] #xSources span span{display:block;font-weight:700;font-size:1.8vh}${b}[data-page=home] #xSources small{display:block;opacity:.6;font-size:1.3vh}`;
   if(t.roundApps) c+=`
-${b} .tab{border-radius:99px;padding:.8vh 1.4vw}${b} .tab.on{background:rgba(255,255,255,.14)!important;color:#fff}
+${b} .tab{border-radius:99px;padding:.8vh 1.4vw}${b} .tab.on:not(.focus){background:rgba(255,255,255,.14)!important;color:#fff}
 ${b} .tab.f.focus{background:#e8eaed!important;color:#202124!important}
 ${b} h2{color:#e8eaed;font-weight:500;font-size:2vh}
 ${b} #favRow,${b} #recentRow{gap:1.6vw}

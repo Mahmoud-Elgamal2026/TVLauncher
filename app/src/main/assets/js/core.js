@@ -239,6 +239,10 @@ function applyLook() {
   b.dataset.theme = S.theme;
   b.dataset.size = S.size;
   b.classList.toggle("lite", !!S.lite);
+  {
+    const th = typeof THEMES !== "undefined" && THEMES.find((t) => t.id === S.theme);
+    b.classList.toggle("lighttheme", S.theme === "light" || !!(th && th.light));
+  }
   b.classList.toggle("kids", isKids());
   const img = S.wall === "image" && S.wallImg;
   b.classList.toggle("wallimg", !!img);

@@ -285,7 +285,7 @@ body.lite *{backdrop-filter:none!important;-webkit-backdrop-filter:none!importan
 body.lite #shelfImg{display:none}
 body.lite .app.f.focus::after,body.lite .it.f.focus::after{display:none}
 body.lite .f.focus{box-shadow:0 0 0 .4vh #fff!important}
-body.lite:not([data-theme=light]) .tabs,body.lite:not([data-theme=light]) .btn,body.lite:not([data-theme=light]) .inp,body.lite:not([data-theme=light]) .it,body.lite:not([data-theme=light]) .chrow,body.lite:not([data-theme=light]) .mbox,body.lite:not([data-theme=light]) .qbtn,body.lite:not([data-theme=light]) .key{background:#2a2a32}
+body.lite:not(.lighttheme) .tabs,body.lite:not(.lighttheme) .btn,body.lite:not(.lighttheme) .inp,body.lite:not(.lighttheme) .it,body.lite:not(.lighttheme) .chrow,body.lite:not(.lighttheme) .mbox,body.lite:not(.lighttheme) .qbtn,body.lite:not(.lighttheme) .key{background:#2a2a32}
 body.lite .btn.pri,body.lite .it.sel{background:var(--sel)}
 body.lite #search{background:#0c0c10}
 
@@ -491,3 +491,8 @@ body.lite .app.f.focus,body.lite .it.f.focus{transform:scale(1.05)}
 #filesSrc .it.sel{background:var(--sel);color:var(--selText,#000)}
 
 .xtab,.dockx{display:none}
+
+/* fast mode on light themes: keep panels light so dark text stays readable */
+body.lite.lighttheme .tabs,body.lite.lighttheme .btn,body.lite.lighttheme .inp,body.lite.lighttheme .it,body.lite.lighttheme .chrow,body.lite.lighttheme .qbtn,body.lite.lighttheme .key{background:rgba(0,0,0,.08)}
+body.lite.lighttheme .mbox{background:#f4f4f6}body.lite.lighttheme #search{background:#f4f4f6}
+body.lite.lighttheme .btn.pri,body.lite.lighttheme .it.sel,body.lite.lighttheme .tab.on{background:var(--sel)}
