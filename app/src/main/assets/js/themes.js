@@ -10,6 +10,7 @@ const THEMES = [
   { id: "atv-oreo", g: "Google / Android TV", n: "Android TV 8–11", bg: "linear-gradient(180deg,#212121,#121212)", card: "#303030", sel: "#fff", selText: "#000", glass: "#2a2a2a", r: ".6vh", tabs: "plain", focus: "scale", ring: "0 0 0 .3vh #fff", dot: "#303030" },
   { id: "atv-leanback", g: "Google / Android TV", n: "Android TV 5–7 · Leanback", bg: "linear-gradient(135deg,#37474f,#1c262b)", card: "#546e7a", sel: "#26a69a", selText: "#fff", glass: "rgba(255,255,255,.08)", r: ".3vh", tabs: "plain", focus: "scale", ring: "0 0 0 .35vh #fff", dot: "#26a69a" },
   { id: "atv-2017", g: "Google / Android TV", n: "Android TV · Classic home", bg: "linear-gradient(115deg,#1f2a55 0%,#2c2f63 40%,#4a2d62 70%,#7a2f5a 100%)", card: "#f2f2f2", sel: "#fff", selText: "#202124", glass: "rgba(255,255,255,.1)", r: ".4vh", tabs: "plain", focus: "scale", ring: "0 0 0 .3vh #fff", dot: "#e53935", classicAtv: 1 },
+  { id: "gtv-round", g: "Google / Android TV", n: "Google TV · Round apps", bg: "radial-gradient(ellipse at 70% 0,#2a3140 0,#14161b 60%,#0d0e11 100%)", card: "#262a31", sel: "#e8eaed", selText: "#202124", glass: "rgba(255,255,255,.08)", r: "1.2vh", tabs: "plain", focus: "ring", ring: "0 0 0 .35vh #fff", dot: "#8ab4f8", roundApps: 1 },
   { id: "shield", g: "Google / Android TV", n: "NVIDIA Shield", bg: "radial-gradient(circle at 80% 0,#203314,#0a0a0a 60%)", card: "#1f1f1f", sel: "#76b900", selText: "#000", glass: "#1c1c1c", r: ".6vh", tabs: "underline", focus: "ring", ring: "0 0 0 .4vh #76b900", accent: "#76b900", dot: "#76b900" },
   { id: "bravia", g: "Google / Android TV", n: "Sony Bravia", bg: "linear-gradient(135deg,#1b2129,#0b0e12)", card: "#2a313b", sel: "#e6e6e6", selText: "#111", glass: "rgba(255,255,255,.07)", r: ".5vh", tabs: "plain", focus: "ring", ring: "0 0 0 .35vh #e6e6e6", dot: "#2a313b" },
   // ---- Samsung ----
@@ -70,6 +71,18 @@ ${b} h2{color:#fff;font-weight:700;font-size:2.3vh;letter-spacing:.02em}
 ${b} .app{border:1px solid rgba(255,255,255,.06)}
 ${b} .app .nm{color:#bbb}${b} .app.focus .nm{color:#e5a00d}
 ${b} .btn.pri,${b} .it.sel{background:#e5a00d;color:#000}`;
+  if (t.roundApps) c += `
+${b} .tab{border-radius:99px;padding:.8vh 1.4vw}${b} .tab.on{background:rgba(255,255,255,.14)!important;color:#fff}
+${b} .tab.f.focus{background:#e8eaed!important;color:#202124!important}
+${b} h2{color:#e8eaed;font-weight:500;font-size:2vh}
+${b} #favRow,${b} #recentRow{gap:1.6vw}
+${b} #favRow .app,${b} #recentRow .app{width:10.5vh!important;height:10.5vh!important;border-radius:50%!important;aspect-ratio:1/1;background:#fff;overflow:hidden}
+${b} #favRow .app img,${b} #recentRow .app img{max-width:64%;max-height:64%}
+${b} #favRow .app img.banner,${b} #recentRow .app img.banner{border-radius:50%;object-fit:cover}
+${b} #favRow .app .nm,${b} #recentRow .app .nm{font-size:1.5vh}
+${b} #favRow .app .badge,${b} #recentRow .app .badge{display:none}
+${b} #favRow .app.f.focus,${b} #recentRow .app.f.focus{transform:scale(1.12);box-shadow:0 0 0 .35vh #fff,0 1.2vh 2.6vh rgba(0,0,0,.6)}
+${b} #shelfTitle{font-weight:500}`;
   if (t.classicAtv) c += `
 ${b} #shelfImg,${b} #shade{display:none}
 ${b} #shelf{height:3vh;padding:0}${b} #shelfTitle,${b} #shelfSub{display:none}
