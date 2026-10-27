@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b0b10">
+<title>TV Remote</title>
+<style>
+:root{--bg:#0b0b10;--card:#17171f;--card2:#22222c;--text:#f3f3f7;--mute:#8d8da0;--acc:#4f7cff;--ok:#2ecc71;--bad:#ff5a5f}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,"SF Pro Text","Segoe UI",Roboto,"Noto Sans Arabic",Tahoma,sans-serif;height:100%}
+body{display:flex;flex-direction:column;padding-bottom:calc(68px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:10px;padding:14px 16px 6px}
+header h1{font-size:18px;font-weight:700;flex:1}
+#prof{background:var(--card);border:0;color:var(--text);border-radius:99px;padding:7px 12px;font-size:14px;font-family:inherit}
+#now{font-size:13px;color:var(--mute);padding:0 16px 8px;min-height:20px}
+main{flex:1;overflow-y:auto;padding:4px 16px 20px}
+.tab{display:none}.tab.on{display:block}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(18,18,24,.96);backdrop-filter:blur(20px);border-top:1px solid #23232d;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;border:0;color:var(--mute);font-family:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0}
+nav button b{font-size:20px;font-weight:400}
+nav button.on{color:var(--text)}
+button{font-family:inherit;cursor:pointer}
+.pad{position:relative;width:min(78vw,300px);aspect-ratio:1;margin:18px auto 10px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#2a2a36,#16161d);box-shadow:0 14px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06)}
+.pad button{position:absolute;background:none;border:0;color:var(--text);font-size:26px;width:34%;height:34%;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.pad button:active{background:rgba(255,255,255,.08)}
+.pad .u{top:0;left:33%}.pad .d{bottom:0;left:33%}.pad .l{left:0;top:33%}.pad .r{right:0;top:33%}
+.pad .ok{left:30%;top:30%;width:40%;height:40%;background:#30303c;font-size:17px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.row{display:flex;gap:10px;margin:10px 0}
+.btn{flex:1;background:var(--card);border:0;color:var(--text);border-radius:14px;padding:13px 8px;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.btn b{font-size:20px;font-weight:400}
+.btn:active{background:var(--card2);transform:scale(.97)}
+.btn.pri{background:var(--acc)}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.keys button{background:var(--card);border:0;color:var(--text);border-radius:12px;padding:14px;font-size:20px}
+h2{font-size:14px;color:var(--mute);font-weight:600;margin:18px 2px 8px}
+input,textarea{width:100%;background:var(--card);border:1px solid #2a2a35;color:var(--text);border-radius:12px;padding:12px;font-size:16px;font-family:inherit}
+textarea{min-height:90px;resize:vertical}
+.item{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .t small{display:block;font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:right}
+.ib{background:var(--card2);border:0;color:var(--text);border-radius:10px;width:38px;height:38px;font-size:16px;flex:0 0 auto}
+.ib.on{background:#3a3220;color:#ffc94d}
+.prog{height:3px;background:#333;border-radius:3px;margin-top:5px;overflow:hidden}.prog i{display:block;height:100%;background:#e50914}
+.empty{color:var(--mute);font-size:14px;padding:14px 4px}
+.note{font-size:12px;color:var(--mute);margin-top:6px;line-height:1.6}
+#toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-80px);background:#2b2b36;color:#fff;padding:10px 16px;border-radius:99px;font-size:14px;transition:transform .25s;z-index:9;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#toast.on{transform:translateX(-50%) translateY(0)}
+#pair{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:30px;text-align:center;z-index:8}
+#pair.on{display:flex}
+#pair input{max-width:220px;text-align:center;font-size:28px;letter-spacing:.3em}
+.search{display:flex;gap:8px}.search input{flex:1}
+#alerts .al{display:flex;gap:10px;align-items:center;background:#2a2333;border-radius:14px;padding:10px 12px;margin-bottom:8px;animation:pop .3s}
+#alerts .al b{font-size:22px}#alerts .al div{flex:1;min-width:0}#alerts .al strong{display:block;font-size:14px}#alerts .al small{color:var(--mute);font-size:12px}
+@keyframes pop{from{transform:scale(.95);opacity:0}to{transform:none;opacity:1}}
+</style>
+</head>
+<body>
+<header><h1>📺 TV Remote</h1><button id="prof">…</button></header>
+<div id="now"></div>
+<main>
+  <section class="tab on" id="t-remote">
+    <div id="alerts"></div>
+    <div class="pad">
+      <button class="u" data-k="up">▲</button><button class="d" data-k="down">▼</button>
+      <button class="l" data-k="left">◀</button><button class="r" data-k="right">▶</button>
+      <button class="ok" data-k="ok">OK</button>
+    </div>
+    <div class="row"><button class="btn" data-k="back"><b>↩</b><span data-t="back"></span></button><button class="btn" data-k="home"><b>⌂</b><span data-t="home"></span></button><button class="btn" data-k="menu"><b>☰</b><span data-t="options"></span></button></div>
+    <div class="row"><button class="btn" data-v="down"><b>🔉</b></button><button class="btn" data-v="mute"><b>🔇</b></button><button class="btn" data-v="up"><b>🔊</b></button></div>
+    <div class="row"><button class="btn" data-a="tv"><b>📺</b><span data-t="iptv"></span></button><button class="btn" data-a="last"><b>⏮</b><span data-t="last"></span></button><button class="btn" data-a="frame"><b>🖼</b><span data-t="frame"></span></button><button class="btn" data-a="sleep"><b>😴</b><span data-t="sleep"></span></button></div>
+    <h2 data-t="numbers"></h2>
+    <div class="keys">${KEYS}</div>
+  </section>
+  <section class="tab" id="t-type">
+    <h2 data-t="typeTitle"></h2>
+    <textarea id="txt"></textarea>
+    <div class="row"><button class="btn pri" id="sendTxt"><b>⌨️</b><span data-t="sendTv"></span></button><button class="btn" id="searchTxt"><b>🔍</b><span data-t="searchTv"></span></button></div>
+    <p class="note" data-t="typeNote"></p>
+  </section>
+  <section class="tab" id="t-links">
+    <h2 data-t="playlists"></h2><div id="lists"></div>
+    <div class="row" style="flex-wrap:nowrap"><input id="lName" style="flex:0 0 34%" data-ph="name"><input id="lUrl" dir="ltr" placeholder="http://.../playlist.m3u"></div>
+    <div class="row"><button class="btn pri" id="lAdd"><span data-t="add"></span></button></div>
+    <h2>Xtream Codes</h2>
+    <input id="xS" dir="ltr" placeholder="http://server:port">
+    <div class="row"><input id="xU" dir="ltr" data-ph="user"><input id="xP" dir="ltr" type="password" data-ph="pass"></div>
+    <div class="row"><button class="btn pri" id="xAdd"><span data-t="addX"></span></button></div>
+    <h2>EPG (XMLTV)</h2><div class="search"><input id="epg" dir="ltr" placeholder="http://.../epg.xml.gz"><button class="ib" data-save="epg">💾</button></div>
+    <h2 data-t="city"></h2><div class="search"><input id="city"><button class="ib" data-save="city">💾</button></div>
+    <h2 data-t="teams"></h2><div class="search"><input id="favTeams" placeholder="Al Ahly, Zamalek"><button class="ib" data-save="favTeams">💾</button></div>
+    <h2 data-t="backup"></h2>
+    <div class="row"><button class="btn" id="bkDown"><b>⬇️</b><span data-t="bkDown"></span></button><button class="btn" id="bkUp"><b>⬆️</b><span data-t="bkUp"></span></button></div>
+    <input type="file" id="bkFile" accept="application/json,.json" style="display:none">
+    <p class="note" data-t="bkNote"></p>
+    <h2 data-t="adhan"></h2><div class="search"><input id="adhanUrl" dir="ltr" placeholder="https://.../adhan.mp3"><button class="ib" data-save="adhanUrl">💾</button></div>
+  </section>
+  <section class="tab" id="t-favs"><h2 data-t="favOrder"></h2><div id="favs"></div><h2 data-t="favCh"></h2><div id="favCh"></div></section>
+  <section class="tab" id="t-apps"><div class="search"><input id="appQ" data-ph="findApp"></div><div id="apps" style="margin-top:10px"></div></section>
+  <section class="tab" id="t-watch"><h2 data-t="watch"></h2><div id="watch"></div></section>
+</main>
+<nav>
+  <button class="on" data-tab="remote"><b>🎮</b><span data-t="remote"></span></button>
+  <button data-tab="type"><b>⌨️</b><span data-t="type"></span></button>
+  <button data-tab="watch"><b>▶️</b><span data-t="watchS"></span></button>
+  <button data-tab="favs"><b>⭐</b><span data-t="favs"></span></button>
+  <button data-tab="apps"><b>📦</b><span data-t="apps"></span></button>
+  <button data-tab="links"><b>🔗</b><span data-t="links"></span></button>
+</nav>
+<div id="pair"><div style="font-size:48px">📺</div><h1 data-t="pairTitle" style="font-size:20px"></h1><p class="note" data-t="pairNote"></p>
+  <input id="pairCode" inputmode="numeric" maxlength="4"><button class="btn pri" id="pairGo" style="max-width:220px;width:100%"><span data-t="connect"></span></button></div>
+<div id="toast"></div>
+<script>
+"use strict";
+const TX={ar:{back:"رجوع",home:"الرئيسية",options:"خيارات",iptv:"القنوات",last:"آخر قناة",frame:"البرواز",sleep:"نوم",numbers:"رقم القناة",typeTitle:"اكتب على التلفزيون",sendTv:"ابعت للخانة المفتوحة",searchTv:"دوّر على التلفزيون",
+  typeNote:"لو فيه خانة كتابة مفتوحة على التلفزيون، الكلام هيتكتب فيها. لو مفيش، هيدوّر بيه.",playlists:"قوائم القنوات (M3U)",name:"الاسم",add:"إضافة القائمة",city:"المدينة (طقس وصلاة)",teams:"فرقك المفضلة",adhan:"رابط صوت الأذان (اختياري)",
+  favOrder:"ترتيب المفضلة",favCh:"القنوات المفضلة",findApp:"دوّر على تطبيق...",watch:"كمّل المشاهدة",remote:"ريموت",type:"كتابة",watchS:"متابعة",favs:"المفضلة",apps:"التطبيقات",links:"الروابط",
+  pairTitle:"اكتب كود الربط اللي ظاهر على التلفزيون",pairNote:"الإعدادات ← التحكم من الموبايل",connect:"اتصال",saved:"اتحفظ ✓",sent:"اتبعت ✓",err:"مفيش اتصال بالتلفزيون",kids:"بروفايل الأطفال مش بيسمح بالتعديل",
+  empty:"مفيش حاجة هنا لسه",backup:"نسخة احتياطية",bkDown:"تنزيل على الموبايل",bkUp:"استرجاع من الموبايل",bkNote:"الملف فيه كل الإعدادات والروابط والبروفايلات (وكمان باسوردات Xtream)، فخليه في مكان آمن.",restored:"اتسترجعت ✓",user:"اسم المستخدم",pass:"الباسورد",addX:"إضافة اشتراك Xtream",playing:"شغال دلوقتي:",open:"فتح",pin:"الرقم السري"},
+ en:{back:"Back",home:"Home",options:"Options",iptv:"Channels",last:"Last ch.",frame:"Frame",sleep:"Sleep",numbers:"Channel number",typeTitle:"Type on the TV",sendTv:"Send to the open field",searchTv:"Search on TV",
+  typeNote:"If a text field is open on the TV the text goes there; otherwise it searches.",playlists:"Channel playlists (M3U)",name:"Name",add:"Add playlist",city:"City (weather & prayer)",teams:"Your teams",adhan:"Adhan sound URL (optional)",
+  favOrder:"Favorites order",favCh:"Favorite channels",findApp:"Find an app...",watch:"Continue watching",remote:"Remote",type:"Type",watchS:"Watching",favs:"Favorites",apps:"Apps",links:"Links",
+  pairTitle:"Enter the pairing code shown on the TV",pairNote:"Settings → Phone control",connect:"Connect",saved:"Saved ✓",sent:"Sent ✓",err:"Can't reach the TV",kids:"Kids profile doesn't allow changes",
+  empty:"Nothing here yet",backup:"Backup",bkDown:"Download to phone",bkUp:"Restore from phone",bkNote:"The file holds all settings, links and profiles (including Xtream passwords) — keep it safe.",restored:"Restored ✓",user:"Username",pass:"Password",addX:"Add Xtream account",playing:"Now playing:",open:"Open",pin:"PIN"}};
+let lang=(navigator.language||"ar").startsWith("ar")?"ar":"en", st=null;
+const $=id=>document.getElementById(id), t=k=>TX[lang][k]||k;
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let code=new URLSearchParams(location.search).get("k")||localStorage.getItem("tvcode")||"";
+if(code) localStorage.setItem("tvcode",code);
+function i18n(){ document.documentElement.lang=lang; document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+  document.querySelectorAll("[data-t]").forEach(e=>e.textContent=t(e.dataset.t)); document.querySelectorAll("[data-ph]").forEach(e=>e.placeholder=t(e.dataset.ph)) }
+let toastT; function toast(m){ const e=$("toast"); e.textContent=m; e.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>e.classList.remove("on"),1800) }
+const buzz=()=>{ try{navigator.vibrate&&navigator.vibrate(12)}catch(e){} };
+async function api(cmd,args){
+  try{
+    const r=await fetch("/api?k="+encodeURIComponent(code),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({cmd},args||{}))});
+    if(r.status===403){ $("pair").classList.add("on"); return null }
+    const j=await r.json(); if(j.error==="kids"){ toast(t("kids")); return null } return j;
+  }catch(e){ toast(t("err")); return null }
+}
+async function refresh(){
+  const s=await api("state"); if(!s) return; st=s; lang=s.lang||lang; i18n();
+  if(typeof s.evId==="number"&&s.evId<lastEv){ lastEv=s.evId; localStorage.setItem("tvEv",lastEv) }
+  $("prof").textContent=`${s.profile.emoji} ${s.profile.name}`;
+  $("now").textContent=s.playing?`${t("playing")} ${s.playing.no?s.playing.no+" · ":""}${s.playing.name}`:"";
+  $("lists").innerHTML=s.lists.length?s.lists.map((l,i)=>`<div class="item"><div class="t"><b>${l.type==="xtream"?"🔑":"📃"} ${esc(l.name)}</b><small>${esc(l.type==="xtream"?l.server+" ("+l.user+")":l.url)}</small></div><button class="ib" data-dl="${i}">🗑</button></div>`).join(""):`<div class="empty">${t("empty")}</div>`;
+  ["epg","city","favTeams","adhanUrl"].forEach(k=>{ if(document.activeElement!==$(k)) $(k).value=s[k]||"" });
+  $("favs").innerHTML=s.favs.length?s.favs.map((a,i)=>`<div class="item"><div class="t"><b>${esc(a.name)}</b></div>
+    <button class="ib" data-mv="${i}:-1">▲</button><button class="ib" data-mv="${i}:1">▼</button><button class="ib" data-launch="${esc(a.pkg)}">▶</button><button class="ib on" data-fav="${esc(a.pkg)}">★</button></div>`).join(""):`<div class="empty">${t("empty")}</div>`;
+  $("favCh").innerHTML=s.favCh.length?s.favCh.map(c=>`<div class="item"><div class="t"><b>${c.no?c.no+" · ":""}${esc(c.name)}</b></div><button class="ib" data-play="${esc(c.url)}">▶</button></div>`).join(""):`<div class="empty">${t("empty")}</div>`;
+  renderApps();
+  $("watch").innerHTML=s.watch.length?s.watch.map(w=>`<div class="item"><div class="t"><b>${esc(w.name)}</b>${w.pct?`<div class="prog"><i style="width:${w.pct}%"></i></div>`:""}</div>
+    ${w.url?`<button class="ib" data-play="${esc(w.url)}">▶</button>`:w.pkg?`<button class="ib" data-launch="${esc(w.pkg)}">▶</button>`:""}<button class="ib" data-wr="${esc(w.key)}">🗑</button></div>`).join(""):`<div class="empty">${t("empty")}</div>`;
+}
+function renderApps(){ if(!st) return; const q=$("appQ").value.trim().toLowerCase();
+  $("apps").innerHTML=st.apps.filter(a=>!q||a.name.toLowerCase().includes(q)).map(a=>`<div class="item"><div class="t"><b>${esc(a.name)}</b></div>
+    <button class="ib${a.fav?" on":""}" data-fav="${esc(a.pkg)}">${a.fav?"★":"☆"}</button><button class="ib" data-launch="${esc(a.pkg)}">▶</button></div>`).join("") }
+$("appQ").addEventListener("input",renderApps);
+// repeat-on-hold for arrows
+let holdT=null, holdI=null;
+function startHold(k){ api("key",{k}); buzz(); if(!["up","down","left","right"].includes(k)) return; holdT=setTimeout(()=>{ holdI=setInterval(()=>api("key",{k}),160) },450) }
+function stopHold(){ clearTimeout(holdT); clearInterval(holdI) }
+document.querySelectorAll("[data-k]").forEach(b=>{
+  b.addEventListener("pointerdown",e=>{ e.preventDefault(); startHold(b.dataset.k) });
+  ["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,stopHold));
+});
+$("t-remote").querySelector(".keys").innerHTML=["1","2","3","4","5","6","7","8","9","","0",""].map(n=>n?`<button data-num="${n}">${n}</button>`:"<span></span>").join("");
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("button"); if(!b) return; const d=b.dataset;
+  if(d.tab){ document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b)); document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.id==="t-"+d.tab)); if(d.tab!=="remote"&&d.tab!=="type") refresh(); return }
+  if(d.num){ buzz(); api("key",{k:d.num}); return }
+  if(d.v){ buzz(); api("volume",{d:d.v}); return }
+  if(d.a){ buzz(); api("action",{a:d.a}); return }
+  if(d.launch){ buzz(); if(await api("launch",{pkg:d.launch})) toast(t("sent")); return }
+  if(d.play){ buzz(); if(await api("play",{url:d.play})) toast(t("sent")); setTimeout(refresh,800); return }
+  if(d.fav){ await api("fav",{pkg:d.fav}); refresh(); return }
+  if(d.wr){ await api("watchRemove",{key:d.wr}); refresh(); return }
+  if(d.mv){ const [i,dir]=d.mv.split(":").map(Number), o=st.favs.map(a=>a.pkg), j=i+dir; if(j<0||j>=o.length) return; [o[i],o[j]]=[o[j],o[i]]; await api("favs",{order:o}); refresh(); return }
+  if(d.dl){ const l=st.lists.slice(); l.splice(+d.dl,1); if(await api("lists",{lists:l})) toast(t("saved")); refresh(); return }
+  if(d.save){ if(await api("set",{k:d.save,v:$(d.save).value})) toast(t("saved")); return }
+  switch(b.id){
+    case "sendTxt": if(await api("text",{t:$("txt").value,submit:true})) toast(t("sent")); return;
+    case "searchTxt": if(await api("search",{t:$("txt").value})) toast(t("sent")); return;
+    case "lAdd": { const u=$("lUrl").value.trim(); if(!u) return; const l=(st?st.lists:[]).concat([{name:$("lName").value.trim()||"IPTV",url:u}]);
+      if(await api("lists",{lists:l})){ toast(t("saved")); $("lUrl").value=$("lName").value="" } refresh(); return }
+    case "xAdd": { const sv=$("xS").value.trim(), u=$("xU").value.trim(); if(!sv||!u) return;
+      const l=(st?st.lists:[]).concat([{type:"xtream",name:sv.replace(/^https?:\/\//,"").split(/[:/]/)[0],server:/^https?:/.test(sv)?sv:"http://"+sv,user:u,pass:$("xP").value}]);
+      if(await api("lists",{lists:l})){ toast(t("saved")); $("xS").value=$("xU").value=$("xP").value="" } refresh(); return }
+    case "bkDown": { const d=await api("backup"); if(!d) return; const blob=new Blob([JSON.stringify(d)],{type:"application/json"});
+      const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`tvlauncher-backup-${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); return }
+    case "bkUp": $("bkFile").click(); return;
+    case "pairGo": code=$("pairCode").value.trim(); localStorage.setItem("tvcode",code); $("pair").classList.remove("on"); refresh(); return;
+    case "prof": { if(!st) return; const names=st.profiles.map((p,i)=>`${i+1}. ${p.emoji} ${p.name}`).join("\n"); const n=+prompt(names); const p=st.profiles[n-1]; if(!p) return;
+      let pin=""; if(st.kids) pin=prompt(t("pin"))||""; if(await api("profile",{id:p.id,pin})) setTimeout(refresh,600); return }
+  }
+});
+$("bkFile").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; try{ const d=JSON.parse(await f.text()); if(await api("restore",{data:d})){ toast(t("restored")); setTimeout(refresh,1500) } }catch(x){ toast("✗") } e.target.value="" });
+// alerts from the TV (prayer, matches, notifications) while this page is open
+let lastEv=+localStorage.getItem("tvEv")||0;
+async function pollEvents(){ const r=await api("events",{since:lastEv}); if(!r||!r.events||!r.events.length) return;
+  r.events.forEach(ev=>{ lastEv=Math.max(lastEv,ev.id); $("alerts").insertAdjacentHTML("afterbegin",`<div class="al"><b>${esc(ev.icon)}</b><div><strong>${esc(ev.title)}</strong><small>${esc(ev.text)}</small></div></div>`) });
+  while($("alerts").children.length>3) $("alerts").lastChild.remove();
+  localStorage.setItem("tvEv",lastEv); const e=r.events[r.events.length-1]; toast(`${e.icon} ${e.title}`); try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(x){} }
+setInterval(()=>{ if(code) pollEvents() },6000);
+i18n(); if(!code) $("pair").classList.add("on"); else refresh();
+setInterval(()=>{ if(!document.hidden&&code) api("state").then(s=>{ if(s){ st=s; $("now").textContent=s.playing?`${t("playing")} ${s.playing.no?s.playing.no+" · ":""}${s.playing.name}`:"" } }) },8000);
+</script>
+</body>
+</html>

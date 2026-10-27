@@ -1,0 +1,35 @@
+name: Build APK
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      # web/ is the UI source; this converts it for old Android TV WebViews (Android 7+) into app/src/main/assets
+      - run: npm ci || npm install
+      - run: npm run build
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.7' }
+      - name: Restore signing key
+        env: { KEYSTORE_B64: "${{ secrets.KEYSTORE_B64 }}" }
+        run: if [ -n "$KEYSTORE_B64" ]; then echo "$KEYSTORE_B64" | base64 -d > app/tvlauncher.jks; fi
+      - run: gradle assembleRelease --no-daemon
+        env: { KEYSTORE_PASS: "${{ secrets.KEYSTORE_PASS }}" }
+      - run: cp app/build/outputs/apk/release/app-release.apk TVLauncher-v${{ github.run_number }}.apk
+      - uses: actions/upload-artifact@v4
+        with: { name: TVLauncher-apk, path: TVLauncher-v*.apk }
+      # Every build becomes a release, so the launcher can update itself from GitHub.
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: TV Launcher v${{ github.run_number }}
+          body: ${{ github.event.head_commit.message }}
+          files: TVLauncher-v${{ github.run_number }}.apk

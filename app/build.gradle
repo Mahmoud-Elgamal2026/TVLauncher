@@ -1,0 +1,40 @@
+plugins { id 'com.android.application' }
+
+def runNo = (System.getenv("GITHUB_RUN_NUMBER") ?: "1") as int
+
+android {
+    namespace 'com.mahmoud.tvlauncher'
+    compileSdk 34
+    defaultConfig {
+        applicationId "com.mahmoud.tvlauncher"
+        minSdk 23
+        targetSdk 34
+        versionCode runNo
+        versionName "1.${runNo}"
+    }
+    // The release key is not stored in the repo: CI restores it from the KEYSTORE_B64 secret.
+    // Without it (local builds) the debug key is used.
+    def ks = file("tvlauncher.jks")
+    signingConfigs {
+        release {
+            if (ks.exists()) {
+                storeFile ks
+                storePassword System.getenv("KEYSTORE_PASS") ?: "tvlauncher123"
+                keyAlias "tvlauncher"
+                keyPassword System.getenv("KEYSTORE_PASS") ?: "tvlauncher123"
+            }
+        }
+    }
+    buildTypes {
+        release { minifyEnabled false; signingConfig ks.exists() ? signingConfigs.release : signingConfigs.debug }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8; coreLibraryDesugaringEnabled true }
+    lint { abortOnError false; checkReleaseBuilds false }
+}
+
+dependencies {
+    // Shizuku: lets the launcher run "pm" commands (remove/restore system apps) without root
+    implementation "dev.rikka.shizuku:api:13.1.5"
+    implementation "dev.rikka.shizuku:provider:13.1.5"
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "tvlauncher-web",
+  "private": true,
+  "description": "Builds the launcher UI (web/) into app/src/main/assets for old Android TV WebViews (Chrome 53+).",
+  "scripts": { "build": "node tools/build-web.mjs" },
+  "devDependencies": { "esbuild": "0.24.0", "postcss": "8.4.47", "acorn": "8.12.1" }
+}

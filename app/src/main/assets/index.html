@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TV Launcher</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body data-theme="apple" data-size="m">
+<div id="shelfBg"></div><div id="wall"></div><div id="shelfImg"></div><div id="shade"></div>
+
+<div class="top">
+  <div class="left">
+    <button class="qbtn f" id="profBtn"></button>
+    <button class="qbtn f" id="qBtn">⚡</button>
+    <button class="qbtn f" id="searchBtn">🔍</button>
+    <button class="qbtn f" id="browserBtn">🌐</button>
+    <div class="weather"><div id="wIcon"></div><div id="wTemp"></div><div id="wCity"></div></div>
+    <div class="status"><span id="sNet"></span><span id="sDisk"></span></div>
+  </div>
+  <div class="tabs" id="tabs">
+    <button class="tab f on" data-page="home" data-i18n="home"></button>
+    <button class="tab f" data-page="apps" data-i18n="apps"></button>
+    <button class="tab f" data-page="tv" data-i18n="tv"></button>
+    <button class="tab f" data-page="vod" data-i18n="vodTab"></button>
+    <button class="tab f" data-page="store" data-i18n="store"></button>
+    <button class="tab f" data-page="settings" data-i18n="settings"></button>
+  </div>
+  <div class="clock"><div id="time">--:--</div><div id="date"></div></div>
+</div>
+<div class="ticker" id="ticker"><span id="tPrayer"></span><span id="tMatch"></span><span id="tSleep"></span></div>
+
+<section class="page on" id="home"><div class="scroll">
+  <div id="shelf"><div id="shelfTitle"></div><div id="shelfSub"></div></div>
+  <h2 data-i18n="continueW" data-row="watchRow"></h2><div class="row" id="watchRow"></div>
+  <h2 data-i18n="favorites"></h2><div class="row" id="favRow"></div>
+  <h2 data-i18n="folders" data-row="folderRow"></h2><div class="row" id="folderRow"></div>
+  <h2 data-i18n="matchesToday" data-row="matchRow"></h2><div class="row" id="matchRow"></div>
+  <h2 data-i18n="favChannels" data-row="favChRow"></h2><div class="row" id="favChRow"></div>
+  <h2 data-i18n="quick" data-row="quickRow"></h2><div class="row" id="quickRow"></div>
+  <h2 data-i18n="recent" data-row="recentRow"></h2><div class="row" id="recentRow"></div>
+</div></section>
+
+<section class="page" id="apps"><div class="scroll"><div class="grid" id="appGrid"></div></div></section>
+
+<section class="page" id="tv">
+  <div class="rcv">
+    <div class="rcv-cats">
+      <input class="inp f" id="chSearch" data-i18n-ph="search">
+      <div class="list" id="groups"></div>
+    </div>
+    <div class="rcv-list list" id="channels"></div>
+    <div class="rcv-prev">
+      <div class="pv"><video id="pvVideo" muted playsinline></video><div id="pvLogo"></div></div>
+      <div id="pvName"></div>
+      <div class="pvEpg"><div id="pvNow"></div><div class="bar"><i id="pvBar"></i></div><div id="pvNext"></div></div>
+      <div class="pvHint" data-i18n="rcvHint"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="vod">
+  <div class="vodw">
+    <div class="list vodCats" id="vodCats"></div>
+    <div class="vodMain">
+      <div id="vodHero"><div class="vh"><div id="vodHeroTitle"></div><div id="vodHeroMeta"></div><div id="vodHeroPlot"></div></div></div>
+      <div class="scroll vodScroll"><div class="pgrid" id="vodGrid"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="store">
+  <div class="vodw"><div class="list" id="storeCats"></div><div class="scroll" id="storeMain"></div></div>
+</section>
+
+<section class="page" id="settings"><div class="scroll" id="setScroll"></div></section>
+
+<div id="player"><video id="video" autoplay playsinline></video>
+  <div id="pInfo"><div id="pState"></div><div id="pNum"></div><img id="pLogo" alt=""><div class="pTxt"><div id="pName"></div><div id="pNow"></div><div class="bar"><i id="pBar"></i></div><div id="pNext"></div></div></div>
+  <div id="plist"><div class="plh" id="plistTitle"></div><div class="list" id="plistItems"></div></div>
+</div>
+<div id="numEntry"></div>
+<div id="search"><div class="srch-top"><input class="inp f" id="sInput" data-i18n-ph="searchAll"><button class="qbtn f" id="voiceBtn">🎤</button></div><div class="scroll" id="sResults"></div></div>
+<div id="detail"><div id="dBack"></div><div class="dShade"></div>
+  <div class="dBody"><div id="dPoster"></div><div class="dInfo"><div id="dTitle"></div><div id="dMeta"></div><div id="dPlot"></div><div class="inline" id="dBtns"></div>
+    <div class="inline" id="dSeasons"></div><div class="list" id="dEps"></div></div></div></div>
+<div class="overlay" id="dlg"><div class="mbox" id="dbox"></div></div>
+<div id="frame"><div id="frameA" class="fimg"></div><div id="frameB" class="fimg"></div><div id="frameArt"><div id="frameArtImg"></div></div>
+  <div id="frameInfo"><div id="fTime"></div><div id="fDate"></div><div id="fWeather"></div><div id="fPrayer"></div><div id="fMatch"></div><div id="fForecast"></div><div id="fAzkar"></div></div></div>
+<div id="blackout"></div>
+<div id="banners"></div>
+<div class="hint" data-i18n="hint"></div>
+
+<script src="js/compat.js"></script>
+<script src="js/lib-hls.min.js"></script>
+<script src="js/lib-qrcode.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/core.js"></script>
+<script src="js/themes.js"></script>
+<script src="js/home.js"></script>
+<script src="js/tv.js"></script>
+<script src="js/vod.js"></script>
+<script src="js/extras.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/remote.js"></script>
+<script src="js/life.js"></script>
+<script src="js/store.js"></script>
+<script>boot()</script>
+</body>
+</html>
