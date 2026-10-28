@@ -38,8 +38,9 @@ public class MainActivity extends Activity {
         msg.setBackgroundColor(0xFF0B0E1A); msg.setTextColor(0xFFFFFFFF);
         msg.setText("بيدوّر على البوكس في الواي فاي…");
         setContentView(msg);
+        // open the last box straight away; only search the network if it doesn't answer
         String last = prefs.getString("host", null);
-        if (last != null) check(last, ok -> { if (ok) open(last); else scan(); }); else scan();
+        if (last != null) open(last); else scan();
     }
 
     interface Cb { void done(boolean ok); }
@@ -90,10 +91,14 @@ public class MainActivity extends Activity {
         l.addView(t); l.addView(e); l.addView(go); l.addView(again); setContentView(l);
     }
 
-    void open(String host) {
+    void open(final String host) {
         web = new WebView(this);
         WebSettings s = web.getSettings(); s.setJavaScriptEnabled(true); s.setDomStorageEnabled(true);
-        web.setWebViewClient(new WebViewClient());
+        web.setWebViewClient(new WebViewClient() {
+            @Override public void onReceivedError(WebView v, int code, String desc, String url) {
+                if (url != null && url.startsWith("http://" + host)) runOnUiThread(() -> { msg.setText("بيدوّر على البوكس في الواي فاي…"); setContentView(msg); web = null; scan(); });
+            }
+        });
         web.addJavascriptInterface(new Bridge(), "PhoneApp");
         web.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> cb, FileChooserParams p) {

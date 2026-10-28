@@ -219,7 +219,7 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
 <div style="display:flex;gap:10px"><button id="phWall" style="flex:1;padding:14px;border-radius:14px;border:0;background:#2a7d4f;color:#fff;font-size:16px">خلفية للانشر</button>
 <button id="phFrame" style="flex:1;padding:14px;border-radius:14px;border:0;background:#7a3bff;color:#fff;font-size:16px">صور للبرواز (أكتر من صورة)</button></div>
 <input type="file" id="phFile" accept="image/*" style="display:none"><div id="phMsg" style="color:#8a90a8;margin-top:6px;font-size:14px"></div></div>
-<div id="tpWrap" style="padding:10px 14px"><div id="tpad" style="height:230px;border-radius:18px;background:#1b1e2b;display:flex;align-items:center;justify-content:center;color:#8a90a8;font-size:15px;user-select:none;touch-action:none">اسحب للأسهم · دوس = OK · دوستين = رجوع</div>
+<div id="tpWrap" style="padding:10px 14px"><input id="liveType" placeholder="⌨️ اكتب هنا — بيتكتب على التليفزيون على طول" style="width:100%;box-sizing:border-box;margin-bottom:10px;padding:14px;border-radius:14px;border:0;background:#1b1e2b;color:#fff;font-size:16px"><div id="tpad" style="height:230px;border-radius:18px;background:#1b1e2b;display:flex;align-items:center;justify-content:center;color:#8a90a8;font-size:15px;user-select:none;touch-action:none">اسحب للأسهم · دوس = OK · دوستين = رجوع</div>
 <div style="display:flex;gap:10px;margin-top:10px"><button id="micBtn" style="flex:1;padding:14px;border-radius:14px;border:0;background:#3b6cff;color:#fff;font-size:17px">🎤 بحث بالصوت</button></div></div>
 <script>
 (function(){ var b=document.body, ph=document.getElementById("phWall"), tp=document.getElementById("tpWrap"); try{ var first=b.firstElementChild; if(tp) b.insertBefore(tp,first); if(ph){ var sec=ph.parentNode.parentNode; b.insertBefore(sec,tp?tp.nextSibling:first) } }catch(e){} })();
@@ -237,6 +237,9 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
   fi.onchange=async function(){ var fs=[].slice.call(fi.files||[]); if(!fs.length) return; var n=0;
     for(var i=0;i<fs.length;i++){ pm.textContent="بيبعت "+(i+1)+" من "+fs.length+"…"; try{ var d=await shrink(fs[i]); var r=await api("photo",{data:d,mode:phMode}); if(r&&r.ok) n++ }catch(e){} }
     pm.textContent="✓ اتبعت "+n+" صورة"; fi.value="" };
+  var lt=document.getElementById("liveType"), ltT=null;
+  lt.addEventListener("input",function(){ clearTimeout(ltT); ltT=setTimeout(function(){ api("text",{t:lt.value,submit:false}) },300) });
+  lt.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); api("text",{t:lt.value,submit:true}); lt.value=""; lt.blur() } });
   window.onPhoneVoice=function(t){ if(t) api("search",{t:t}) };
   window.onPhoneShare=function(u){ if(u) api("share",{u:u}) };
   window.onPhoneVolume=function(d){ api("volume",{d:d}) };

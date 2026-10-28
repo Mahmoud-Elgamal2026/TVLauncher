@@ -493,3 +493,84 @@ hwSettings = function(w) {
   } }, { label: L("done"), fn: () => {
   } }]));
 };
+Object.assign(T.ar, { cinema: "وضع السينما", cinemaOn: "🎬 وضع السينما شغال", cinemaOff: "خرجت من وضع السينما" });
+Object.assign(T.en, { cinema: "Cinema mode", cinemaOn: "🎬 Cinema mode on", cinemaOff: "Cinema mode off" });
+function applyCinema() {
+  document.body.classList.toggle("cinema", !!S.cinema);
+  if (S.cinema) document.body.dataset.anim = "off";
+  else applyLook();
+}
+function toggleCinema() {
+  S.cinema = !S.cinema;
+  applyCinema();
+  banner("🎬", L(S.cinema ? "cinemaOn" : "cinemaOff"), "", 2500);
+  renderPager();
+}
+setTimeout(applyCinema, 0);
+const _renderPagerC = renderPager;
+renderPager = function() {
+  _renderPagerC();
+  const d = $("homePager");
+  if (!d) return;
+  let b = $("railCinema");
+  if (!b) {
+    const m = $("railBoost");
+    const h = `<button class="rb f" id="railCinema"><b>🎬</b><span>${esc(L("cinema"))}</span></button>`;
+    if (m) m.insertAdjacentHTML("beforebegin", h);
+    else d.insertAdjacentHTML("beforeend", h);
+    b = $("railCinema");
+  }
+  b.classList.toggle("on", !!S.cinema);
+};
+activators.unshift((el) => {
+  if (el.id === "railCinema") {
+    toggleCinema();
+    return true;
+  }
+  return false;
+});
+Object.assign(DEF, { matchAlerts: {}, matchApp: "" });
+Object.assign(T.ar, { mRemind: "🔔 فكّرني قبلها بربع ساعة", mReminded: "هفكّرك قبل الماتش", mPickApp: "هتتفرج منين؟", mSoon: "الماتش بعد ربع ساعة", mOpen: "افتح", mLater: "بعدين" });
+Object.assign(T.en, { mRemind: "🔔 Remind me 15 min before", mReminded: "I'll remind you before kick-off", mPickApp: "Which app do you watch on?", mSoon: "Match in 15 minutes", mOpen: "Open", mLater: "Later" });
+hwMatchesDialog = function() {
+  const list = (typeof matches !== "undefined" ? matches : []).filter((e) => evState(e) !== "ft");
+  if (!list.length) return dialog("⚽ " + L("hwMatches"), [{ label: L("mNone"), fn: () => {
+  } }]);
+  dialog("⚽ " + L("hwMatches"), list.map((e) => ({ icon: (S.matchAlerts || {})[e.idEvent] ? "🔔" : "⚽", label: `${e.strHomeTeam} × ${e.strAwayTeam} · ${evState(e) === "live" ? L("live") : fmtTime(evTime(e))}`, fn: () => setTimeout(() => matchRemind(e), 30) })));
+};
+function matchRemind(e) {
+  const set = () => {
+    const a = Object.assign({}, S.matchAlerts || {});
+    a[e.idEvent] = { t: +evTime(e), n: `${e.strHomeTeam} × ${e.strAwayTeam}` };
+    S.matchAlerts = a;
+    banner("🔔", L("mReminded"), a[e.idEvent].n, 4e3);
+  };
+  if (S.matchApp) return set();
+  dialog(L("mPickApp"), visibleApps().slice(0, 40).map((a) => ({ label: appName(a), fn: () => {
+    S.matchApp = a.pkg;
+    set();
+  } })));
+}
+setInterval(() => {
+  const a = Object.assign({}, S.matchAlerts || {}), now = Date.now();
+  let ch = false;
+  Object.keys(a).forEach((id) => {
+    const m = a[id];
+    if (now > m.t + 3 * 36e5) {
+      delete a[id];
+      ch = true;
+      return;
+    }
+    if (!m.fired && now >= m.t - 15 * 6e4) {
+      m.fired = 1;
+      ch = true;
+      chime();
+      if (on("player") || on("dlg")) banner("⚽", L("mSoon"), m.n, 2e4);
+      else dialog("⚽ " + L("mSoon"), [{ label: L("mOpen") + (S.matchApp && byPkg(S.matchApp) ? " " + appName(byPkg(S.matchApp)) : ""), pri: 1, fn: () => {
+        if (S.matchApp) launch(S.matchApp);
+      } }, { label: L("mLater"), fn: () => {
+      } }], { sub: m.n });
+    }
+  });
+  if (ch) S.matchAlerts = a;
+}, 3e4);
