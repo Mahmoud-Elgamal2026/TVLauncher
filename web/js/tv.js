@@ -260,7 +260,7 @@ function numKey(d,onDone){
 function gotoNumber(n){ const c=channels.find(x=>x.no===n); if(!c){A.toast(L("noRes"));return} if(!chAllowed(c)) return;
   if(!playList.includes(c)) playList=channels.filter(chAllowed); play(c) }
 let pHold=null, pHeld=false;
-layers.push({test:()=>on("player")&&!on("dlg"),ownsEnter:true,key(e){
+layers.unshift({test:()=>on("player")&&!on("dlg"),ownsEnter:true,key(e){
   const k=e.key, pl=$("plist").classList.contains("on"), v=$("video");
   if(isBack(k)||k==="Backspace"){ e.preventDefault&&e.preventDefault(); clearTimeout(nextT); if(pl){ $("plist").classList.remove("on"); focused=null; showInfo() } else stopPlayer(); return true }
   if(/^[0-9]$/.test(k)&&isLive(playing)){ numKey(k,gotoNumber); return true }

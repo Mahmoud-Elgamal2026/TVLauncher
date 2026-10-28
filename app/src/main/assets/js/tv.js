@@ -597,7 +597,7 @@ function gotoNumber(n) {
   play(c);
 }
 let pHold = null, pHeld = false;
-layers.push({ test: () => on("player") && !on("dlg"), ownsEnter: true, key(e) {
+layers.unshift({ test: () => on("player") && !on("dlg"), ownsEnter: true, key(e) {
   const k = e.key, pl = $("plist").classList.contains("on"), v = $("video");
   if (isBack(k) || k === "Backspace") {
     e.preventDefault && e.preventDefault();

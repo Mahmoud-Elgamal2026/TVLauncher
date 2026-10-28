@@ -76,3 +76,24 @@ renderCreator(); const _applyLangC=applyLang; applyLang=function(){ _applyLangC.
 (function(){ const s=document.createElement("div"); s.id="splashSig"; const ar=S.lang==="ar";
   s.innerHTML=`<img src="${CREATOR.img}" onerror="this.remove()" alt=""><div class="t1">TV Launcher</div><div class="t2">${ar?"من تصميم وتطوير":"Designed & built by"}</div><div class="t3">${esc(ar?CREATOR.ar:CREATOR.en)}</div>`;
   document.body.appendChild(s); setTimeout(()=>s.classList.add("out"),1600); setTimeout(()=>s.remove(),2300) })();
+
+// ================= Easier widget removal + always-closable player =================
+// in arrange mode OK opens a clear action sheet for that widget (remove is first)
+const _hwEditStartX=hwEditStart; hwEditStart=function(){ _hwEditStartX(); banner("✏️",S.lang==="ar"?"دوس OK على أي ويدجت عشان تشيلها أو تغيّرها":"Press OK on a widget to remove or change it",L("edDone"),600000) };
+layers.unshift({test:()=>hwEdit.on&&!hwEdit.grab&&!on("dlg"),ownsEnter:true,key:e=>{
+  const k=e.key; if(!(k==="Enter"||e.keyCode===13||e.keyCode===23)) return false; held=true;
+  const id=focused&&focused.dataset&&focused.dataset.hw; if(!id) return false;
+  const w=hwGet(id), t=HW_TYPES.find(x=>x[0]===(w&&w.t))||["","",""];
+  dialog(t[1]+" "+L(t[2]),[
+    {icon:"🗑",label:L("hwRemove"),pri:1,fn:()=>{ hwSave(hwList().filter(x=>x.id!==id)); setTimeout(()=>{ const e2=document.querySelector("#hwBoard .hw"); if(e2) focus(e2) },60) }},
+    {icon:"✋",label:S.lang==="ar"?"امسكها وحرّكها بالأسهم":"Grab and move with arrows",fn:()=>{ hwEdit.grab=id; renderHW(); banner("✋",L("edHold"),"",600000) }},
+    {icon:"➕",label:L("wBigger"),keep:1,fn:()=>hwSet(id,{sz:Math.min(3,(hwGet(id).sz||1)+1)})},
+    {icon:"➖",label:L("wSmaller"),keep:1,fn:()=>hwSet(id,{sz:Math.max(1,(hwGet(id).sz||1)-1)})},
+    {icon:"🎨",label:L("hwStyle"),keep:1,fn:()=>{ const x=hwGet(id); hwSet(id,{st:HW_STYLES[(HW_STYLES.indexOf(x.st||"glass")+1)%HW_STYLES.length]}) }},
+    {label:L("done"),fn:()=>{}}],{grid:3});
+  return true }});
+// the player: Back, Home or the menu key always close it; a stream that never starts closes itself
+document.addEventListener("keydown",e=>{ if(on("player")&&!on("dlg")&&(e.key==="Home"||e.key==="Escape")){ stopPlayer() } },true);
+let plWatch=null;
+const _playX=play; play=function(c){ _playX.apply(this,arguments); clearTimeout(plWatch);
+  plWatch=setTimeout(()=>{ const v=$("video"); if(on("player")&&v&&(v.readyState<2||v.error)){ stopPlayer(); A.toast(S.lang==="ar"?"القناة مش شغالة — اتقفلت":"Stream didn't start — closed") } },25000) };

@@ -441,7 +441,10 @@ function hwMenu(id) {
     }, 40);
   };
   const rtl = document.documentElement.dir === "rtl";
-  const items = [];
+  const items = [{ icon: "🗑", label: L("hwRemove"), pri: 1, fn: () => {
+    hwSave(hwList().filter((x) => x.id !== id));
+    A.toast("🗑 " + L("hwRemove"));
+  } }];
   if (w.t !== "yt") items.push(
     { icon: rtl ? "➡️" : "⬅️", label: L("hwLeft"), keep: 1, fn: () => swap(-1) },
     { icon: rtl ? "⬅️" : "➡️", label: L("hwRight"), keep: 1, fn: () => swap(1) },
@@ -456,7 +459,7 @@ function hwMenu(id) {
     } }
   );
   if (w.t === "yt" || w.t === "note" || w.t === "matches") items.push({ icon: "⚙️", label: L("hwSettings"), fn: () => setTimeout(() => hwSettings(w), 30) });
-  items.push({ icon: "🗑", label: L("hwRemove"), fn: () => hwSave(hwList().filter((x) => x.id !== id)) }, { icon: "＋", label: L("hwAdd"), fn: () => setTimeout(hwAddMenu, 30) }, { label: L("done"), fn: () => {
+  items.push({ icon: "＋", label: L("hwAdd"), fn: () => setTimeout(hwAddMenu, 30) }, { label: L("done"), fn: () => {
   } });
   dialog(t[1] + " " + L(t[2]), items, { grid: 3 });
 }

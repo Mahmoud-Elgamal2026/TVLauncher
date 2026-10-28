@@ -155,12 +155,12 @@ function hwMenu(id){
   const w=hwGet(id); if(!w) return; const t=HW_TYPES.find(x=>x[0]===w.t)||[w.t,"",""], l=hwList(), i=l.findIndex(x=>x.id===id);
   const swap=d=>{ const j=i+d; if(j<0||j>=l.length) return; const n=l.slice(); const tmp=n[i]; n[i]=n[j]; n[j]=tmp; hwSave(n); setTimeout(()=>{ const e=document.querySelector(`#hwBoard [data-hw="${id}"]`); if(e) focus(e); hwMenu(id) },40) };
   const rtl=document.documentElement.dir==="rtl";
-  const items=[];
+  const items=[{icon:"🗑",label:L("hwRemove"),pri:1,fn:()=>{ hwSave(hwList().filter(x=>x.id!==id)); A.toast("🗑 "+L("hwRemove")) }}];
   if(w.t!=="yt") items.push({icon:rtl?"➡️":"⬅️",label:L("hwLeft"),keep:1,fn:()=>swap(-1)},{icon:rtl?"⬅️":"➡️",label:L("hwRight"),keep:1,fn:()=>swap(1)},
     {icon:"📏",label:L("hwSize")+": "+L(["szS","szM","szL"][(w.sz||1)-1]),keep:1,fn:()=>{ hwSet(id,{sz:(w.sz||1)%3+1}); setTimeout(()=>hwMenu(id),40) }},
     {icon:"🎨",label:L("hwStyle")+": "+L(HW_STNAME[w.st||"glass"]),keep:1,fn:()=>{ const s=HW_STYLES[(HW_STYLES.indexOf(w.st||"glass")+1)%HW_STYLES.length]; hwSet(id,{st:s}); setTimeout(()=>hwMenu(id),40) }});
   if(w.t==="yt"||w.t==="note"||w.t==="matches") items.push({icon:"⚙️",label:L("hwSettings"),fn:()=>setTimeout(()=>hwSettings(w),30)});
-  items.push({icon:"🗑",label:L("hwRemove"),fn:()=>hwSave(hwList().filter(x=>x.id!==id))},{icon:"＋",label:L("hwAdd"),fn:()=>setTimeout(hwAddMenu,30)},{label:L("done"),fn:()=>{}});
+  items.push({icon:"＋",label:L("hwAdd"),fn:()=>setTimeout(hwAddMenu,30)},{label:L("done"),fn:()=>{}});
   dialog(t[1]+" "+L(t[2]),items,{grid:3});
 }
 function hwSettings(w){
