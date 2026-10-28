@@ -108,7 +108,15 @@ function remoteCmd(m) {
       return { ok: 1 };
     }
     case "set": {
-      const allowed = ["epg", "city", "favTeams", "adhanUrl", "repo"];
+      const allowed = ["epg", "city", "favTeams", "adhanUrl", "repo", "tgToken"];
+      if (m.k === "tgToken") {
+        S.tgToken = String(m.v || "").trim();
+        S.tgChat = "";
+        if (typeof tgInit === "function") tgInit();
+        if (document.querySelector("#settings.on")) renderSettings();
+        banner("🤖", "Telegram", L("saved"), 4e3);
+        return { ok: 1 };
+      }
       if (!allowed.includes(m.k)) return { error: "key" };
       S[m.k] = String(m.v || "").trim();
       if (m.k === "epg") loadEpg();

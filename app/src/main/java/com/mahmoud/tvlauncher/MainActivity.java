@@ -1406,6 +1406,24 @@ public class MainActivity extends Activity {
             }).start();
         }
 
+        /** Plain file write/read for the USB backup (only inside storage roots). */
+        @JavascriptInterface
+        public boolean writeText(String path, String text) {
+            if (path == null || !path.startsWith("/storage/") && !path.startsWith("/mnt/")) return false;
+            try (OutputStream o = new java.io.FileOutputStream(new File(path))) { o.write(text.getBytes("UTF-8")); return true; }
+            catch (Throwable t) { return false; }
+        }
+
+        @JavascriptInterface
+        public String readText(String path) {
+            if (path == null || !path.startsWith("/storage/") && !path.startsWith("/mnt/")) return "";
+            try {
+                StringBuilder sb = new StringBuilder();
+                try (BufferedReader r = new BufferedReader(new InputStreamReader(new java.io.FileInputStream(new File(path)), "UTF-8"))) { String l; while ((l = r.readLine()) != null) sb.append(l).append('\n'); }
+                return sb.toString();
+            } catch (Throwable t) { return ""; }
+        }
+
         // ---------- backup ----------
         @JavascriptInterface
         public void exportBackup(final String json) {

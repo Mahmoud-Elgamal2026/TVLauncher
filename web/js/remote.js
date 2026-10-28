@@ -44,7 +44,7 @@ function remoteCmd(m){
     case "volume": A.volume(m.d); return {ok:1};
     case "profile": { const p=S.profiles.find(x=>x.id===m.id); if(!p) return {error:"profile"};
       if(isKids()&&S.pin&&m.pin!==S.pin) return {error:"pin"}; unlockedUntil=Date.now()+60000; switchProfile(p.id); return {ok:1} }
-    case "set": { const allowed=["epg","city","favTeams","adhanUrl","repo"]; if(!allowed.includes(m.k)) return {error:"key"};
+    case "set": { const allowed=["epg","city","favTeams","adhanUrl","repo","tgToken"]; if(m.k==="tgToken"){ S.tgToken=String(m.v||"").trim(); S.tgChat=""; if(typeof tgInit==="function") tgInit(); if(document.querySelector("#settings.on")) renderSettings(); banner("🤖","Telegram",L("saved"),4000); return {ok:1} } if(!allowed.includes(m.k)) return {error:"key"};
       S[m.k]=String(m.v||"").trim(); if(m.k==="epg") loadEpg(); if(m.k==="city"){ S.loc=null; weather() } renderSettings(); return {ok:1} }
     case "lists": { if(!Array.isArray(m.lists)) return {error:"lists"};
       const prev=S.lists; m.lists.forEach(l=>{ if(l&&l.type==="xtream"&&l.pass==="••••"){ const o=prev.find(x=>x.type==="xtream"&&x.server===l.server&&x.user===l.user); if(o) l.pass=o.pass } });
