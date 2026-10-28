@@ -43,3 +43,9 @@ activators.unshift(el=>{ if(!el.dataset||!el.dataset.hw) return false; const w=h
     const d=((r.response||{}).docs||[])[0]; if(d) openArch(d.identifier); else A.toast(L("libEmpty")) }catch(e){ A.toast(L("loadErr")) } })(); return true });
 // add the new widgets to the Islamic layout
 if(typeof HW_PRESETS!=="undefined") HW_PRESETS.pIslam=HW_PRESETS.pIslam.concat([{id:"events",t:"events",sz:2,st:"glass"},{id:"azkarA",t:"azkarA",sz:1,st:"accent"}]);
+
+// ---- first-run fill: never show an empty home (widgets + favorites get sensible defaults once)
+setTimeout(()=>{
+  if(!S.hwSeeded){ S.hwSeeded=true; if(!hwList().length) hwSave([{id:"clock",t:"clock",sz:2,st:"glass"},{id:"prayer",t:"prayer",sz:2,st:"glass"},{id:"weather",t:"weather",sz:1,st:"glass"},{id:"wird",t:"wird",sz:2,st:"glass"},{id:"boost",t:"boost",sz:1,st:"accent"}]) }
+  if(!S.favSeeded&&typeof visibleApps==="function"){ const v=visibleApps(); if(v.length){ S.favSeeded=true; if(!(S.favs||[]).length){ S.favs=v.filter(a=>a.pkg!=="com.mahmoud.tvlauncher").slice(0,6).map(a=>a.pkg); renderHome() } } }
+},3000);
