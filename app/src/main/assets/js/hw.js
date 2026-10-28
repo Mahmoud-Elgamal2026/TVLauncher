@@ -712,3 +712,73 @@ layers.unshift({ test: () => hwEdit.on && !on("dlg"), ownsEnter: true, key: (e) 
   }
   return true;
 } });
+Object.assign(DEF, { homeOrder: "fav", favSize: "s" });
+Object.assign(T.ar, { homeLook: "🏠 شكل الرئيسية", hoOrder: "الترتيب", hoFavTop: "المفضلة فوق", hoWTop: "الويدجت فوق", hoSize: "حجم أيقونات المفضلة", szXS: "صغير جداً", hoBar: "شريط الصلاة والماتش فوق", hoShow: "إظهار", hoHide: "إخفاء" });
+Object.assign(T.en, { homeLook: "🏠 Home look", hoOrder: "Order", hoFavTop: "Favorites first", hoWTop: "Widgets first", hoSize: "Favorite icon size", szXS: "Extra small", hoBar: "Prayer/match bar on top", hoShow: "Show", hoHide: "Hide" });
+function applyHomeLook() {
+  if (document.body.dataset.favsz !== (S.favSize || "s")) {
+    document.body.dataset.favsz = S.favSize || "s";
+    document.querySelectorAll("#favRow .app").forEach((a) => {
+      a.__w = null;
+      a.style.height = "";
+    });
+    if (window.__fixAspect) __fixAspect();
+  }
+  const fr = $("favRow"), fh = fr && fr.previousElementSibling, wh = $("hwH"), wb = $("hwBoard");
+  if (!fr || !wh || !wb) return;
+  const extra = [$("ytH"), $("ytRow"), $("libFavH"), $("libFavRow")].filter(Boolean);
+  if (S.homeOrder === "w") {
+    fh.parentNode.insertBefore(wh, fh);
+    fh.parentNode.insertBefore(wb, fh);
+    extra.forEach((e) => fh.parentNode.insertBefore(e, fh));
+  } else {
+    let after = fr;
+    [wh, wb].concat(extra).forEach((e) => {
+      after.parentNode.insertBefore(e, after.nextSibling);
+      after = e;
+    });
+  }
+}
+function homeLookMenu() {
+  const cyc = (k, vals) => {
+    S[k] = vals[(vals.indexOf(S[k]) + 1) % vals.length];
+    if (k === "tickerOn") updateTicker();
+    applyHomeLook();
+    renderHome();
+    setTimeout(() => {
+      homeLookMenu();
+      const b = $("dbox").querySelector('[data-di="' + idx[k] + '"]');
+      if (b) focus(b);
+    }, 30);
+  };
+  const idx = { homeOrder: 0, favSize: 1, tickerOn: 2 };
+  dialog(L("homeLook"), [
+    { icon: "↕️", label: L("hoOrder") + ": " + L(S.homeOrder === "w" ? "hoWTop" : "hoFavTop"), keep: 1, fn: () => cyc("homeOrder", ["fav", "w"]) },
+    { icon: "📏", label: L("hoSize") + ": " + L({ xs: "szXS", s: "szS", m: "szM", l: "szL" }[S.favSize || "s"]), keep: 1, fn: () => cyc("favSize", ["xs", "s", "m", "l"]) },
+    { icon: "📰", label: L("hoBar") + ": " + L(S.tickerOn ? "hoShow" : "hoHide"), keep: 1, fn: () => cyc("tickerOn", [true, false]) },
+    { label: L("done"), fn: () => {
+    } }
+  ], { grid: 3 });
+}
+activators.unshift((el) => {
+  if (el.id === "homeLookBtn") {
+    homeLookMenu();
+    return true;
+  }
+  return false;
+});
+const _hwToolbarH = hwToolbar;
+hwToolbar = function() {
+  _hwToolbarH();
+  const t = document.querySelector("#hwH .hwtools");
+  if (t && !$("homeLookBtn")) t.insertAdjacentHTML("afterbegin", `<button class="btn sm f" id="homeLookBtn">${esc(L("homeLook"))}</button>`);
+};
+const _renderHWH = renderHW;
+renderHW = function() {
+  _renderHWH.apply(this, arguments);
+  applyHomeLook();
+};
+if (!S.homeLookSeeded) {
+  S.homeLookSeeded = true;
+  if (S.simple) S.tickerOn = false;
+}
