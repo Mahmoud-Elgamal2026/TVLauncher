@@ -207,5 +207,11 @@ setInterval(()=>{ if(code) pollEvents() },6000);
 i18n(); if(!code) $("pair").classList.add("on"); else refresh();
 setInterval(()=>{ if(!document.hidden&&code) api("state").then(s=>{ if(s){ st=s; $("now").textContent=s.playing?`${t("playing")} ${s.playing.no?s.playing.no+" · ":""}${s.playing.name}`:"" } }) },8000);
 </script>
+<script>
+// opened from the TV's Telegram QR: jump to the token box
+if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById("tgToken"); if(!i) return; var sec=i.closest&&i.closest("section,.page,.tab-page"); if(sec&&sec.id&&window.show) try{ show(sec.id) }catch(e){}
+  [].forEach.call(document.querySelectorAll("section,.page"),function(x){ if(x.contains(i)){ x.style.display="block"; x.classList.add("on") } });
+  i.scrollIntoView({block:"center"}); i.focus(); i.style.outline="3px solid #ffd54a"; },600) }
+</script>
 </body>
 </html>

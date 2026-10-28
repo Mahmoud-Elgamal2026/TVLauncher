@@ -536,7 +536,7 @@ window.mediaSettings = function() {
   if (!S.tgCode) S.tgCode = String(1e5 + Math.floor(Math.random() * 9e5));
   return eng + sec(L("sBoot"), field(L("bootPlay"), onoff("bootPlay"))) + sec(
     "✈️ " + L("sTg"),
-    field(L("tgToken"), inputRow("tgTokInp", S.tgToken, "123456:ABC-DEF...", "tgTokSave")) + field("", `<pre class="code" dir="auto" style="white-space:pre-wrap">${esc(L("tgHow"))}</pre>`) + (S.tgToken ? field("", `<div class="inline">${linked ? `<span class="btn sm">✅ ${L("tgLinked")}</span><button class="btn f" id="tgUnlink">${L("tgUnlink")}</button>` : `<span class="btn sm">${L("tgCode")}: <b style="font-size:2.6vh" dir="ltr">${esc(S.tgCode)}</b></span>`}</div>`) : "")
+    field(L("tgToken"), inputRow("tgTokInp", S.tgToken, "123456:ABC-DEF...", "tgTokSave")) + field("", `<button class="btn pri f" id="tgPhoneBtn">📱 ${S.lang === "ar" ? "الصق التوكن من الموبايل (صوّر الكود)" : "Paste the token from your phone (scan)"}</button>`) + field("", `<pre class="code" dir="auto" style="white-space:pre-wrap">${esc(L("tgHow"))}</pre>`) + (S.tgToken ? field("", `<div class="inline">${linked ? `<span class="btn sm">✅ ${L("tgLinked")}</span><button class="btn f" id="tgUnlink">${L("tgUnlink")}</button>` : `<span class="btn sm">${L("tgCode")}: <b style="font-size:2.6vh" dir="ltr">${esc(S.tgCode)}</b></span>`}</div>`) : "")
   ) + sec("⏺ " + L("rec"), field(L("recDir"), recDirSeg()));
 };
 function recDirSeg() {

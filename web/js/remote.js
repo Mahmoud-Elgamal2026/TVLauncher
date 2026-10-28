@@ -140,3 +140,11 @@ quickSettings=function(){ _quick(); const items=$("dbox")._items; if(!items||isK
   focus(g.querySelector(".f")) };
 
 setTimeout(()=>{ if(S.autoUpdate&&Date.now()-store.get("lastUpdCheck",0)>12*3600000) checkUpdates(false) },30000);
+
+// token from the phone: QR opens the phone page straight on the Telegram token box
+function tgPhoneDialog(){ const url=remoteUrl(); if(!url) return phoneDialog();
+  const u=url+"#tg";
+  dialog("🤖 "+(S.lang==="ar"?"توكن تيليجرام من الموبايل":"Telegram token from your phone"),[{label:L("done"),fn:()=>{}}],{html:`<div style="display:flex;align-items:center;justify-content:center"><div style="background:#fff;padding:1.2vh;border-radius:1.4vh;line-height:0;margin:0 1.2vw">${qrSvg(u,300)}</div>
+   <div style="font-size:2.1vh;line-height:2;margin:0 1.2vw">${S.lang==="ar"?"١. صوّر الكود بكاميرا الموبايل (الموبايل على نفس الواي فاي)<br>٢. هتفتح خانة التوكن على طول<br>٣. الصق التوكن ودوس 💾 — خلاص":"1. Scan with your phone camera (same Wi-Fi)<br>2. The token box opens<br>3. Paste and tap 💾"}</div></div><div class="dlist" style="margin-top:1vh"><button class="btn pri f" data-di="0">${L("done")}</button></div>`});
+}
+activators.push(el=>{ if(el.id==="tgPhoneBtn"){ tgPhoneDialog(); return true } return false });
