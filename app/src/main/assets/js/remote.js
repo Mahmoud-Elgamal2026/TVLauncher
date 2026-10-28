@@ -177,6 +177,21 @@ function remoteCmd(m) {
       nat("openUri", u);
       return { ok: 1, did: "link" };
     }
+    case "photo": {
+      const u = nat("saveImageB64", String(m.data || ""));
+      if (!u) return { error: "photo" };
+      if (m.mode === "frame") {
+        S.frames = (S.frames || []).concat([u]).slice(-60);
+        S.frameSrc = "mine";
+        banner("🖼", S.lang === "ar" ? "صورة جديدة للبرواز" : "New frame photo", "", 3e3);
+      } else {
+        S.wallImg = u;
+        S.wall = "image";
+        applyLook();
+        banner("🖼", S.lang === "ar" ? "خلفية جديدة من الموبايل" : "New wallpaper from phone", "", 3e3);
+      }
+      return { ok: 1 };
+    }
     case "watchRemove":
       watchRemove(String(m.key));
       return { ok: 1 };

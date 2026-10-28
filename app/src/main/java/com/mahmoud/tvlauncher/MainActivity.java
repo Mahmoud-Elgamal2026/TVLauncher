@@ -1259,6 +1259,18 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void restartUi() { ui.post(() -> MainActivity.this.restartUi("telegram")); }
 
+        /** Saves a picture sent from the phone (base64 JPEG) and returns its local URL. */
+        @JavascriptInterface
+        public String saveImageB64(String b64) {
+            try {
+                byte[] d = android.util.Base64.decode(b64.replaceFirst("^data:[^,]*,", ""), android.util.Base64.DEFAULT);
+                File dir = new File(getFilesDir(), "mine"); dir.mkdirs();
+                File f = new File(dir, "p" + System.currentTimeMillis() + ".jpg");
+                try (OutputStream o = new java.io.FileOutputStream(f)) { o.write(d); }
+                return Uri.fromFile(f).toString();
+            } catch (Throwable t) { return ""; }
+        }
+
         /** Light self-clean: old cache files, old slideshow photos, stale icons, WebView RAM. Returns freed bytes. */
         @JavascriptInterface
         public long selfClean() {

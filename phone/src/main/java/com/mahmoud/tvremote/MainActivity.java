@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.speech.RecognizerIntent;
 import android.view.KeyEvent;
 import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
+import android.net.Uri;
 import org.json.JSONObject;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
@@ -25,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MainActivity extends Activity {
     static final int PORT = 8765;
     WebView web; TextView msg; SharedPreferences prefs; String pendingShare;
-    static final int REQ_VOICE = 7;
+    static final int REQ_VOICE = 7, REQ_FILE = 8; ValueCallback<Uri[]> fileCb;
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -69,6 +72,15 @@ public class MainActivity extends Activity {
         WebSettings s = web.getSettings(); s.setJavaScriptEnabled(true); s.setDomStorageEnabled(true);
         web.setWebViewClient(new WebViewClient());
         web.addJavascriptInterface(new Bridge(), "PhoneApp");
+        web.setWebChromeClient(new WebChromeClient() {
+            @Override public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> cb, FileChooserParams p) {
+                if (fileCb != null) fileCb.onReceiveValue(null); fileCb = cb;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT).addCategory(Intent.CATEGORY_OPENABLE).setType("image/*");
+                if (p.getMode() == FileChooserParams.MODE_OPEN_MULTIPLE) i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                try { startActivityForResult(Intent.createChooser(i, "اختار صورة"), REQ_FILE); } catch (Exception e) { fileCb = null; return false; }
+                return true;
+            }
+        });
         web.loadUrl("http://" + host + ":" + PORT + "/");
         setContentView(web);
     }
@@ -85,6 +97,14 @@ public class MainActivity extends Activity {
 
     @Override protected void onActivityResult(int req, int res, Intent data) {
         super.onActivityResult(req, res, data);
+        if (req == REQ_FILE) {
+            Uri[] out = null;
+            if (res == RESULT_OK && data != null) {
+                if (data.getClipData() != null) { int n = data.getClipData().getItemCount(); out = new Uri[n]; for (int k = 0; k < n; k++) out[k] = data.getClipData().getItemAt(k).getUri(); }
+                else if (data.getData() != null) out = new Uri[]{ data.getData() };
+            }
+            if (fileCb != null) fileCb.onReceiveValue(out); fileCb = null; return;
+        }
         if (req == REQ_VOICE && res == RESULT_OK && data != null) {
             java.util.ArrayList<String> r = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             if (r != null && !r.isEmpty()) js("window.onPhoneVoice&&onPhoneVoice(" + JSONObject.quote(r.get(0)) + ")");

@@ -214,6 +214,10 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
   [].forEach.call(document.querySelectorAll("section,.page"),function(x){ if(x.contains(i)){ x.style.display="block"; x.classList.add("on") } });
   i.scrollIntoView({block:"center"}); i.focus(); i.style.outline="3px solid #ffd54a"; },600) }
 </script>
+<div style="padding:10px 14px"><h2 style="margin:6px 0">🖼 صورك على التليفزيون</h2>
+<div style="display:flex;gap:10px"><button id="phWall" style="flex:1;padding:14px;border-radius:14px;border:0;background:#2a7d4f;color:#fff;font-size:16px">خلفية للانشر</button>
+<button id="phFrame" style="flex:1;padding:14px;border-radius:14px;border:0;background:#7a3bff;color:#fff;font-size:16px">صور للبرواز (أكتر من صورة)</button></div>
+<input type="file" id="phFile" accept="image/*" style="display:none"><div id="phMsg" style="color:#8a90a8;margin-top:6px;font-size:14px"></div></div>
 <div id="tpWrap" style="padding:10px 14px"><div id="tpad" style="height:230px;border-radius:18px;background:#1b1e2b;display:flex;align-items:center;justify-content:center;color:#8a90a8;font-size:15px;user-select:none;touch-action:none">اسحب للأسهم · دوس = OK · دوستين = رجوع</div>
 <div style="display:flex;gap:10px;margin-top:10px"><button id="micBtn" style="flex:1;padding:14px;border-radius:14px;border:0;background:#3b6cff;color:#fff;font-size:17px">🎤 بحث بالصوت</button></div></div>
 <script>
@@ -224,6 +228,13 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
       key(Math.abs(dx)>Math.abs(dy)?(dx>0?"right":"left"):(dy>0?"down":"up")); sx=t.clientX; sy=t.clientY } e.preventDefault() },{passive:false});
   p.addEventListener("touchend",function(e){ if(!moved&&Date.now()-st<350){ var now=Date.now(); if(now-last<320){ key("back"); last=0 } else { last=now; setTimeout(function(){ if(last&&Date.now()-last>=300){ key("ok"); last=0 } },330) } } e.preventDefault() },{passive:false});
   document.getElementById("micBtn").onclick=function(){ if(window.PhoneApp&&PhoneApp.voice){ PhoneApp.voice() } else { var q=prompt("قول أو اكتب اللي بتدوّر عليه (استخدم مايك الكيبورد)"); if(q) api("search",{t:q}) } };
+  var phMode="wall", fi=document.getElementById("phFile"), pm=document.getElementById("phMsg");
+  document.getElementById("phWall").onclick=function(){ phMode="wall"; fi.multiple=false; fi.click() };
+  document.getElementById("phFrame").onclick=function(){ phMode="frame"; fi.multiple=true; fi.click() };
+  function shrink(file){ return new Promise(function(res,rej){ var img=new Image(), r=new FileReader(); r.onload=function(){ img.onload=function(){ var W=1920,H=1080,s=Math.min(1,Math.max(W/img.width,H/img.height)), c=document.createElement("canvas"); c.width=Math.round(img.width*s); c.height=Math.round(img.height*s); c.getContext("2d").drawImage(img,0,0,c.width,c.height); res(c.toDataURL("image/jpeg",0.82)) }; img.onerror=rej; img.src=r.result }; r.onerror=rej; r.readAsDataURL(file) }) }
+  fi.onchange=async function(){ var fs=[].slice.call(fi.files||[]); if(!fs.length) return; var n=0;
+    for(var i=0;i<fs.length;i++){ pm.textContent="بيبعت "+(i+1)+" من "+fs.length+"…"; try{ var d=await shrink(fs[i]); var r=await api("photo",{data:d,mode:phMode}); if(r&&r.ok) n++ }catch(e){} }
+    pm.textContent="✓ اتبعت "+n+" صورة"; fi.value="" };
   window.onPhoneVoice=function(t){ if(t) api("search",{t:t}) };
   window.onPhoneShare=function(u){ if(u) api("share",{u:u}) };
   window.onPhoneVolume=function(d){ api("volume",{d:d}) };
