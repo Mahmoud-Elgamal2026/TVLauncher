@@ -173,9 +173,25 @@ function focus(el){
   if(!el) return;
   if(focused) focused.classList.remove("focus");
   focused=el; el.classList.add("focus"); el.focus({preventScroll:true});
-  el.scrollIntoView({block:"nearest",inline:"nearest",behavior:S.lite?"auto":"smooth"});
+  keepVisible(el);
   if(el.classList.contains("tab")){ if(el.dataset.page) showPage(el.dataset.page); return }
   focusHooks.forEach(h=>h(el));
+}
+// Scroll every scrollable parent so the focused item is fully on screen, with breathing room.
+// Written by hand because old TV WebViews ignore scrollIntoView options.
+function keepVisible(el){
+  const pad=Math.round(innerHeight*0.06), padX=Math.round(innerWidth*0.04);
+  let p=el.parentElement;
+  while(p&&p!==document.body){
+    const cs=getComputedStyle(p), oy=/(auto|scroll)/.test(cs.overflowY)&&p.scrollHeight>p.clientHeight+2, ox=/(auto|scroll)/.test(cs.overflowX)&&p.scrollWidth>p.clientWidth+2;
+    if(oy||ox){
+      const r=el.getBoundingClientRect(), pr=p.getBoundingClientRect();
+      if(oy){ if(r.top<pr.top+pad) p.scrollTop-=pr.top+pad-r.top; else if(r.bottom>pr.bottom-pad) p.scrollTop+=r.bottom-(pr.bottom-pad) }
+      if(ox){ if(r.left<pr.left+padX) p.scrollLeft-=pr.left+padX-r.left; else if(r.right>pr.right-padX) p.scrollLeft+=r.right-(pr.right-padX) }
+    }
+    if(cs.position==="fixed") break;
+    p=p.parentElement;
+  }
 }
 function move(dir){
   if(!focused||!document.body.contains(focused)||focused.offsetParent===null) return focus(fallbackFocus());
