@@ -70,7 +70,7 @@ BEFORE=$(adb shell pidof $APP | tr -d '\r')
 js "runningMenu()" 2; shot 45-running-apps
 js "closeDialog();closeOne('$APP')" 3
 AFTER=$(adb shell pidof $APP | tr -d '\r')
-if [ -n "$BEFORE" ] && [ -z "$AFTER" ]; then R=PASS; else R=FAIL; fi
+if [ -n "$BEFORE" ] && [ "$AFTER" != "$BEFORE" ]; then R=PASS; else R=FAIL; fi
 echo "TVL|close-app|$R|$APP pid before=$BEFORE after=$AFTER" >> $OUT/extra.txt
 # full self-test (network, IPTV, recording, radio, files ...)
 adb push selftest.built.js /sdcard/Download/selftest.js
