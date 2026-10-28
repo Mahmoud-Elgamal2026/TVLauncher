@@ -1256,6 +1256,9 @@ public class MainActivity extends Activity {
             return o.toString();
         }
 
+        @JavascriptInterface
+        public void restartUi() { ui.post(() -> MainActivity.this.restartUi("telegram")); }
+
         /** Light self-clean: old cache files, old slideshow photos, stale icons, WebView RAM. Returns freed bytes. */
         @JavascriptInterface
         public long selfClean() {

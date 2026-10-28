@@ -393,8 +393,8 @@ function tgInit() {
   tgReady = !!S.tgToken;
 }
 const TGT = {
-  ar: { hi: "أهلاً! البوكس متربط بيك دلوقتي ✅", pair: "اكتب كود الربط اللي ظاهر في الإعدادات ← التحكم من تيليجرام", no: "مش مسموحلك تتحكم في الجهاز ده", ok: "تمام ✅", nf: "ملقتش", playing: "شغال دلوقتي", idle: "مفيش حاجة شغالة", page: "الصفحة", recs: "تسجيلات شغالة", none: "مفيش", help: "الأوامر:\nقناة <اسم أو رقم>\nالجاية / اللي قبلها\nصوت+ / صوت-\nافتح <اسم تطبيق>\nسجّل <دقايق>\nرسالة <نص> (تظهر على الشاشة)\nنوم <دقايق>\nوقّف · رئيسية · رجوع\nأو استخدم الزراير تحت 👇" },
-  en: { hi: "Hi! This box is now linked to you ✅", pair: "Send the pairing code shown in Settings → Telegram control", no: "You're not allowed to control this box", ok: "Done ✅", nf: "Not found", playing: "Now playing", idle: "Nothing playing", page: "Page", recs: "Recording", none: "none", help: "Commands:\nch <name or number>\nnext / prev\nvol+ / vol-\nopen <app name>\nrec <minutes>\nmsg <text> (shows on screen)\nsleep <minutes>\nstop · home · back\nor use the buttons below 👇" }
+  ar: { hi: "أهلاً! البوكس متربط بيك دلوقتي ✅", pair: "اكتب كود الربط اللي ظاهر في الإعدادات ← التحكم من تيليجرام", no: "مش مسموحلك تتحكم في الجهاز ده", ok: "تمام ✅", nf: "ملقتش", playing: "شغال دلوقتي", idle: "مفيش حاجة شغالة", page: "الصفحة", recs: "تسجيلات شغالة", none: "مفيش", help: "خلفية اقفل / خلفية شغل — الخلفية المتحركة\nسريع — الوضع السريع\nنضف — تنضيف الرامات\nريستارت — إعادة تشغيل الواجهة\nالأوامر:\nقناة <اسم أو رقم>\nالجاية / اللي قبلها\nصوت+ / صوت-\nافتح <اسم تطبيق>\nسجّل <دقايق>\nرسالة <نص> (تظهر على الشاشة)\nنوم <دقايق>\nوقّف · رئيسية · رجوع\nأو استخدم الزراير تحت 👇" },
+  en: { hi: "Hi! This box is now linked to you ✅", pair: "Send the pairing code shown in Settings → Telegram control", no: "You're not allowed to control this box", ok: "Done ✅", nf: "Not found", playing: "Now playing", idle: "Nothing playing", page: "Page", recs: "Recording", none: "none", help: "anim off / anim on — moving background\nlite — fast mode\nclean — free RAM\nrestart — restart the UI\nCommands:\nch <name or number>\nnext / prev\nvol+ / vol-\nopen <app name>\nrec <minutes>\nmsg <text> (shows on screen)\nsleep <minutes>\nstop · home · back\nor use the buttons below 👇" }
 };
 const tgt = (k) => (TGT[S.lang] || TGT.en)[k];
 const TG_KB = () => JSON.stringify([
@@ -506,6 +506,27 @@ function tgCmd(t) {
   if (is("sleep", "نوم")) {
     setSleep(Math.max(0, parseInt(arg) || 0));
     return tgt("ok");
+  }
+  if (is("anim", "خلفية", "خلفيه", "الخلفية")) {
+    const off = /off|لا|اقفل|قفل|ايقاف|إيقاف|0/i.test(arg);
+    S.anim = off ? "off" : "auto";
+    S.liveWall = false;
+    applyLook();
+    return off ? "🛑 الخلفية المتحركة اتقفلت" : "✨ الخلفية المتحركة اشتغلت";
+  }
+  if (is("lite", "سريع", "خفيف")) {
+    S.lite = !/off|لا|0/i.test(arg);
+    S.perfChosen = true;
+    applyLook();
+    return S.lite ? "⚡ الوضع السريع شغال" : "🎨 الوضع السريع مقفول";
+  }
+  if (is("clean", "نضف", "نضّف", "تنظيف")) {
+    if (window.autoClean) autoClean(true);
+    return "🧹 بنضّف";
+  }
+  if (is("restart", "ريستارت", "اعادة")) {
+    setTimeout(() => nat("restartUi"), 500);
+    return "🔄 بعيد تشغيل الواجهة";
   }
   return tgt("help");
 }
