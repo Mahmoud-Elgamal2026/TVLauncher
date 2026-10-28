@@ -1,0 +1,12 @@
+plugins { id 'com.android.application' }
+def runNo = (System.getenv("GITHUB_RUN_NUMBER") ?: "1") as int
+android {
+    namespace 'com.mahmoud.tvremote'
+    compileSdk 34
+    defaultConfig { applicationId "com.mahmoud.tvremote"; minSdk 21; targetSdk 34; versionCode runNo; versionName "1.${runNo}" }
+    def ks = file("../app/tvlauncher.jks")
+    signingConfigs { release { if (ks.exists()) { storeFile ks; storePassword System.getenv("KEYSTORE_PASS") ?: "tvlauncher123"; keyAlias "tvlauncher"; keyPassword System.getenv("KEYSTORE_PASS") ?: "tvlauncher123" } } }
+    buildTypes { release { minifyEnabled false; signingConfig ks.exists() ? signingConfigs.release : signingConfigs.debug } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+    lint { abortOnError false; checkReleaseBuilds false }
+}

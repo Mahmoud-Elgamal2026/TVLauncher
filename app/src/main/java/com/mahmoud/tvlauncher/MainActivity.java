@@ -949,7 +949,7 @@ public class MainActivity extends Activity {
                     JSONArray as = rel.optJSONArray("assets");
                     if (as != null) for (int i = 0; i < as.length(); i++) {
                         String u = as.getJSONObject(i).optString("browser_download_url", "");
-                        if (u.endsWith(".apk")) { url = u; break; }
+                        if (u.endsWith(".apk") && u.contains("TVLauncher")) { url = u; break; }
                     }
                     JSONObject o = new JSONObject();
                     o.put("latest", latest); o.put("tag", tag); o.put("current", versionCode());

@@ -108,7 +108,11 @@ function remoteCmd(m) {
       return { ok: 1 };
     }
     case "set": {
-      const allowed = ["epg", "city", "favTeams", "adhanUrl", "repo", "tgToken"];
+      const allowed = ["epg", "city", "favTeams", "adhanUrl", "repo", "tgToken", "ytChannel"];
+      if (m.k === "ytChannel") {
+        if (window.ytAddFromPhone) ytAddFromPhone(String(m.v || "").trim());
+        return { ok: 1 };
+      }
       if (m.k === "tgToken") {
         S.tgToken = String(m.v || "").trim();
         S.tgChat = "";

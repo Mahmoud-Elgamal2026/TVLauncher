@@ -644,3 +644,4 @@ body[data-hpage="0"] h2.favh{display:none!important}
 .herobox .hlive{font-size:2.3vh;margin-top:1vh;background:rgba(220,30,30,.55);padding:.5vh 1vw;border-radius:1vh;align-self:flex-start}
 .herobox .hlive span{color:#fff;opacity:.9;margin-inline-start:.6vw}
 .herobox .hwird{margin-top:1.2vh;font-size:1.9vh;opacity:.92;max-width:70%;line-height:1.5;max-height:5.8vh;overflow:hidden;text-shadow:0 .2vh .8vh rgba(0,0,0,.7)}
+.hrail .rb.boostrb{background:linear-gradient(135deg,#3b6cff,#7a3bff);margin-top:2vh}
