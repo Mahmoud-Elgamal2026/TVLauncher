@@ -214,5 +214,21 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
   [].forEach.call(document.querySelectorAll("section,.page"),function(x){ if(x.contains(i)){ x.style.display="block"; x.classList.add("on") } });
   i.scrollIntoView({block:"center"}); i.focus(); i.style.outline="3px solid #ffd54a"; },600) }
 </script>
+<div id="tpWrap" style="padding:10px 14px"><div id="tpad" style="height:230px;border-radius:18px;background:#1b1e2b;display:flex;align-items:center;justify-content:center;color:#8a90a8;font-size:15px;user-select:none;touch-action:none">اسحب للأسهم · دوس = OK · دوستين = رجوع</div>
+<div style="display:flex;gap:10px;margin-top:10px"><button id="micBtn" style="flex:1;padding:14px;border-radius:14px;border:0;background:#3b6cff;color:#fff;font-size:17px">🎤 بحث بالصوت</button></div></div>
+<script>
+(function(){ var p=document.getElementById("tpad"); if(!p) return; var sx=0,sy=0,st=0,last=0,moved=false;
+  function key(k){ try{ api("key",{k:k}) }catch(e){} if(navigator.vibrate) navigator.vibrate(12) }
+  p.addEventListener("touchstart",function(e){ var t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=Date.now(); moved=false; e.preventDefault() },{passive:false});
+  p.addEventListener("touchmove",function(e){ var t=e.touches[0], dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>45||Math.abs(dy)>45){ moved=true;
+      key(Math.abs(dx)>Math.abs(dy)?(dx>0?"right":"left"):(dy>0?"down":"up")); sx=t.clientX; sy=t.clientY } e.preventDefault() },{passive:false});
+  p.addEventListener("touchend",function(e){ if(!moved&&Date.now()-st<350){ var now=Date.now(); if(now-last<320){ key("back"); last=0 } else { last=now; setTimeout(function(){ if(last&&Date.now()-last>=300){ key("ok"); last=0 } },330) } } e.preventDefault() },{passive:false});
+  document.getElementById("micBtn").onclick=function(){ if(window.PhoneApp&&PhoneApp.voice){ PhoneApp.voice() } else { var q=prompt("قول أو اكتب اللي بتدوّر عليه (استخدم مايك الكيبورد)"); if(q) api("search",{t:q}) } };
+  window.onPhoneVoice=function(t){ if(t) api("search",{t:t}) };
+  window.onPhoneShare=function(u){ if(u) api("share",{u:u}) };
+  window.onPhoneVolume=function(d){ api("volume",{d:d}) };
+  if(window.PhoneApp&&PhoneApp.pending){ var x=PhoneApp.pending(); if(x) setTimeout(function(){ onPhoneShare(x) },800) }
+})();
+</script>
 </body>
 </html>

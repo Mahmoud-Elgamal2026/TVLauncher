@@ -53,6 +53,11 @@ function remoteCmd(m){
       loadLists().then(loadEpg); renderSettings(); return {ok:1} }
     case "favs": { if(!Array.isArray(m.order)) return {error:"favs"}; S.favs=m.order.filter(p=>typeof p==="string"&&byPkg(p)); renderHome(); return {ok:1} }
     case "fav": toggleList("favs",String(m.pkg)); renderHome(); return {ok:1};
+    case "share": { const u=String(m.u||"").trim(); if(!u) return {error:"share"}; if(on("frame")) stopFrame();
+      if(/youtube\.com\/(@|channel\/|c\/|user\/)/i.test(u)||/^@/.test(u)){ if(window.ytAddFromPhone) ytAddFromPhone(u); return {ok:1,did:"channel"} }
+      const v=u.match(/(?:youtu\.be\/|v=|shorts\/|live\/)([\w-]{11})/); if(v){ if(on("player")) stopPlayer(); if(window.openYt) openYt(v[1]); else nat("openUri",u); return {ok:1,did:"video"} }
+      if(/\.(m3u8|mp4|mkv|mp3|ts)(\?|$)/i.test(u)){ play({name:u.split("/").pop(),url:u,kind:"movie"}); return {ok:1,did:"media"} }
+      nat("openUri",u); return {ok:1,did:"link"} }
     case "watchRemove": watchRemove(String(m.key)); return {ok:1};
   }
   return {error:"cmd"};

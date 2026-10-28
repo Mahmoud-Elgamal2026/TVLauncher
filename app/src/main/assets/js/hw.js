@@ -369,6 +369,7 @@ function renderYt() {
   }
   r.innerHTML = ytVids.map((v) => `<div class="yv f" tabindex="0" data-yv="${esc(v.v)}" data-hw="${esc(w.id)}"><img loading="lazy" src="https://i.ytimg.com/vi/${esc(v.v)}/mqdefault.jpg" alt=""><div class="ytt">${esc(v.title)}</div><div class="ytc">${esc(v.ch)} · ${esc(ago(v.at))}</div></div>`).join("");
 }
+window.openYt = (id) => openYt(id);
 function openYt(id) {
   const tv = ["com.google.android.youtube.tv", "com.google.android.youtube.tvkids", "com.liskovsoft.smarttubetv", "com.teamsmart.videomanager.tv", "com.google.android.youtube"];
   const p = tv.find((x) => A.isInstalled(x));
