@@ -223,7 +223,7 @@ const FREE_PACKS=[
   ["en","🇬🇧",{ar:"قنوات إنجليزي",en:"English"},"languages/eng.m3u"]];
 const packUrl=p=>/^https?:/.test(p[3])?p[3]:"https://iptv-org.github.io/iptv/"+p[3];
 MT.ar.freeTitle="مفيش اشتراك IPTV؟ ضيف قنوات مجانية بضغطة";MT.en.freeTitle="No IPTV subscription? Add free channels in one press";
-MT.ar.freePacks="قنوات مجانية جاهزة";MT.en.freePacks="Ready-made free channels";MT.ar.freeNote="قنوات مجانية متاحة للعامة من مشروع iptv-org — مش كلها شغالة طول الوقت، واللانشر بيعلّم على الواقفة";MT.en.freeNote="Free public channels from the iptv-org project — not all are always up; the launcher marks dead ones";
+MT.ar.listsBtn="القوائم والدول";MT.en.listsBtn="Lists & countries";MT.ar.packOnly="اعرض دي بس";MT.en.packOnly="Show only this";MT.ar.freePacks="قنوات مجانية جاهزة";MT.en.freePacks="Ready-made free channels";MT.ar.freeNote="قنوات مجانية متاحة للعامة من مشروع iptv-org — مش كلها شغالة طول الوقت، واللانشر بيعلّم على الواقفة";MT.en.freeNote="Free public channels from the iptv-org project — not all are always up; the launcher marks dead ones";
 MT.ar.freeAdded="اتضافت";MT.en.freeAdded="Added";MT.ar.ownList="أو ضيف اشتراكك من الإعدادات";MT.en.ownList="or add your own subscription in Settings";
 Object.keys(MT).forEach(l=>Object.assign(T[l],MT[l]));
 function freePackHtml(){ return `<div class="freebox"><div class="sec"><h3>📺 ${esc(L("freeTitle"))}</h3><div class="inline">${FREE_PACKS.map(p=>{ const on=S.lists.some(l=>l.url===packUrl(p));
@@ -273,3 +273,18 @@ const _tgCmdC=tgCmd; tgCmd=function(t){ const m=String(t).match(/^\/?(اقفل|c
 
 // the same packs from Settings (tap again to remove a pack)
 const _mediaSettingsF=window.mediaSettings; window.mediaSettings=function(){ return sec("📺 "+L("freePacks"),freePackHtml().replace(/<\/?div class="freebox">/g,"").replace(/<div class="sec"><h3>[^<]*<\/h3>/,"<div>"))+_mediaSettingsF() };
+
+// IPTV page: a permanent "Lists & countries" entry to add, remove or switch channel packs at any time
+function packsMenu(){
+  const items=FREE_PACKS.map(p=>{ const url=packUrl(p), on=S.lists.some(l=>l.url===url), nm=p[2][S.lang]||p[2].en;
+    return {icon:on?"✅":p[1],label:nm,pri:on,fn:()=>{ const l=S.lists; S.lists=on?l.filter(x=>x.url!==url):l.concat([{name:p[1]+" "+nm,url}]); afterPacks(on?"−":"+",nm) }} });
+  const own=S.lists.filter(l=>!FREE_PACKS.some(p=>packUrl(p)===l.url));
+  if(own.length) own.forEach(l=>items.unshift({icon:"⭐",label:l.name||"IPTV",pri:1,fn:()=>setTimeout(()=>{ showPage("settings"); renderSettings() },30)}));
+  items.push({icon:"⚙️",label:L("ownList"),fn:()=>{ showPage("settings"); renderSettings() }});
+  dialog("📦 "+L("listsBtn"),items,{grid:3,sub:L("freeNote")});
+}
+function afterPacks(sign,nm){ banner("📺",sign+" "+nm,"...",2500); curGroup="__all"; loadLists().then(()=>{ if(window.loadEpg) loadEpg(); renderGroups(); if(window.runCheck) runCheck(true) }) }
+const _renderGroupsP=renderGroups; renderGroups=function(){ _renderGroupsP.apply(this,arguments); if(isKids()) return;
+  const g=$("groups"); if(g&&channels.length) g.insertAdjacentHTML("afterbegin",`<div class="it f packbtn" tabindex="0" id="packsBtn">📦 ${esc(L("listsBtn"))}</div>`) };
+activators.push(el=>{ if(el.id==="packsBtn"){ packsMenu(); return true } return false });
+window.packsMenu=packsMenu;

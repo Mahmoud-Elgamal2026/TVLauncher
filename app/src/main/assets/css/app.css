@@ -539,3 +539,4 @@ html.nogrid #settings .dgrid{display:-webkit-flex;display:flex;-webkit-flex-wrap
 #fw_azkar{font-size:3vh;text-align:center;max-width:40vw}
 #frame.art #fwBox .fw{color:#3b2f22;text-shadow:none;background:rgba(255,255,255,.35)}
 body.lite .fimg.show{animation:none}
+.packbtn{background:var(--sel)!important;color:var(--selText)!important;font-weight:700;margin-bottom:1vh}
