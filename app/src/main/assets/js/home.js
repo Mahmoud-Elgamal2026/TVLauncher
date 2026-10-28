@@ -1,4 +1,24 @@
 "use strict";
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
 let apps = [];
 const QUICK = [
   ["YouTube", "com.google.android.youtube.tv", "com.google.android.youtube"],
@@ -175,6 +195,7 @@ function appMenu(pkg, fromFav, watchKey) {
   );
   items.push({ label: L("cancel"), fn: () => {
   } });
+  if (!kid && pkg !== "com.mahmoud.tvlauncher") items.splice(1, 0, { icon: "🗑", label: S.lang === "ar" ? "مسح التطبيق" : "Uninstall", fn: () => uninstallAny(pkg) });
   dialog(appName(a), items);
 }
 function setCustom(pkg, patch) {
@@ -299,4 +320,36 @@ function timeUp() {
     const u = S.usage;
     if (u && u.m >= +(profile().limit || 0) + (u.bonus || 0)) setTimeout(timeUp, 500);
   };
+}
+function uninstallAny(pkg) {
+  return __async(this, null, function* () {
+    let sys = false;
+    try {
+      const l = JSON.parse(nat("listPackages") || "[]");
+      const x = l.find((o) => o.pkg === pkg || o.package === pkg || o.p === pkg);
+      sys = !!(x && x.sys);
+    } catch (e) {
+    }
+    if (!sys) {
+      nat("uninstallApp", pkg);
+      setTimeout(() => {
+        if (typeof loadApps === "function") loadApps();
+      }, 8e3);
+      return;
+    }
+    if (typeof shz === "function" && shz() === "ok") {
+      try {
+        yield runShell(`pm uninstall -k --user 0 ${pkg}`);
+        A.toast("🗑 " + (S.lang === "ar" ? "اتمسح" : "Removed"));
+        S.favs = S.favs.filter((p) => p !== pkg);
+        if (typeof loadApps === "function") loadApps();
+        else renderHome();
+      } catch (e) {
+        nat("uninstallApp", pkg);
+      }
+    } else {
+      nat("uninstallApp", pkg);
+      A.toast(S.lang === "ar" ? "لو ده تطبيق نظام ومارضيش يتمسح، شغّل Shizuku الأول" : "System app? Start Shizuku first");
+    }
+  });
 }

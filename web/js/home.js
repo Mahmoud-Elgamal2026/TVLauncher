@@ -100,6 +100,7 @@ function appMenu(pkg,fromFav,watchKey){
     {label:isLocked(pkg)?L("unlock"):L("lock"),fn:()=>{ if(!S.pin){A.toast(L("needPin"));return} guard(true,()=>{toggleList("locked",pkg);renderHome()}) }},
     {label:L("info"),fn:()=>A.appInfo(pkg)});
   items.push({label:L("cancel"),fn:()=>{}});
+  if(!kid&&pkg!=="com.mahmoud.tvlauncher") items.splice(1,0,{icon:"🗑",label:S.lang==="ar"?"مسح التطبيق":"Uninstall",fn:()=>uninstallAny(pkg)});
   dialog(appName(a),items);
 }
 function setCustom(pkg,patch){ const c=S.custom; c[pkg]=Object.assign({},c[pkg]||{},patch); Object.keys(c[pkg]).forEach(k=>{if(!c[pkg][k])delete c[pkg][k]}); if(!Object.keys(c[pkg]).length) delete c[pkg]; S.custom=c; renderHome() }
@@ -154,4 +155,12 @@ function timeUp(){
   if(on("player")&&window.stopPlayer) stopPlayer();
   askPin(L("timeUp"),pin=>{ if(pin!==S.pin){A.toast(L("wrongPin"));return false} const u=S.usage; u.bonus=(u.bonus||0)+30; S.usage=u; closeDialog() },L("timeUpSub"));
   dlgOnClose=()=>{ const u=S.usage; if(u&&u.m>=(+(profile().limit||0))+(u.bonus||0)) setTimeout(timeUp,500) };
+}
+
+// uninstall: normal apps via Android's dialog; system apps via Shizuku when it's running
+async function uninstallAny(pkg){
+  let sys=false; try{ const l=JSON.parse(nat("listPackages")||"[]"); const x=l.find(o=>o.pkg===pkg||o.package===pkg||o.p===pkg); sys=!!(x&&x.sys) }catch(e){}
+  if(!sys){ nat("uninstallApp",pkg); setTimeout(()=>{ if(typeof loadApps==="function") loadApps() },8000); return }
+  if(typeof shz==="function"&&shz()==="ok"){ try{ await runShell(`pm uninstall -k --user 0 ${pkg}`); A.toast("🗑 "+(S.lang==="ar"?"اتمسح":"Removed")); S.favs=S.favs.filter(p=>p!==pkg); if(typeof loadApps==="function") loadApps(); else renderHome() }catch(e){ nat("uninstallApp",pkg) } }
+  else { nat("uninstallApp",pkg); A.toast(S.lang==="ar"?"لو ده تطبيق نظام ومارضيش يتمسح، شغّل Shizuku الأول":"System app? Start Shizuku first") }
 }
