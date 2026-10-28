@@ -62,6 +62,16 @@ for t in $(cat themes.txt); do js "S.lite=true;S.theme='$t';applyLook();renderHo
 js "S.lists=[];S.favCh=[];channels=[];renderGroups();showPage('tv');focus(document.querySelector('[data-freepack=eg]'))" 2; shot 43-iptv-empty
 key DPAD_CENTER; sleep 25; shot 44-iptv-free-added
 js "console.log('TVL|free-pack|'+(channels.length>0?'PASS':'FAIL')+'|'+channels.length+' channels')" 1
+# close a real running app from inside the launcher
+APP=$(adb shell pm list packages | grep -m1 -oE "com.android.tv.settings|com.android.settings|com.google.android.youtube.tv" | tr -d '\r')
+js "launch('$APP')" 6
+adb shell am start -n $PKG/.MainActivity >/dev/null; sleep 3
+BEFORE=$(adb shell pidof $APP | tr -d '\r')
+js "runningMenu()" 2; shot 45-running-apps
+js "closeDialog();closeOne('$APP')" 3
+AFTER=$(adb shell pidof $APP | tr -d '\r')
+if [ -n "$BEFORE" ] && [ -z "$AFTER" ]; then R=PASS; else R=FAIL; fi
+echo "TVL|close-app|$R|$APP pid before=$BEFORE after=$AFTER" >> $OUT/extra.txt
 # full self-test (network, IPTV, recording, radio, files ...)
 adb push selftest.built.js /sdcard/Download/selftest.js
 js "var s=document.createElement('script');s.src='file:///sdcard/Download/selftest.js';s.onerror=function(){console.log('TVL|load-selftest|FAIL|script load error')};document.body.appendChild(s)" 5
@@ -70,7 +80,7 @@ shot 40-after-selftest
 js "showPage('tv');renderGroups&&renderGroups();focus(document.querySelector('#channels .f')||document.querySelector('#groups .f'))" 3; shot 41-iptv-channels
 key DPAD_CENTER; sleep 12; shot 42-iptv-playing; key BACK; sleep 1
 adb logcat -d -s chromium:* AndroidRuntime:E ActivityManager:W > $OUT/logcat.txt
-grep -o 'TVL|[^"]*' $OUT/logcat.txt | sed 's/", source.*//' > $OUT/results.txt
+grep -o 'TVL|[^"]*' $OUT/logcat.txt | sed 's/", source.*//' > $OUT/results.txt; cat $OUT/extra.txt >> $OUT/results.txt 2>/dev/null
 grep -E 'Uncaught|FATAL|TypeError|ReferenceError|SyntaxError' $OUT/logcat.txt > $OUT/errors.txt
 cat $OUT/results.txt; echo ERRORS; cat $OUT/errors.txt | head -40
 true

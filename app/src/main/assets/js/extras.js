@@ -366,6 +366,7 @@ window.onFramesAdded = (json) => {
 function quickSettings() {
   const st = "android.settings.";
   dialog(L("qTitle"), [
+    { icon: "📋", label: L("runApps"), fn: () => setTimeout(() => window.runningMenu && runningMenu(), 30) },
     { icon: "🖼️", label: L("frameNow"), fn: startFrame },
     { icon: "😴", label: L("sleepT") + (sleepAt ? " · " + fmtLeft(sleepAt - Date.now()) : ""), fn: sleepMenu },
     { icon: "👥", label: L("profiles"), fn: profileMenu },

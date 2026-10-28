@@ -234,3 +234,32 @@ activators.push(el=>{
 function updVodTab(){ const t=document.querySelector('.tab[data-page="vod"]'); if(!t) return; const has=(typeof vodCats!=="undefined"&&vodCats.length)||S.watch.some(w=>w.kind)||S.lists.some(l=>l.type==="xtream");
   t.style.display=has?"":"none"; if(!has&&document.querySelector("#vod.on")) showPage("home") }
 setInterval(updVodTab,4000); setTimeout(updVodTab,1500);
+
+// ---------- close running apps from inside the launcher ----------
+MT.ar.runApps="التطبيقات المفتوحة";MT.en.runApps="Open apps";MT.ar.closeApp="اقفل التطبيق";MT.en.closeApp="Close app";
+MT.ar.closeAll="اقفل الكل";MT.en.closeAll="Close all";MT.ar.closed="اتقفل";MT.en.closed="Closed";MT.ar.noRun="مفيش تطبيقات مفتوحة";MT.en.noRun="No open apps";
+Object.keys(MT).forEach(l=>Object.assign(T[l],MT[l]));
+let openedApps=[];
+const _launchC=launch; launch=function(pkg){ openedApps=[pkg].concat(openedApps.filter(p=>p!==pkg)).slice(0,20); return _launchC.apply(this,arguments) };
+async function closeOne(pkg){
+  // with Shizuku running: a real force-stop (also ends background services); otherwise Android's background kill
+  if(typeof shz==="function"&&shz()==="ok"){ try{ await runShell("am force-stop "+pkg) }catch(e){ nat("closeApp",pkg) } } else nat("closeApp",pkg);
+  openedApps=openedApps.filter(p=>p!==pkg);
+}
+function runningMenu(){
+  const list=openedApps.map(byPkg).filter(Boolean);
+  if(!list.length){ A.toast(L("noRun")); return }
+  const items=list.map(a=>({icon:"✖",label:appName(a),keep:1,fn:async()=>{ await closeOne(a.pkg); banner("✖",L("closed"),appName(a),1800); setTimeout(()=>{ closeDialog(); if(openedApps.length) runningMenu() },30) }}));
+  items.push({icon:"🧹",label:L("closeAll")+" ("+list.length+")",pri:1,fn:async()=>{ const n=list.length; for(const a of list) await closeOne(a.pkg); if(window.cleanRam) nat("cleanRam"); banner("🧹",L("closeAll"),n+" "+L("closed"),2500) }});
+  dialog("📋 "+L("runApps"),items,{grid:3});
+}
+window.runningMenu=runningMenu;
+if(typeof ACTIONS==="function"){ const _AR=ACTIONS; ACTIONS=()=>[["📋",L("runApps"),runningMenu]].concat(_AR()) }
+const _appMenuC=appMenu; appMenu=function(pkg){ _appMenuC.apply(this,arguments); if(pkg===undefined) return;
+  const box=$("dbox"), items=box._items, g=box.querySelector(".mgrid,.dlist"); if(!g) return;
+  items.splice(1,0,{label:"✖ "+L("closeApp"),fn:async()=>{ await closeOne(pkg); banner("✖",L("closed"),appName(byPkg(pkg)||{name:pkg}),1800) }});
+  g.innerHTML=items.map((it,i)=>`<button class="btn f${it.pri?" pri":""}" data-di="${i}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };
+// Telegram: "اقفل <اسم>" / "close <name>", or "اقفل الكل"
+const _tgCmdC=tgCmd; tgCmd=function(t){ const m=String(t).match(/^\/?(اقفل|close)\s*(.*)$/i); if(!m) return _tgCmdC.apply(this,arguments);
+  const q=m[2].trim().toLowerCase(); if(!q||/^(الكل|all)$/.test(q)){ const n=openedApps.length; openedApps.slice().forEach(p=>closeOne(p)); return "🧹 "+n }
+  const a=apps.find(x=>appName(x).toLowerCase().indexOf(q)>=0); if(!a) return tgt("nf"); closeOne(a.pkg); return "✖ "+appName(a) };

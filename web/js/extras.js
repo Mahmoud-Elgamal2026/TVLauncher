@@ -174,7 +174,7 @@ window.onFramesAdded=json=>{ try{ const add=JSON.parse(json); S.frames=[...S.fra
 function quickSettings(){
   const st="android.settings.";
   dialog(L("qTitle"),[
-    {icon:"🖼️",label:L("frameNow"),fn:startFrame},{icon:"😴",label:L("sleepT")+(sleepAt?" · "+fmtLeft(sleepAt-Date.now()):""),fn:sleepMenu},
+    {icon:"📋",label:L("runApps"),fn:()=>setTimeout(()=>window.runningMenu&&runningMenu(),30)},{icon:"🖼️",label:L("frameNow"),fn:startFrame},{icon:"😴",label:L("sleepT")+(sleepAt?" · "+fmtLeft(sleepAt-Date.now()):""),fn:sleepMenu},
     {icon:"👥",label:L("profiles"),fn:profileMenu},{icon:"🔍",label:L("aSearch"),fn:()=>openSearch("")},
     {icon:"📶",label:L("wifi"),fn:()=>A.openSettings(st+"WIFI_SETTINGS")},{icon:"🎧",label:L("bt"),fn:()=>A.openSettings(st+"BLUETOOTH_SETTINGS")},
     {icon:"🔊",label:L("sound"),fn:()=>A.openSettings(st+"SOUND_SETTINGS")},{icon:"🖥️",label:L("display"),fn:()=>A.openSettings(st+"DISPLAY_SETTINGS")},

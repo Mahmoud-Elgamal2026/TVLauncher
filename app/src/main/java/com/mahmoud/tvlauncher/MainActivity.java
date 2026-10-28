@@ -584,6 +584,15 @@ public class MainActivity extends Activity {
             }).start();
         }
 
+
+        /** Closes an app that is in the background (every app is, while the launcher is on screen). No root needed. */
+        @JavascriptInterface
+        public boolean closeApp(String pkg) {
+            if (pkg == null || pkg.equals(getPackageName())) return false;
+            try { ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).killBackgroundProcesses(pkg); return true; }
+            catch (Throwable t) { return false; }
+        }
+
         // ---------- start-up: resume last channel ----------
         /** True once per boot, for the first launcher start within 10 minutes of the box turning on. */
         @JavascriptInterface
