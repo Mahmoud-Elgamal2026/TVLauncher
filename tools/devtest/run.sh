@@ -96,6 +96,13 @@ js "showPage('sports')" 15; shot 53-sports; js "console.log('TVL|sports-tab|'+(d
 js "S.anim='auto';S.theme='ramadan';applyLook();renderHome();showPage('home')" 3; shot 54-live-ramadan
 js "console.log('TVL|live-theme|'+(document.body.dataset.anim==='lanterns'&&getComputedStyle(document.querySelector('#animBg i')).animationName!=='none'?'PASS':'FAIL')+'|anim='+document.body.dataset.anim+' name='+getComputedStyle(document.querySelector('#animBg i')).animationName)" 1
 js "S.theme='apple';applyLook();autoClean(true).then(function(){console.log('TVL|self-clean|'+(lastClean>0?'PASS':'FAIL')+'|lastClean='+lastClean)})" 4
+js "S.simple=true;applySimple();showPage('home');renderHome()" 3; shot 55-home-widgets
+js "console.log('TVL|hw-board|'+(document.querySelectorAll('#hwBoard .hw').length>=4?'PASS':'FAIL')+'|'+document.querySelectorAll('#hwBoard .hw').length+' widgets')" 1
+js "showPage('lib');renderLib()" 15; shot 56-lib-quran
+js "console.log('TVL|lib-quran|'+(document.querySelectorAll('#libMain [data-reciter]').length>10?'PASS':'FAIL')+'|'+document.querySelectorAll('#libMain [data-reciter]').length+' reciters')" 1
+js "libCat='oldar';renderLib()" 15; shot 57-lib-films
+js "console.log('TVL|lib-archive|'+(document.querySelectorAll('#libMain [data-arch]').length>5?'PASS':'FAIL')+'|'+document.querySelectorAll('#libMain [data-arch]').length+' items')" 1
+js "S.simple=false;applySimple()" 1
 key SEARCH; sleep 3; shot 51-voice; key BACK; sleep 1
 # volume keys show the on-screen bar
 key VOLUME_UP; sleep 0.5; shot 52-vol-osd
