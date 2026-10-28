@@ -105,11 +105,11 @@ textarea{min-height:90px;resize:vertical}
 </main>
 <nav>
   <button class="on" data-tab="remote"><b>🎮</b><span data-t="remote"></span></button>
-  <button data-tab="type"><b>⌨️</b><span data-t="type"></span></button>
+  <button data-tab="type"><b>⌨️</b><span>كتابة وتاتش</span></button>
   <button data-tab="watch"><b>▶️</b><span data-t="watchS"></span></button>
   <button data-tab="favs"><b>⭐</b><span data-t="favs"></span></button>
   <button data-tab="apps"><b>📦</b><span data-t="apps"></span></button>
-  <button data-tab="links"><b>🔗</b><span data-t="links"></span></button>
+  <button data-tab="links"><b>🖼</b><span>صور وروابط</span></button>
 </nav>
 <div id="pair"><div style="font-size:48px">📺</div><h1 data-t="pairTitle" style="font-size:20px"></h1><p class="note" data-t="pairNote"></p>
   <input id="pairCode" inputmode="numeric" maxlength="4"><button class="btn pri" id="pairGo" style="max-width:220px;width:100%"><span data-t="connect"></span></button></div>
@@ -222,7 +222,7 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
 <div id="tpWrap" style="padding:10px 14px"><input id="liveType" placeholder="⌨️ اكتب هنا — بيتكتب على التليفزيون على طول" style="width:100%;box-sizing:border-box;margin-bottom:10px;padding:14px;border-radius:14px;border:0;background:#1b1e2b;color:#fff;font-size:16px"><div id="tpad" style="height:230px;border-radius:18px;background:#1b1e2b;display:flex;align-items:center;justify-content:center;color:#8a90a8;font-size:15px;user-select:none;touch-action:none">اسحب للأسهم · دوس = OK · دوستين = رجوع</div>
 <div style="display:flex;gap:10px;margin-top:10px"><button id="micBtn" style="flex:1;padding:14px;border-radius:14px;border:0;background:#3b6cff;color:#fff;font-size:17px">🎤 بحث بالصوت</button></div></div>
 <script>
-(function(){ var b=document.body, ph=document.getElementById("phWall"), tp=document.getElementById("tpWrap"); try{ var first=b.firstElementChild; if(tp) b.insertBefore(tp,first); if(ph){ var sec=ph.parentNode.parentNode; b.insertBefore(sec,tp?tp.nextSibling:first) } }catch(e){} })();
+(function(){ /* keep the Remote tab clean: typing + touchpad + voice go to the Type tab, photos to the Links tab */ try{ var tp=document.getElementById("tpWrap"), ph=document.getElementById("phWall"), ty=document.getElementById("t-type"), lk=document.getElementById("t-links"); if(tp&&ty) ty.insertBefore(tp,ty.firstChild); if(ph&&lk){ var sec=ph.parentNode.parentNode; lk.insertBefore(sec,lk.firstChild) } }catch(e){} })();
 (function(){ var p=document.getElementById("tpad"); if(!p) return; var sx=0,sy=0,st=0,last=0,moved=false;
   function key(k){ try{ api("key",{k:k}) }catch(e){} if(navigator.vibrate) navigator.vibrate(12) }
   p.addEventListener("touchstart",function(e){ var t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=Date.now(); moved=false; e.preventDefault() },{passive:false});
