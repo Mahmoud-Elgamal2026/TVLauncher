@@ -78,12 +78,12 @@ const WIDGETS = [
 const wEl = (w) => document.querySelector(w[1]), wHead = (w) => w[2] && document.querySelector(w[2]);
 function lay() {
   const all = S.layouts || {};
-  return all[S.theme] || {};
+  if (all.__all) return all.__all;
+  const any = all[S.theme] || Object.keys(all).map((k) => all[k]).find((v) => v && Object.keys(v).length);
+  return any || {};
 }
 function saveLay(l) {
-  const all = Object.assign({}, S.layouts || {});
-  all[S.theme] = l;
-  S.layouts = all;
+  S.layouts = { __all: l };
 }
 function applyWidgets() {
   const l = lay(), scroll = document.querySelector("#home .scroll");

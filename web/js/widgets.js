@@ -11,8 +11,8 @@ const WIDGETS=[["hero","#shelf",null,1],["watch","#watchRow",'h2[data-row="watch
   ["matches","#matchRow",'h2[data-row="matchRow"]',1],["favch","#favChRow",'h2[data-row="favChRow"]',1],["quick","#quickRow",'h2[data-row="quickRow"]',1],["recent","#recentRow",'h2[data-row="recentRow"]',1],
   ["clock",".top .clock",null,0],["ticker","#ticker",null,0],["weather",".top .weather",null,0],["sources","#xSources",null,0],["allapps","#xAllApps",null,0]];
 const wEl=w=>document.querySelector(w[1]), wHead=w=>w[2]&&document.querySelector(w[2]);
-function lay(){ const all=S.layouts||{}; return all[S.theme]||{} }
-function saveLay(l){ const all=Object.assign({},S.layouts||{}); all[S.theme]=l; S.layouts=all }
+function lay(){ const all=S.layouts||{}; if(all.__all) return all.__all; const any=all[S.theme]||Object.keys(all).map(k=>all[k]).find(v=>v&&Object.keys(v).length); return any||{} }
+function saveLay(l){ S.layouts={__all:l} }
 
 function applyWidgets(){
   const l=lay(), scroll=document.querySelector("#home .scroll");

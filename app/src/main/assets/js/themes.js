@@ -74,6 +74,19 @@ ${b} h2{color:#fff;font-weight:700;font-size:2.3vh;letter-spacing:.02em}
 ${b} .app{border:1px solid rgba(255,255,255,.06)}
 ${b} .app .nm{color:#bbb}${b} .app.focus .nm{color:#e5a00d}
 ${b} .btn.pri,${b} .it.sel{background:#e5a00d;color:#000}`;
+  if (t.vidaa) c += `
+${b} #shade{background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(10,4,30,.75) 100%)}
+${b} #favRow .app,${b} #recentRow .app{background:#fff;width:calc(var(--tile,16vw) * .78)}
+${b} #favRow .app .nm,${b} #recentRow .app .nm{color:#fff}
+${b} #shelfTitle{font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+${b} .tab.on:not(.focus){color:#fff!important}${b} h2{color:#fff}
+${b} .app .lbl{color:#3a136e;text-shadow:none}`;
+  if (t.vidaa) c += `
+${b} .app.match{background:rgba(10,12,24,.55)!important;color:#fff}${b} .app.match *{color:#fff}`;
+  return c;
+}
+function layoutCss(t, b) {
+  let c = "";
   if (t.lay === "gtv") c += `
 ${b}[data-page=home] #shelf{height:44vh}${b}[data-page=home] #shelfTitle{font-size:6.4vh;font-weight:500}
 ${b}[data-page=home] #home .scroll{display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column}
@@ -116,20 +129,13 @@ ${b}[data-page=home] #shelf{height:30vh}
 ${b}[data-page=home] #favRow .app{width:12vw;aspect-ratio:2/3;border-radius:1.2vh}
 ${b}[data-page=home] #favRow .app img{max-width:64%;max-height:40%}
 ${b}[data-page=home] #favRow .app .nm{opacity:1;top:auto;bottom:1.2vh;margin:0;position:absolute;font-weight:600}`;
-  if (t.vidaa) c += `
-${b} #shade{background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(10,4,30,.75) 100%)}
-${b} #favRow .app,${b} #recentRow .app{background:#fff;width:calc(var(--tile,16vw) * .78)}
-${b} #favRow .app .nm,${b} #recentRow .app .nm{color:#fff}
-${b} #shelfTitle{font-weight:800;letter-spacing:.06em;text-transform:uppercase}
-${b} .tab.on:not(.focus){color:#fff!important}${b} h2{color:#fff}
-${b} .app .lbl{color:#3a136e;text-shadow:none}`;
   if (t.startPage) c += `
 ${b} #shelfImg,${b} #shelfTitle,${b} #shelfSub{display:none}
 ${b} #shade{background:transparent}
 ${b} #shelf{height:24vh}
-${b} .top .clock{position:fixed;top:9vh;left:0;right:0;text-align:center;pointer-events:none;z-index:4}
-${b} .top .clock #time{font-size:9.5vh;font-weight:200;letter-spacing:-.02em;line-height:1}
-${b} .top .clock #date{font-size:1.8vh;opacity:.55;margin-top:1.2vh}
+${b}[data-page=home] .top .clock{position:fixed;top:9vh;left:0;right:0;text-align:center;pointer-events:none;z-index:4}
+${b}[data-page=home] .top .clock #time{font-size:9.5vh;font-weight:200;letter-spacing:-.02em;line-height:1}
+${b}[data-page=home] .top .clock #date{font-size:1.8vh;opacity:.55;margin-top:1.2vh}
 ${b} #home h2{text-align:center;color:#e8eaed;font-weight:600;font-size:1.9vh}
 ${b} #home .row{-webkit-justify-content:center;justify-content:center;-webkit-flex-wrap:wrap;flex-wrap:wrap;overflow:visible;gap:2.2vh 1.6vw}
 ${b} #home .row .app{width:8.4vh!important;height:8.4vh!important;aspect-ratio:1/1;border-radius:1.8vh;border:1px solid rgba(255,255,255,.08);margin-bottom:3.4vh}
@@ -191,7 +197,7 @@ ${b} #favRow .app .nm,${b} #recentRow .app .nm{font-size:1.5vh}
 ${b} #favRow .app .badge,${b} #recentRow .app .badge{display:none}
 ${b} #favRow .app.f.focus,${b} #recentRow .app.f.focus{transform:scale(1.12);box-shadow:0 0 0 .35vh #fff,0 1.2vh 2.6vh rgba(0,0,0,.6)}
 ${b} #shelfTitle{font-weight:500}`;
-  if (t.classicAtv || t.vidaa || t.lay === "bar") c += `
+  if (t.classicAtv || t.lay === "bar") c += `
 ${b} .app.match{background:rgba(10,12,24,.55)!important;color:#fff}${b} .app.match *{color:#fff}`;
   if (t.classicAtv) c += `
 ${b} #shelfImg,${b} #shade{display:none}
@@ -209,7 +215,7 @@ ${b} #home h2[data-row=quickRow]::before{background-color:#7e57c2;background-ima
 ${b} #home h2[data-row=recentRow]::before{background-color:#546e7a;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M13 3a9 9 0 1 0 9 9h-2a7 7 0 1 1-7-7zm-1 5v5l4 2.5.8-1.3-3.3-2V8z'/%3E%3C/svg%3E")}
 ${b} #home .row{width:calc(100% - 9vw);-webkit-flex:none;flex:none;padding:3.2vh 1vw 3.4vh;margin-bottom:0}
 ${b} #home .row .app{width:calc(var(--tile,16vw) * .82);border-radius:.3vh}
-${b} #home #favRow .app{background:#f2f2f2}${b} #home .app .lbl{color:#202124;text-shadow:none}
+${b} #home #favRow .app{background:#f2f2f2}${b} #home #favRow .app .lbl{color:#202124;text-shadow:none}
 ${b} #home #favRow .app img:not(.banner):not(.cover){max-width:62%;max-height:62%}
 ${b} #home .app .nm{color:#fff;font-size:1.6vh;opacity:0}${b} #home .app.focus .nm{opacity:1}
 ${b} #home .app.f.focus{transform:scale(1.18);box-shadow:0 1.6vh 3.2vh rgba(0,0,0,.55)}
@@ -228,13 +234,47 @@ function physicalCss(css) {
     return `${sel}{${decl}}${pre("ltr")}{${map(decl, "ltr")}}${pre("rtl")}{${map(decl, "rtl")}}`;
   });
 }
+const DESIGNS = [
+  ["hero", "🍎", { ar: "tvOS · عنوان كبير وصفوف", en: "tvOS · big title & rows" }],
+  ["gtv", "🔷", { ar: "Google TV · آخر استخدام الأول", en: "Google TV · recent first" }],
+  ["round", "⚪", { ar: "Google TV · تطبيقات دواير", en: "Google TV · round apps" }],
+  ["classic", "🔴", { ar: "Android TV · أيقونات جانبية", en: "Android TV · side icons" }],
+  ["bar", "▬", { ar: "Samsung / LG · شريط تحت", en: "Samsung / LG · bottom bar" }],
+  ["grid", "▦", { ar: "Fire TV / Roku · شبكة كبيرة", en: "Fire TV / Roku · big grid" }],
+  ["xbox", "🟩", { ar: "Xbox · بلاطة كبيرة", en: "Xbox · hero tile" }],
+  ["psrow", "🎮", { ar: "PlayStation · أيقونات فوق", en: "PlayStation · top icons" }],
+  ["sidelist", "☰", { ar: "Kodi / Plex · قايمة جانبية", en: "Kodi / Plex · side list" }],
+  ["poster", "🎬", { ar: "بوسترات أفلام", en: "Movie posters" }],
+  ["dock", "🧩", { ar: "Dock · لوحات جانبية", en: "Dock · side panels" }],
+  ["start", "🕒", { ar: "Start page · ساعة في النص", en: "Start page · centre clock" }]
+];
+const designOf = (th) => !th ? "hero" : th.dock ? "dock" : th.startPage ? "start" : th.roundApps ? "round" : th.classicAtv ? "classic" : th.lay || "hero";
 (function() {
+  const lays = DESIGNS.map((d) => {
+    const k = d[0];
+    return layoutCss({ lay: k, dock: k === "dock", startPage: k === "start", roundApps: k === "round", classicAtv: k === "classic" }, `body[data-lay="${k}"]`);
+  }).join("\n");
   const st = document.createElement("style");
   st.id = "themeCss";
-  st.textContent = physicalCss(THEMES.filter((t) => !t.builtIn).map(themeCss).join("\n"));
+  st.textContent = physicalCss(THEMES.filter((t) => !t.builtIn).map(themeCss).join("\n") + "\n" + lays);
   document.head.appendChild(st);
 })();
+function designPicker() {
+  const cur = document.body.dataset.lay || "hero";
+  return `<div class="dgrid">${DESIGNS.map((d) => `<button class="btn f dcard${cur === d[0] ? " pri" : ""}" data-design="${d[0]}"><b>${d[1]}</b><span>${esc(d[2][S.lang] || d[2].en)}</span></button>`).join("")}</div>`;
+}
 function themePicker() {
   const groups = [...new Set(THEMES.map((t) => t.g))];
   return groups.map((g) => `<div class="tgroup"><span class="tg">${esc(g === "Originals" ? S.lang === "ar" ? "تصميمات اللانشر" : "Launcher originals" : g)}</span><div class="inline">${THEMES.filter((t) => t.g === g).map((t) => `<button class="btn f tbtn${S.theme === t.id ? " pri" : ""}" data-set="theme:${t.id}"><i class="tdot" style="background:${t.dot}"></i>${esc(t.n)}</button>`).join("")}</div></div>`).join("");
 }
+activators.push((el) => {
+  if (el.dataset && el.dataset.design) {
+    S.design = el.dataset.design;
+    applyLook();
+    renderHome();
+    if (window.renderSettings) renderSettings();
+    focus(document.querySelector(`[data-design="${el.dataset.design}"]`));
+    return true;
+  }
+  return false;
+});

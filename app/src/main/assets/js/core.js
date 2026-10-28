@@ -95,6 +95,7 @@ const A = {
 };
 window.A = A;
 const DEF = {
+  design: "",
   perfChosen: false,
   lang: "ar",
   theme: "apple",
@@ -242,7 +243,7 @@ function applyLook() {
   {
     const th = typeof THEMES !== "undefined" && THEMES.find((t) => t.id === S.theme);
     b.classList.toggle("lighttheme", S.theme === "light" || !!(th && th.light));
-    b.dataset.lay = th && th.lay || (th && th.classicAtv ? "classic" : "");
+    b.dataset.lay = S.design || (typeof designOf === "function" ? designOf(th) : "hero");
   }
   b.classList.toggle("kids", isKids());
   const img = S.wall === "image" && S.wallImg;

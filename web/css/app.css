@@ -417,3 +417,8 @@ body.lighttheme .f.focus{outline-color:#111}
 body.lite .app.f.focus,body.lite .it.f.focus,body.lite .poster.f.focus{transform:scale(1.06)}
 .app.focus .nm{opacity:1!important}
 .chrow .nm2 b,.chrow .nm2 small{unicode-bidi:plaintext;display:block}html[dir=rtl] .chrow .nm2{text-align:right}html[dir=ltr] .chrow .nm2{text-align:left}
+
+.dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2vh .8vw}
+html.nogrid .dgrid{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap}html.nogrid .dgrid>*{width:calc(25% - .8vw);margin:0 .4vw 1.2vh}
+.dcard{display:flex;flex-direction:column;align-items:center;gap:.8vh;padding:1.6vh .6vw;min-height:11vh;text-align:center}
+.dcard b{font-size:3.6vh;line-height:1}.dcard span{font-size:1.55vh;line-height:1.3}

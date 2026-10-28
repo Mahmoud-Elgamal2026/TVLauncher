@@ -13,7 +13,8 @@ function renderSettings(){
   const h=
   sec(L("sLook"),
     field(L("language"),seg("lang",[["ar","العربية"],["en","English"]]))+
-    field(L("theme"),themePicker())+
+    field(S.lang==="ar"?"🧩 التصميم (شكل الشاشة)":"🧩 Design (screen layout)",designPicker())+
+    field(S.lang==="ar"?"🎨 الألوان":"🎨 Colours",themePicker())+
     field(L("size"),seg("size",[["s",L("small")],["m",L("medium")],["l",L("large")]]))+
     field(L("wallpaper"),seg("wall",[["dynamic",L("wDynamic")],["daily",L("wDaily")]]).replace("</div>",`<button class="btn f${S.wall==="image"?" pri":""}" id="wallPick">${L("wPick")}</button><button class="btn f" id="wall4k">🖼 ${L("w4k")}</button></div>`)+
       `<div style="margin-top:1.2vh">${inputRow("wallUrl",S.wallImg&&!S.wallImg.startsWith("data:")?S.wallImg:"",L("wUrl"),"wallUrlSave")}</div>`)+

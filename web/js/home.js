@@ -52,7 +52,7 @@ function renderHome(){
   setRow("watchRow",S.watch.map(watchTile).join(""));
   let fv=S.favs.map(byPkg).filter(a=>a&&allowed(a.pkg));
   if(isKids()&&!fv.length) fv=visibleApps();
-  if(!fv.length&&S.theme==="dock") fv=visibleApps().slice(0,6);
+  if(!fv.length&&document.body.dataset.lay==="dock") fv=visibleApps().slice(0,6);
   $("favRow").innerHTML=fv.length?fv.map(tile).join(""):`<div class="empty">${L("noFav")}</div>`;
   if(window.renderMatchRow) renderMatchRow();
   const last=S.lastCh, fc=[...(last?[last]:[]),...S.favCh.filter(c=>!last||c.url!==last.url)].filter(c=>!window.chAllowed||chAllowed(c));

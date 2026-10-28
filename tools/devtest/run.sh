@@ -36,6 +36,9 @@ key DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT; shot 12-settings-right; chk 12 
 # every theme on home (fast mode, like the box)
 for t in $(cat themes.txt); do js "S.theme='$t';applyLook();renderHome();showPage('home');focus(document.querySelector('#favRow .app')||document.querySelector('.tab.on'))" 2; shot "20-theme-$t"; done
 js "S.theme='apple';applyLook();renderHome()" 1
+# every design (screen layout) on the real device
+for d in hero gtv round classic bar grid xbox psrow sidelist poster dock start; do js "S.design='$d';S.theme='ramadan';applyLook();renderHome();showPage('home');focus(document.querySelector('#favRow .app')||document.querySelector('.tab.on'))" 2; shot "21-design-$d"; done
+js "S.design='';S.theme='apple';applyLook();renderHome()" 1
 # dialogs
 js "radioMenu()" 6; shot 30-radio-menu; key BACK
 js "wallMenu()" 2; shot 31-wall-menu; key BACK
