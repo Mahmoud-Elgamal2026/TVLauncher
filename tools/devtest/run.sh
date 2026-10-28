@@ -43,18 +43,18 @@ js "widgetMenu()" 2; shot 32-widgets; key BACK
 js "setupWizard()" 2; shot 33-setup; key BACK
 js "showPage('store');storeCat='code';renderStore()" 2; shot 34-store-code
 # widget editor with the real remote: open, pick Favorites, smaller x2, move, arrows, key 1, OK
-js "closeDialog();S.layouts={};S.theme='apple';applyLook();renderHome();showPage('settings');renderSettings();focus($('wEditBtn'))" 2
+js "closeDialog();S.layouts={};S.theme='apple';applyLook();renderHome();showPage('settings');renderSettings();focus(document.getElementById('wEditBtn'))" 2
 key DPAD_CENTER; sleep 1; shot 35-w-menu
-js "focus([].slice.call($('dbox').querySelectorAll('[data-di]')).filter(function(b){return b.textContent.indexOf(L('w_fav'))>=0})[0])" 1
+js "focus([].slice.call(document.getElementById('dbox').querySelectorAll('[data-di]')).filter(function(b){return b.textContent.indexOf(L('w_fav'))>=0})[0])" 1
 key DPAD_CENTER; sleep 1; shot 36-w-actions
-js "focus([].slice.call($('dbox').querySelectorAll('[data-di]')).filter(function(b){return b.textContent.indexOf(L('wSmaller'))>=0})[0])" 1
+js "focus([].slice.call(document.getElementById('dbox').querySelectorAll('[data-di]')).filter(function(b){return b.textContent.indexOf(L('wSmaller'))>=0})[0])" 1
 key DPAD_CENTER DPAD_CENTER
-js "focus([].slice.call($('dbox').querySelectorAll('[data-di]')).filter(function(b){return b.textContent.indexOf(L('wMove'))>=0})[0])" 1
+js "focus([].slice.call(document.getElementById('dbox').querySelectorAll('[data-di]')).filter(function(b){return b.textContent.indexOf(L('wMove'))>=0})[0])" 1
 key DPAD_CENTER; sleep 1; key DPAD_UP DPAD_UP DPAD_UP DPAD_LEFT DPAD_LEFT KEYCODE_1; shot 37-w-moving
 key DPAD_CENTER; sleep 2; shot 38-w-after-ok
 js "var l=lay().fav||{};console.log('TVL|widget-remote|'+((l.x!=null&&l.s&&l.s<1)?'PASS':'FAIL')+'|'+JSON.stringify(lay())+' moving='+!!moving)" 1
 key BACK; sleep 1; js "showPage('home');renderHome()" 2; shot 39-w-home
-js "var l=lay().fav||{};var r=$('favRow').getBoundingClientRect();console.log('TVL|widget-applied|'+((l.x!=null&&$('favRow').style.position==='fixed')?'PASS':'FAIL')+'|top='+(r.top|0)+' pos='+$('favRow').style.position)" 1
+js "var l=lay().fav||{};var r=document.getElementById('favRow').getBoundingClientRect();console.log('TVL|widget-applied|'+((l.x!=null&&document.getElementById('favRow').style.position==='fixed')?'PASS':'FAIL')+'|top='+(r.top|0)+' pos='+document.getElementById('favRow').style.position)" 1
 js "S.layouts={};applyWidgets()" 1
 # focus frame visible in every theme (real D-pad, fast mode)
 for t in $(cat themes.txt); do js "S.lite=true;S.theme='$t';applyLook();renderHome();showPage('home');focus(document.querySelector('.tab[data-page=home]'))" 2; key DPAD_DOWN; shot "25-focus-$t"; done
