@@ -157,3 +157,14 @@ activators.unshift(el=>{ if(el.id==="railMic"){ if(typeof A.voice==="function") 
 
 // one page: big widget on top, favorite apps right under it
 if(!S.onePageSeeded){ S.onePageSeeded=true; S.homeOrder="w"; S.homePage=0 }
+
+// ================= Header tidy: status chips (sleep timer, location, match) sit next to Settings, not over the clock =================
+setTimeout(()=>{ const t=$("ticker"), tabs=$("tabs"); if(t&&tabs&&t.parentNode!==tabs){ tabs.appendChild(t); t.classList.add("intabs") } },0);
+// side rail order: pages, then Boost, then the voice mic last
+const _renderPagerO=renderPager; renderPager=function(){ _renderPagerO(); const d=$("homePager"), m=$("railMic"); if(d&&m&&d.lastElementChild!==m) d.appendChild(m) };
+// YouTube widget: removable from its own settings and from long-press on any video
+const _hwSettingsY=hwSettings; hwSettings=function(w){ if(w.t!=="yt") return _hwSettingsY(w);
+  const chs=S.ytCh||[];
+  dialog("▶️ "+L("hwYt"),[{icon:"＋",label:L("ytAdd"),pri:1,fn:()=>setTimeout(ytAddDlg,30)}]
+    .concat(chs.map(c=>({icon:"✖",label:L("ytRem")+": "+c.name,fn:()=>{ S.ytCh=chs.filter(x=>x.id!==c.id); ytAt=0; ytLoad(true); setTimeout(()=>hwSettings(w),30) }})))
+    .concat([{icon:"🗑",label:S.lang==="ar"?"شيل ويدجت يوتيوب كلها":"Remove the YouTube widget",fn:()=>{ hwSave(hwList().filter(x=>x.t!=="yt")); const f=document.querySelector("#hwBoard .hw"); if(f) focus(f) }},{label:L("done"),fn:()=>{}}])) };

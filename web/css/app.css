@@ -649,3 +649,5 @@ body[data-hpage="1"] #home .scroll > #favRow,body[data-hpage="1"] #home .scroll 
 #creator img{width:5.2vh!important;height:5.2vh!important;border-width:2px!important}
 #creator{font-size:2.2vh!important;opacity:.9!important;gap:1vw!important;bottom:2vh!important}
 #creator img{width:5.2vh!important;height:5.2vh!important;border-width:2px!important}
+.ticker.intabs{position:static!important;display:inline-flex;align-items:center;gap:1vw;margin-inline-start:1vw;font-size:1.6vh}
+.ticker.intabs span{background:rgba(255,255,255,.08);padding:.4vh .8vw;border-radius:1vh;white-space:nowrap}

@@ -49,6 +49,7 @@ textarea{min-height:90px;resize:vertical}
 #toast.on{transform:translateX(-50%) translateY(0)}
 #pair{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:30px;text-align:center;z-index:8}
 #pair.on{display:flex}
+#pair button{flex:0 0 auto!important;height:auto!important;max-width:220px;width:100%}
 #pair input{max-width:220px;text-align:center;font-size:28px;letter-spacing:.3em}
 .search{display:flex;gap:8px}.search input{flex:1}
 #alerts .al{display:flex;gap:10px;align-items:center;background:#2a2333;border-radius:14px;padding:10px 12px;margin-bottom:8px;animation:pop .3s}
@@ -221,6 +222,7 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
 <div id="tpWrap" style="padding:10px 14px"><div id="tpad" style="height:230px;border-radius:18px;background:#1b1e2b;display:flex;align-items:center;justify-content:center;color:#8a90a8;font-size:15px;user-select:none;touch-action:none">اسحب للأسهم · دوس = OK · دوستين = رجوع</div>
 <div style="display:flex;gap:10px;margin-top:10px"><button id="micBtn" style="flex:1;padding:14px;border-radius:14px;border:0;background:#3b6cff;color:#fff;font-size:17px">🎤 بحث بالصوت</button></div></div>
 <script>
+(function(){ var b=document.body, ph=document.getElementById("phWall"), tp=document.getElementById("tpWrap"); try{ var first=b.firstElementChild; if(tp) b.insertBefore(tp,first); if(ph){ var sec=ph.parentNode.parentNode; b.insertBefore(sec,tp?tp.nextSibling:first) } }catch(e){} })();
 (function(){ var p=document.getElementById("tpad"); if(!p) return; var sx=0,sy=0,st=0,last=0,moved=false;
   function key(k){ try{ api("key",{k:k}) }catch(e){} if(navigator.vibrate) navigator.vibrate(12) }
   p.addEventListener("touchstart",function(e){ var t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=Date.now(); moved=false; e.preventDefault() },{passive:false});

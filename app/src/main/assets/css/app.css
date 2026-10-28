@@ -788,3 +788,9 @@ html[dir=rtl] .herobox .hlive span{margin-right:.6vw}
 #creator img{width:5.2vh!important;height:5.2vh!important;border-width:2px!important}
 #creator{font-size:2.2vh!important;opacity:.9!important;gap:1vw!important;bottom:2vh!important}
 #creator img{width:5.2vh!important;height:5.2vh!important;border-width:2px!important}
+.ticker.intabs{position:static!important;display:inline-flex;align-items:center;gap:1vw;font-size:1.6vh}
+html[dir=ltr] .ticker.intabs{margin-left:1vw}
+html[dir=rtl] .ticker.intabs{margin-right:1vw}
+html[dir=ltr].nofg .ticker.intabs > * + *{margin-left:1vw}
+html[dir=rtl].nofg .ticker.intabs > * + *{margin-right:1vw}
+.ticker.intabs span{background:rgba(255,255,255,.08);padding:.4vh .8vw;border-radius:1vh;white-space:nowrap}
