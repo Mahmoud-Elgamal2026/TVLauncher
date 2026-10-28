@@ -227,8 +227,10 @@ tickers.push(() => {
     target = m;
     dua = L("duaIftar");
   } else {
-    card.style.display = "none";
-    return;
+    const tf = typeof prayersTomorrow !== "undefined" && prayersTomorrow.length ? prayersTomorrow[0].getTime ? prayersTomorrow[0].getTime() : +prayersTomorrow[0] : f + 864e5;
+    label = L("rImsakIn");
+    target = tf - 10 * 6e4;
+    dua = L("duaSuhoor");
   }
   const left = Math.max(0, target - now), h = Math.floor(left / 36e5), mi = Math.floor(left % 36e5 / 6e4), se = Math.floor(left % 6e4 / 1e3);
   card.innerHTML = `<div class="rt">${esc(L("rTitle"))}</div><div class="rl">${esc(label)}</div><div class="rc">${h}:${String(mi).padStart(2, "0")}:${String(se).padStart(2, "0")}</div><div class="rd">${esc(dua)}</div>`;

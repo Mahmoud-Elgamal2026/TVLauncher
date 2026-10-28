@@ -67,7 +67,10 @@ tickers.push(()=>{
   if(!show){ card.style.display="none"; return }
   const now=Date.now(), f=prayers[0].getTime?prayers[0].getTime():+prayers[0], m=prayers[4].getTime?prayers[4].getTime():+prayers[4];
   let label,target,dua;
-  if(now<f){ label=L("rImsakIn"); target=f-10*60000; dua=L("duaSuhoor") } else if(now<m){ label=L("rIftarIn"); target=m; dua=L("duaIftar") } else { card.style.display="none"; return }
+  if(now<f){ label=L("rImsakIn"); target=f-10*60000; dua=L("duaSuhoor") } else if(now<m){ label=L("rIftarIn"); target=m; dua=L("duaIftar") }
+  else { // after iftar: count down to tomorrow's imsak
+    const tf=(typeof prayersTomorrow!=="undefined"&&prayersTomorrow.length)?(prayersTomorrow[0].getTime?prayersTomorrow[0].getTime():+prayersTomorrow[0]):f+86400000;
+    label=L("rImsakIn"); target=tf-10*60000; dua=L("duaSuhoor") }
   const left=Math.max(0,target-now), h=Math.floor(left/3600000), mi=Math.floor(left%3600000/60000), se=Math.floor(left%60000/1000);
   card.innerHTML=`<div class="rt">${esc(L("rTitle"))}</div><div class="rl">${esc(label)}</div><div class="rc">${h}:${String(mi).padStart(2,"0")}:${String(se).padStart(2,"0")}</div><div class="rd">${esc(dua)}</div>`;
   card.style.display="";
