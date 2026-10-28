@@ -416,3 +416,4 @@ body.lighttheme .f.focus{outline-color:#111}
 .inp.f.focus{outline-offset:0}
 body.lite .app.f.focus,body.lite .it.f.focus,body.lite .poster.f.focus{transform:scale(1.06)}
 .app.focus .nm{opacity:1!important}
+.chrow .nm2 b,.chrow .nm2 small{unicode-bidi:plaintext;display:block}html[dir=rtl] .chrow .nm2{text-align:right}html[dir=ltr] .chrow .nm2{text-align:left}
