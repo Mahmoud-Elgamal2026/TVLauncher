@@ -172,7 +172,9 @@ function visibleFocusables(){
 function focus(el){
   if(!el) return;
   if(focused) focused.classList.remove("focus");
-  focused=el; el.classList.add("focus"); el.focus({preventScroll:true});
+  focused=el; el.classList.add("focus");
+  // text fields only take real (keyboard) focus when OK is pressed; just landing on them must not pop the keyboard up
+  if(el.tagName==="INPUT"){ if(document.activeElement&&document.activeElement!==el&&document.activeElement.blur) document.activeElement.blur() } else el.focus({preventScroll:true});
   keepVisible(el);
   if(el.classList.contains("tab")){ if(el.dataset.page) showPage(el.dataset.page); return }
   focusHooks.forEach(h=>h(el));
@@ -230,7 +232,7 @@ function activate(el){
   if(el.dataset.di!==undefined&&el.closest("#dbox")){ const it=$("dbox")._items[+el.dataset.di]; if(!it) return; if(!it.keep) closeDialog(); it.fn(); return }
   if(el.classList.contains("tab")&&el.dataset.act){ runXtab(el.dataset.act); return }
   if(el.classList.contains("tab")){ const p=document.querySelector(".page.on .f"); if(p) focus(p); return }
-  if(el.tagName==="INPUT"){ el.focus(); return }
+  if(el.tagName==="INPUT"){ el.focus(); setTimeout(()=>{ if(focused===el&&document.activeElement!==el) el.focus() },30); return }
   for(const a of activators) if(a(el)) return;
 }
 function openOptions(el){ if(!el||el.closest("#dbox")) return; for(const h of optionHandlers) if(h(el)) return }

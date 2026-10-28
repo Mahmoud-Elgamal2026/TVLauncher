@@ -443,7 +443,9 @@ function focus(el) {
   if (focused) focused.classList.remove("focus");
   focused = el;
   el.classList.add("focus");
-  el.focus({ preventScroll: true });
+  if (el.tagName === "INPUT") {
+    if (document.activeElement && document.activeElement !== el && document.activeElement.blur) document.activeElement.blur();
+  } else el.focus({ preventScroll: true });
   keepVisible(el);
   if (el.classList.contains("tab")) {
     if (el.dataset.page) showPage(el.dataset.page);
@@ -550,6 +552,9 @@ function activate(el) {
   }
   if (el.tagName === "INPUT") {
     el.focus();
+    setTimeout(() => {
+      if (focused === el && document.activeElement !== el) el.focus();
+    }, 30);
     return;
   }
   for (const a of activators) if (a(el)) return;
