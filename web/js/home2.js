@@ -13,7 +13,7 @@ const HP=["hpMain","hpApps","hpMine"];
 function renderPager(){ const d=$("homePager"); if(!d) return;
   d.innerHTML=HP.map((k,i)=>`<button class="btn sm f${i===(+S.homePage||0)?" on":""}" data-hpage="${i}">${esc(L(k))}</button>`).join("") }
 function applyPage(){ const p=+S.homePage||0, sc=$("home").querySelector(".scroll"); document.body.dataset.hpage=p;
-  if(p===1){ $("homeApps").innerHTML=visibleApps().slice().sort((a,b)=>appName(a).localeCompare(appName(b))).map(tile).join("") } else $("homeApps").innerHTML="";
+  if(p===1){ $("homeApps").innerHTML=visibleApps().filter(a=>!(S.favs||[]).includes(a.pkg)).sort((a,b)=>appName(a).localeCompare(appName(b))).map(tile).join("") } else $("homeApps").innerHTML="";
   $("homeMineEmpty").textContent=p===2&&!(S.libFav||[]).length?L("mineEmpty"):""; if(sc) sc.scrollTop=0 }
 activators.unshift(el=>{ if(el.dataset&&el.dataset.hpage!=null){ S.homePage=+el.dataset.hpage; renderPager(); applyPage(); focus(document.querySelector(`[data-hpage="${S.homePage}"]`)); return true } return false });
 // moving left/right across the page buttons switches page right away

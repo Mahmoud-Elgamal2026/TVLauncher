@@ -602,7 +602,7 @@ body[data-favsz] #favRow{gap:1.4vw}
 /* home pages */
 .hpager{gap:1vw;padding:.4vh 1vw 1vh;justify-content:flex-start}
 .hpager .btn{font-size:1.7vh;padding:.7vh 1.2vw}
-body[data-hpage="1"] #home .scroll > *:not(#homeApps):not(#favRow):not(#folderRow):not(.favh){display:none!important}
+body[data-hpage="1"] #home .scroll > *:not(#homeApps):not(#folderRow){display:none!important}
 body[data-hpage="2"] #home .scroll > *:not(#homePager):not(#libFavH):not(#libFavRow):not(#ytH):not(#ytRow):not(#homeMineEmpty){display:none!important}
 body:not([data-hpage="1"]) #homeApps{display:none}
 .hpapps{padding:1vh 1vw}
@@ -638,7 +638,7 @@ body:not([data-page=home]) .hrail{display:none}
 body.simple #home .scroll{padding-inline-start:9vh}
 /* page 0 = widgets only; page 1 = favorites + folders + all apps */
 
-body[data-hpage="1"] #home .scroll > #favRow,body[data-hpage="1"] #home .scroll > #folderRow{display:flex!important}
+body[data-hpage="1"] #home .scroll > #folderRow{display:flex!important}
 
 #npMini{font-size:1.7vh;opacity:.8;margin-top:.3vh;white-space:nowrap}
 .herobox .hlive{font-size:2.3vh;margin-top:1vh;background:rgba(220,30,30,.55);padding:.5vh 1vw;border-radius:1vh;align-self:flex-start}
