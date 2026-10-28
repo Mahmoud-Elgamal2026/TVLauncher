@@ -590,8 +590,8 @@ body.simple #shelfTitle{font-size:3.4vh!important}body.simple #shelfSub{display:
 .hwboard{padding:.6vh 1vw 1.6vh;gap:1.2vw;justify-content:flex-start;box-sizing:border-box;width:100%}
 .hw{height:22vh}
 .hw.sz1{width:calc(25% - .9vw)}
-.hw.sz2{width:calc(50% - .6vw)}
-.hw.sz3{width:calc(75% - .3vw)}
+.hw.sz2{width:calc(33.333% - .8vw)}
+.hw.sz3{width:calc(50% - .6vw)}
 .hwboard .hw.hwadd{height:22vh}
 /* favorite icon sizes */
 body[data-favsz=xs] #favRow .app{width:9vw!important}
@@ -651,3 +651,6 @@ body[data-hpage="1"] #home .scroll > #folderRow{display:flex!important}
 #creator img{width:5.2vh!important;height:5.2vh!important;border-width:2px!important}
 .ticker.intabs{position:static!important;display:inline-flex;align-items:center;gap:1vw;margin-inline-start:1vw;font-size:1.6vh}
 .ticker.intabs span{background:rgba(255,255,255,.08);padding:.4vh .8vw;border-radius:1vh;white-space:nowrap}
+/* medium widgets are a third of the row: tighter content */
+.hw.sz2 .hwpt{gap:.4vw}.hw.sz2 .hwpt span{padding:.3vh .35vw;font-size:1.25vh}.hw.sz2 .hwpt b{font-size:1.5vh}
+.hw.sz2 .hwbig{font-size:4.6vh}
