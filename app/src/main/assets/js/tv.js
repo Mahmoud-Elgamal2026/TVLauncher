@@ -120,6 +120,13 @@ function loadLists() {
         else channels.push(c);
       });
     });
+    const CAP = window.lowRam ? 6e3 : 3e4;
+    if (channels.length > CAP) {
+      const fav = new Set(S.favCh || []);
+      const f = channels.filter((c) => fav.has(c.url)), rest = channels.filter((c) => !fav.has(c.url));
+      channels = f.concat(rest).slice(0, CAP);
+      A.toast(L("chCapped") + " " + CAP);
+    }
     channels.forEach((c, i) => {
       c.no = i + 1;
       c.cty = detectCountry(c);
@@ -194,6 +201,26 @@ function loadEpg() {
       if (r) Object.keys(r).forEach((k) => {
         if (!merged[k]) merged[k] = r[k];
       });
+    });
+    const want = {};
+    channels.forEach((c) => {
+      if (c.id) {
+        want[c.id] = 1;
+        const j = epgKey(c.id);
+        if (j) want["~" + j] = 1;
+      }
+      want[c.name] = 1;
+      const k = epgKey(c.name);
+      if (k) want["~" + k] = 1;
+    });
+    const until = Date.now() + 864e5, since = Date.now() - 3 * 36e5;
+    if (channels.length) Object.keys(merged).forEach((k) => {
+      if (!want[k] && !want["~" + epgKey(k)]) {
+        delete merged[k];
+        return;
+      }
+      const a = merged[k];
+      if (Array.isArray(a)) merged[k] = a.filter((p) => p[1] > since && p[0] < until);
     });
     epg = merged;
     epgNorm = {};

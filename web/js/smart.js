@@ -160,3 +160,5 @@ setInterval(()=>{ if(Date.now()-lastClean>20*60000) autoClean(false) },60000);
 // a frozen-feeling UI (main thread blocked > 1.5 s) triggers a clean too
 let lagLast=Date.now(), lagHits=0;
 setInterval(()=>{ const d=Date.now()-lagLast-1000; lagLast=Date.now(); if(d>1500){ if(++lagHits>=2&&Date.now()-lastClean>120000){ lagHits=0; autoClean(false) } } else lagHits=Math.max(0,lagHits-1) },1000);
+
+Object.assign(T.ar,{chCapped:"الجهاز رامته ٢ جيجا، فاتحمّل أول"});Object.assign(T.en,{chCapped:"2 GB box: loaded only the first"});

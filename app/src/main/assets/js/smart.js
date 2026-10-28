@@ -463,3 +463,5 @@ setInterval(() => {
     }
   } else lagHits = Math.max(0, lagHits - 1);
 }, 1e3);
+Object.assign(T.ar, { chCapped: "الجهاز رامته ٢ جيجا، فاتحمّل أول" });
+Object.assign(T.en, { chCapped: "2 GB box: loaded only the first" });

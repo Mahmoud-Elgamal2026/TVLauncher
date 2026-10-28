@@ -152,9 +152,13 @@ function multiSelect(title,opts,id,field){
 
 // ================= boot =================
 // auto "fast mode" on slow boxes (old WebView or 2 GB RAM or less) unless the user picked a mode
+let lowRam=false;
 function autoPerf(){
-  if(S.perfChosen) return;
   let ram=0; try{ ram=(JSON.parse(nat("memInfo")||"{}").total||0)/1073741824 }catch(e){}
+  lowRam=!!(ram&&ram<=2.2); window.lowRam=lowRam;
+  // 2 GB boxes: fast mode and no moving background, applied once (the user can still change it after)
+  if(lowRam&&!S.lowRamDone){ S.lowRamDone=true; S.lite=true; S.perfChosen=true; if(!S.anim||S.anim==="auto") S.anim="off"; S.liveWall=false }
+  if(S.perfChosen) return;
   if((window.__chromeVer&&window.__chromeVer<75)||(ram&&ram<=2.2)) S.lite=true;
 }
 // hls.js is big: load it after the home screen is up, or right away when a stream needs it

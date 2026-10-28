@@ -46,6 +46,9 @@ async function loadLists(){
       // files (mp4/mkv...) from M3U lists go to the movies library, live streams stay in the receiver
       if(!c.xt&&/\.(mp4|mkv|avi|mov|m4v|webm)(\?|$)/i.test(c.url)) m3uVod.push({kind:"movie",name:c.name,url:c.url,poster:c.logo,cat:c.group||lists[i].name});
       else channels.push(c) }) });
+  // 2 GB boxes: keep at most 6000 channels in memory (favorites first) so the launcher stays fast
+  const CAP=window.lowRam?6000:30000;
+  if(channels.length>CAP){ const fav=new Set(S.favCh||[]); const f=channels.filter(c=>fav.has(c.url)), rest=channels.filter(c=>!fav.has(c.url)); channels=f.concat(rest).slice(0,CAP); A.toast(L("chCapped")+" "+CAP) }
   channels.forEach((c,i)=>{ c.no=i+1; c.cty=detectCountry(c) });
   const g=new Map(), ct=new Map();
   channels.forEach(c=>{ g.set(c.group,(g.get(c.group)||0)+1); if(c.cty) ct.set(c.cty,(ct.get(c.cty)||0)+1) });
@@ -73,6 +76,10 @@ async function loadEpg(){
   if(!list.length){ epg={}; epgNorm={}; return }
   const res=await Promise.all(list.map(fetchFirst));
   const merged={}; res.forEach(r=>{ if(r) Object.keys(r).forEach(k=>{ if(!merged[k]) merged[k]=r[k] }) });
+  // keep only guides for channels we actually have, and only the next 24 hours (saves a lot of RAM)
+  const want={}; channels.forEach(c=>{ if(c.id){ want[c.id]=1; const j=epgKey(c.id); if(j) want["~"+j]=1 } want[c.name]=1; const k=epgKey(c.name); if(k) want["~"+k]=1 });
+  const until=Date.now()+86400000, since=Date.now()-3*3600000;
+  if(channels.length) Object.keys(merged).forEach(k=>{ if(!want[k]&&!want["~"+epgKey(k)]){ delete merged[k]; return } const a=merged[k]; if(Array.isArray(a)) merged[k]=a.filter(p=>p[1]>since&&p[0]<until) });
   epg=merged; epgNorm={}; Object.keys(merged).forEach(k=>{ const n=epgKey(k); if(n&&!epgNorm[n]) epgNorm[n]=merged[k] });
   if(!Object.keys(merged).length&&u&&NA) A.toast("EPG: "+L("loadErr"));
   renderChannels(); renderHome();
