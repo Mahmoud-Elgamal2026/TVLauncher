@@ -28,6 +28,7 @@ Object.assign(T.ar, {
   libCartoon: "كرتون قديم",
   libBooks: "كتب مسموعة",
   libPlays: "مسرحيات",
+  libFast: "قنوات أفلام 24 ساعة",
   libArabic: "أفلام عربي",
   libHorror: "رعب",
   libRomance: "رومانسي",
@@ -52,6 +53,7 @@ Object.assign(T.en, {
   libCartoon: "Old cartoons",
   libBooks: "Audiobooks",
   libPlays: "Plays",
+  libFast: "24/7 movie channels",
   libArabic: "Arabic films",
   libHorror: "Horror",
   libRomance: "Romance",
@@ -77,12 +79,13 @@ const LIB_CATS = [
   ["action", "💥", "mediatype:movies AND (subject:(action OR اكشن OR أكشن OR western) OR title:(اكشن)) AND (collection:feature_films OR collection:moviesandfilms OR title:(فيلم))"],
   ["comedy", "😂", "mediatype:movies AND (subject:(comedy OR كوميدي OR كوميديا) OR title:(كوميدي)) AND (collection:feature_films OR collection:moviesandfilms OR title:(فيلم))"],
   ["foreign", "🌐", "mediatype:movies AND collection:(feature_films OR moviesandfilms OR film_noir OR scifi_horror)"],
+  ["fast", "📡", null],
   ["classic", "🎬", "collection:feature_films AND mediatype:movies"],
   ["docs", "🌍", "collection:(documentaries OR ephemera) AND mediatype:movies"],
   ["cartoon", "🐭", "collection:classic_cartoons AND mediatype:movies"],
   ["books", "🎧", "collection:librivoxaudio AND mediatype:audio"]
 ];
-const LIBN = { arabic: "libArabic", horror: "libHorror", romance: "libRomance", action: "libAction", comedy: "libComedy", foreign: "libForeign", plays: "libPlays", quran: "libQuran", khutab: "libKhutab", oldar: "libOldAr", classic: "libClassic", docs: "libDocs", cartoon: "libCartoon", books: "libBooks" };
+const LIBN = { fast: "libFast", arabic: "libArabic", horror: "libHorror", romance: "libRomance", action: "libAction", comedy: "libComedy", foreign: "libForeign", plays: "libPlays", quran: "libQuran", khutab: "libKhutab", oldar: "libOldAr", classic: "libClassic", docs: "libDocs", cartoon: "libCartoon", books: "libBooks" };
 let libCat = "quran", libCache = {}, libQ = "";
 (function() {
   const st = document.querySelector('.tab[data-page="settings"]');
@@ -275,6 +278,48 @@ activators.unshift((el) => {
     const p = el.dataset.freeapp;
     if (A.isInstalled(p)) launch(p);
     else nat("openUri", "market://details?id=" + p);
+    return true;
+  }
+  return false;
+});
+const FAST_SRC = [["Pluto TV", "plutotv_all"], ["Plex", "plex_all"], ["Samsung TV Plus", "samsungtvplus_all"], ["Roku", "roku_all"], ["Tubi", "tubi_all"]];
+const FAST_RX = /movie|film|cinema|action|horror|thriller|comed|drama|romance|western|sci-?fi|classic|crime|family|kids|anim|cartoon|arab|عرب|أفلام|افلام/i;
+let fastSrc = 0;
+const _renderLibFa = renderLib;
+renderLib = function() {
+  return __async(this, arguments, function* () {
+    if (libCat !== "fast") return _renderLibFa.apply(this, arguments);
+    $("libCats").innerHTML = libCatsHtml();
+    const src = FAST_SRC[fastSrc], key = "fast|" + src[1];
+    let items = libCache[key];
+    const chips = `<div class="inline lbchips">${FAST_SRC.map((x, i) => `<button class="btn f${i === fastSrc ? " on" : ""}" data-fastsrc="${i}">${esc(x[0])}</button>`).join("")}</div>`;
+    if (!items) {
+      $("libMain").innerHTML = chips + `<p class="hint">${esc(L("libLoading"))}</p>`;
+      try {
+        const t = yield A.fetchText("https://raw.githubusercontent.com/BuddyChewChew/app-m3u-generator/main/playlists/" + src[1] + ".m3u");
+        items = parseM3U(t, src[0]).filter((c) => FAST_RX.test((c.group || "") + " " + c.name) && !libBlocked(c.name)).slice(0, 400);
+        libCache[key] = items;
+      } catch (e) {
+        items = [];
+      }
+    }
+    $("libMain").innerHTML = chips + (items.length ? `<div class="lbgrid small">${items.map((c, i) => libCard({ attr: `data-fastch="${i}"`, img: c.logo || "", icon: "📡", title: c.name, sub: c.group || "" })).join("")}</div>` : `<p class="hint">${esc(L("libEmpty"))}</p>`);
+  });
+};
+activators.unshift((el) => {
+  if (!el.dataset) return false;
+  if (el.dataset.fastsrc != null) {
+    fastSrc = +el.dataset.fastsrc;
+    libCat = "fast";
+    renderLib().then(() => focus(document.querySelector(`[data-fastsrc="${fastSrc}"]`)));
+    return true;
+  }
+  if (el.dataset.fastch != null) {
+    const l = libCache["fast|" + FAST_SRC[fastSrc][1]] || [], c = l[+el.dataset.fastch];
+    if (c) {
+      if (typeof playList !== "undefined") playList = l;
+      play(c);
+    }
     return true;
   }
   return false;

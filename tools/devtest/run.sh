@@ -104,6 +104,9 @@ js "libCat='oldar';renderLib()" 15; shot 57-lib-films
 js "console.log('TVL|lib-clean|'+([].slice.call(document.querySelectorAll('#libMain .lbt')).some(function(e){return libBlocked(e.textContent)})?'FAIL':'PASS')+'|')" 1
 js "libCat='khutab';renderLib()" 15; shot 58-lib-khutab
 js "libCat='plays';libQ='';renderLib()" 20; shot 61-lib-plays
+js "libCat='fast';fastSrc=0;renderLib()" 20; shot 62-lib-fast
+js "console.log('TVL|lib-fast|'+(document.querySelectorAll('#libMain [data-fastch]').length>10?'PASS':'FAIL')+'|'+document.querySelectorAll('#libMain [data-fastch]').length+' channels')" 1
+js "libCat='horror';renderLib()" 15; shot 63-lib-horror
 js "console.log('TVL|lib-plays|'+(document.querySelectorAll('#libMain [data-arch]').length>20?'PASS':'FAIL')+'|'+document.querySelectorAll('#libMain [data-arch]').length+' plays')" 1
 js "console.log('TVL|lib-archive|'+(document.querySelectorAll('#libMain [data-arch]').length>5?'PASS':'FAIL')+'|'+document.querySelectorAll('#libMain [data-arch]').length+' items')" 1
 js "hwSave(hwList().concat([{id:'wird',t:'wird',sz:2,st:'glass'}]));showPage('home')" 10; shot 59-wird
