@@ -154,3 +154,6 @@ const _renderPagerV=renderPager; renderPager=function(){ _renderPagerV(); const 
   const b=$("railBoost"); const h=`<button class="rb f" id="railMic"><b>🎤</b><span>${esc(S.lang==="ar"?"بحث بالصوت":"Voice search")}</span></button>`;
   if(b) b.insertAdjacentHTML("beforebegin",h); else d.insertAdjacentHTML("beforeend",h) };
 activators.unshift(el=>{ if(el.id==="railMic"){ if(typeof A.voice==="function") A.voice(); else openSearch(""); return true } return false });
+
+// one page: big widget on top, favorite apps right under it
+if(!S.onePageSeeded){ S.onePageSeeded=true; S.homeOrder="w"; S.homePage=0 }

@@ -459,3 +459,8 @@ activators.unshift((el) => {
   }
   return false;
 });
+if (!S.onePageSeeded) {
+  S.onePageSeeded = true;
+  S.homeOrder = "w";
+  S.homePage = 0;
+}
