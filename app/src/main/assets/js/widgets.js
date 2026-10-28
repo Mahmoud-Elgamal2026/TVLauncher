@@ -139,7 +139,8 @@ function focusKey(el) {
   if (!el) return null;
   const row = el.parentElement && el.parentElement.id;
   for (const a of ["pkg", "chu", "wk", "folder", "froot", "fi", "scat", "page", "act"]) if (el.dataset && el.dataset[a] != null) return { row, sel: `[data-${a.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase())}="${String(el.dataset[a]).replace(/"/g, '\\"')}"]` };
-  return el.id ? { row, sel: "#" + el.id } : null;
+  if (el.id) return { row, sel: "#" + el.id };
+  return row ? { row, idx: [].indexOf.call(el.parentElement.children, el) } : null;
 }
 const _renderHomeW = renderHome;
 renderHome = function() {
@@ -148,7 +149,7 @@ renderHome = function() {
   applyWidgets();
   if (k && (!focused || !document.body.contains(focused))) {
     const box = k.row && document.getElementById(k.row);
-    const el = box && box.querySelector(k.sel) || document.querySelector(k.sel);
+    const el = k.sel ? box && box.querySelector(k.sel) || document.querySelector(k.sel) : box && (box.children[k.idx] || box.lastElementChild);
     focus(el && el.offsetParent !== null ? el : fallbackFocus());
   }
 };
