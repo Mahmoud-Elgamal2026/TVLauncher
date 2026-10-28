@@ -277,3 +277,30 @@ window.onBackupLoaded=txt=>{ try{ const o=JSON.parse(txt); if(o.app!=="tvlaunche
   A.toast(L("bkLoaded")); boot() }catch(e){A.toast(L("bkBad"))} };
 
 $("dlg").addEventListener("click",e=>{ if(e.target.id==="dlg") closeDialog() });
+
+// ================= Matches tab: every league, yesterday / today / tomorrow =================
+Object.assign(T.ar,{sportsTab:"⚽ الماتشات",spY:"امبارح",spT:"النهارده",spTm:"بكره",spNone:"مفيش ماتشات في اليوم ده",spLoad:"بيحمّل الماتشات…",spLive:"مباشر الآن",spFav:"فرقي"});
+Object.assign(T.en,{sportsTab:"⚽ Matches",spY:"Yesterday",spT:"Today",spTm:"Tomorrow",spNone:"No matches on this day",spLoad:"Loading matches…",spLive:"Live now",spFav:"My teams"});
+let spDay=0; const spCache={};
+async function spFetch(off){
+  if(off===0) return matches;
+  const c=spCache[off]; if(c&&Date.now()-c.at<30*60000) return c.list;
+  const d=new Date(Date.now()+off*86400000), day=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`, out=[];
+  await Promise.all(LEAGUES.map(async l=>{ try{ const r=await A.fetchJSON(`https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=${day}&l=${l[0]}`); (r.events||[]).forEach(e=>{ e._lg=l[0]; out.push(e) }) }catch(e){} }));
+  const list=out.filter(e=>evTime(e)).sort((a,b)=>evTime(a)-evTime(b)); spCache[off]={at:Date.now(),list}; return list;
+}
+async function renderSports(){
+  const days=[[-1,"spY"],[0,"spT"],[1,"spTm"]];
+  $("spDays").innerHTML=days.map(d=>`<button class="btn f${d[0]===spDay?" on":""}" data-spday="${d[0]}">${L(d[1])}</button>`).join("");
+  if(spDay===0&&!matches.length&&S.sportsOn) $("spBody").innerHTML=`<p class="hint">${L("spLoad")}</p>`;
+  const off=spDay, list=await spFetch(off); if(off!==spDay) return;
+  if(!list.length){ $("spBody").innerHTML=`<p class="hint">${L(spDay===0&&!matches.length?"spLoad":"spNone")}</p>`; return }
+  const sec=(title,arr)=>arr.length?`<h3 class="sph">${title}</h3><div class="row sprow">${arr.map(matchTile).join("")}</div>`:"";
+  const live=list.filter(e=>evState(e)==="live"), fav=list.filter(e=>teamFav(e)&&evState(e)!=="live");
+  let h=sec(`<span class="live">●</span> ${L("spLive")}`,live)+sec("⭐ "+L("spFav"),fav);
+  LEAGUES.forEach(l=>{ h+=sec(lgName(l[0]),list.filter(e=>e._lg===l[0]&&evState(e)!=="live"&&!teamFav(e))) });
+  $("spBody").innerHTML=h; if(typeof fixRatios==="function") fixRatios();
+}
+pageHooks["sports:enter"]=renderSports;
+activators.push(el=>{ if(el.dataset.spday!=null){ spDay=+el.dataset.spday; renderSports().then(()=>focus(document.querySelector(`[data-spday="${spDay}"]`))); return true } return false });
+const _rmr=renderMatchRow; renderMatchRow=function(){ _rmr(); if(on&&document.querySelector("#sports.on")&&spDay===0) renderSports() }; window.renderMatchRow=renderMatchRow;

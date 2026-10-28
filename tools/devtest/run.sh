@@ -31,7 +31,7 @@ key DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN; shot 07-apps-scroll; chk 07 apps
 key DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT; shot 08-apps-right-edge; chk 08 apps
 key BACK; sleep 1; shot 09-after-back
 # every page
-for p in tv vod files store settings; do js "showPage('$p');if('$p'==='settings')renderSettings();focus(document.querySelector('.tab[data-page=$p]'))" 2; key DPAD_DOWN; shot "10-page-$p"; done
+for p in tv vod sports files store settings; do js "showPage('$p');if('$p'==='settings')renderSettings();focus(document.querySelector('.tab[data-page=$p]'))" 2; key DPAD_DOWN; shot "10-page-$p"; done
 js "showPage('settings');renderSettings();focus(document.querySelector('#setScroll .f'))" 2
 key DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN; shot 11-settings-scrolled; chk 11 settings
 key DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT; shot 12-settings-right; chk 12 settings
@@ -92,6 +92,7 @@ js "showPage('settings');renderSettings();focus(document.querySelector('#setCats
 js "closeDialog();S.anim='aurora';S.favs=apps.slice(0,4).map(a=>a.pkg);applyLook();renderHome();showPage('home');focus(document.getElementById('boostTile'))" 3; shot 50-home-new
 js "S.anim='off';applyLook()" 1
 # mic button on the remote opens voice search (no crash)
+js "showPage('sports')" 15; shot 53-sports; js "console.log('TVL|sports-tab|'+(document.querySelectorAll('#spDays .btn').length===3&&document.getElementById('spBody').innerHTML.length>20?'PASS':'FAIL')+'|'+document.querySelectorAll('#spBody .match').length+' matches')" 1
 key SEARCH; sleep 3; shot 51-voice; key BACK; sleep 1
 # volume keys show the on-screen bar
 key VOLUME_UP; sleep 0.5; shot 52-vol-osd

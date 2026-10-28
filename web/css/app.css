@@ -502,3 +502,8 @@ body #home .row[data-wnames=focus] .app:not(.focus) .nm{opacity:0!important}
 body #home .row[data-wbg=clear] .app{background:transparent!important;border-color:transparent!important;box-shadow:none}
 body #home .row[data-wbg=card] .app{background:var(--card)!important}
 #allAppsW{row-gap:5.2vh}html.nofg #allAppsW .app{margin-bottom:5.2vh}
+
+#spDays{display:flex;gap:1vw;padding:1vh 2vw}
+.sph{margin:2vh 2vw 1vh;font-size:2.2vh;opacity:.85}
+.sprow{flex-wrap:wrap;gap:1.2vw;padding:0 2vw}
+#sports .hint{padding:4vh 2vw;opacity:.7}
