@@ -240,7 +240,7 @@ Object.assign(DEF,{homeOrder:"fav",favSize:"s"});
 Object.assign(T.ar,{homeLook:"🏠 شكل الرئيسية",hoOrder:"الترتيب",hoFavTop:"المفضلة فوق",hoWTop:"الويدجت فوق",hoSize:"حجم أيقونات المفضلة",szXS:"صغير جداً",hoBar:"شريط الصلاة والماتش فوق",hoShow:"إظهار",hoHide:"إخفاء"});
 Object.assign(T.en,{homeLook:"🏠 Home look",hoOrder:"Order",hoFavTop:"Favorites first",hoWTop:"Widgets first",hoSize:"Favorite icon size",szXS:"Extra small",hoBar:"Prayer/match bar on top",hoShow:"Show",hoHide:"Hide"});
 function applyHomeLook(){
-  if(document.body.dataset.favsz!==(S.favSize||"s")){ document.body.dataset.favsz=S.favSize||"s"; document.querySelectorAll("#favRow .app").forEach(a=>{ a.__w=null; a.style.height="" }); if(window.__fixAspect) __fixAspect() }
+  if(document.body.dataset.favsz!==(S.favSize||"s")){ document.body.dataset.favsz=S.favSize||"s"; document.querySelectorAll("#favRow .app,#homeApps .app").forEach(a=>{ a.__w=null; a.style.height="" }); if(window.__fixAspect) __fixAspect() }
   const fr=$("favRow"), fh=fr&&fr.previousElementSibling, wh=$("hwH"), wb=$("hwBoard"); if(!fr||!wh||!wb) return;
   const extra=[$("ytH"),$("ytRow"),$("libFavH"),$("libFavRow")].filter(Boolean);
   if(S.homeOrder==="w"){ fh.parentNode.insertBefore(wh,fh); fh.parentNode.insertBefore(wb,fh); extra.forEach(e=>fh.parentNode.insertBefore(e,fh)) }

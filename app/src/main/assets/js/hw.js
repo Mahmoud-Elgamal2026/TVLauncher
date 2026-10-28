@@ -731,7 +731,7 @@ Object.assign(T.en, { homeLook: "🏠 Home look", hoOrder: "Order", hoFavTop: "F
 function applyHomeLook() {
   if (document.body.dataset.favsz !== (S.favSize || "s")) {
     document.body.dataset.favsz = S.favSize || "s";
-    document.querySelectorAll("#favRow .app").forEach((a) => {
+    document.querySelectorAll("#favRow .app,#homeApps .app").forEach((a) => {
       a.__w = null;
       a.style.height = "";
     });

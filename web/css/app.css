@@ -602,7 +602,7 @@ body[data-favsz] #favRow{gap:1.4vw}
 /* home pages */
 .hpager{gap:1vw;padding:.4vh 1vw 1vh;justify-content:flex-start}
 .hpager .btn{font-size:1.7vh;padding:.7vh 1.2vw}
-body[data-hpage="1"] #home .scroll > *:not(#homeApps):not(#folderRow){display:none!important}
+body[data-hpage="1"] #home .scroll > *:not(#homeApps):not(#folderRow):not(#zoomBar){display:none!important}
 body[data-hpage="2"] #home .scroll > *:not(#homePager):not(#libFavH):not(#libFavRow):not(#ytH):not(#ytRow):not(#homeMineEmpty){display:none!important}
 body:not([data-hpage="1"]) #homeApps{display:none}
 .hpapps{padding:1vh 1vw}
@@ -662,3 +662,12 @@ body.cinema #hwH,body.cinema #hwBoard,body.cinema #ytH,body.cinema #ytRow,body.c
 body.cinema #favRow .app{width:20vw!important}
 body.cinema::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.35);pointer-events:none;z-index:1}
 body.cinema #home .scroll{padding-top:12vh}
+/* icon size from "Home look" applies to favorites AND the apps page */
+body[data-favsz=xs] #favRow .app,body[data-favsz=xs] #homeApps .app{width:7vw!important}
+body[data-favsz=s] #favRow .app,body[data-favsz=s] #homeApps .app{width:9vw!important}
+body[data-favsz=m] #favRow .app,body[data-favsz=m] #homeApps .app{width:12vw!important}
+body[data-favsz=l] #favRow .app,body[data-favsz=l] #homeApps .app{width:16vw!important}
+body[data-favsz] #homeApps{display:flex!important;flex-wrap:wrap;gap:1.6vh 1.4vw}
+body[data-favsz] #homeApps .app .nm{font-size:1.5vh}
+body[data-hpage="1"] #home .scroll > #zoomBar{display:flex!important}
+body[data-favsz] #homeApps .app .nm{opacity:.8!important}

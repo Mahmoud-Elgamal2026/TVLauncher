@@ -196,3 +196,9 @@ setInterval(()=>{ const a=Object.assign({},S.matchAlerts||{}), now=Date.now(); l
       if(on("player")||on("dlg")) banner("⚽",L("mSoon"),m.n,20000);
       else dialog("⚽ "+L("mSoon"),[{label:L("mOpen")+(S.matchApp&&byPkg(S.matchApp)?" "+appName(byPkg(S.matchApp)):""),pri:1,fn:()=>{ if(S.matchApp) launch(S.matchApp) }},{label:L("mLater"),fn:()=>{}}],{sub:m.n}) } });
   if(ch) S.matchAlerts=a },30000);
+
+// icon size control right on the Apps page too (+ / −)
+if(!S.iconSizeSeeded){ S.iconSizeSeeded=true; if(!S.favSize||S.favSize==="s"||S.favSize==="m") S.favSize="s" }
+const _applyPageZ=applyPage; applyPage=function(){ _applyPageZ.apply(this,arguments); if(+S.homePage===1){ const g=$("homeApps"); if(g&&!$("zoomBar")) g.insertAdjacentHTML("beforebegin",`<div class="inline" id="zoomBar" style="padding:0 1vw 1vh"><button class="btn f" id="zoomOut">➖ ${S.lang==="ar"?"صغّر الأيقونات":"Smaller"}</button><button class="btn f" id="zoomIn">➕ ${S.lang==="ar"?"كبّر":"Bigger"}</button></div>`) } else { const z=$("zoomBar"); if(z) z.remove() } };
+activators.unshift(el=>{ const v=["xs","s","m","l"], i=v.indexOf(S.favSize||"s");
+  if(el.id==="zoomIn"){ S.favSize=v[Math.min(3,i+1)]; applyHomeLook(); return true } if(el.id==="zoomOut"){ S.favSize=v[Math.max(0,i-1)]; applyHomeLook(); return true } return false });
