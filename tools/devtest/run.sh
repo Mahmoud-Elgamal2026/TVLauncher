@@ -72,6 +72,11 @@ js "closeDialog();closeOne('$APP')" 3
 AFTER=$(adb shell pidof $APP | tr -d '\r')
 if [ -n "$BEFORE" ] && [ "$AFTER" != "$BEFORE" ]; then R=PASS; else R=FAIL; fi
 echo "TVL|close-app|$R|$APP pid before=$BEFORE after=$AFTER" >> $OUT/extra.txt
+# long-press OK on an app tile opens its menu (must not launch the app)
+js "closeDialog();S.recent=[];showPage('apps');focus(document.querySelector('#appGrid .app'))" 2
+adb shell input keyevent --longpress DPAD_CENTER; sleep 2; shot 46-longpress
+js "console.log('TVL|long-press|'+((on('dlg')&&!S.recent.length)?'PASS':'FAIL')+'|dialog='+on('dlg')+' launched='+S.recent.length)" 1
+key BACK
 # full self-test (network, IPTV, recording, radio, files ...)
 adb push selftest.built.js /sdcard/Download/selftest.js
 js "var s=document.createElement('script');s.src='file:///sdcard/Download/selftest.js';s.onerror=function(){console.log('TVL|load-selftest|FAIL|script load error')};document.body.appendChild(s)" 5

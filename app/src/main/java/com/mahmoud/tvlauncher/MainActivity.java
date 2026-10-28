@@ -73,6 +73,7 @@ public class MainActivity extends Activity {
     private volatile boolean learningKey = false;
     private SharedPreferences prefs;
     private TelegramBot tg;
+    private boolean okLong = false;
     private WebView web;
     private final Map<String, String> iconCache = new HashMap<>();
     private final Handler ui = new Handler(Looper.getMainLooper());
@@ -172,6 +173,14 @@ public class MainActivity extends Activity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
         int c = e.getKeyCode();
+        // Long-press OK = options menu. Detected here because old WebViews turn OK into an instant click.
+        if (c == KeyEvent.KEYCODE_DPAD_CENTER || c == KeyEvent.KEYCODE_ENTER || c == KeyEvent.KEYCODE_NUMPAD_ENTER) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                if (e.getRepeatCount() == 0) { okLong = false; }
+                else if (!okLong) { okLong = true; js("window.onLongOk&&onLongOk()"); }
+                if (okLong) return true;
+            } else if (e.getAction() == KeyEvent.ACTION_UP && okLong) { okLong = false; return true; }
+        }
         if (!isCoreKey(c)) {
             if (learningKey) {
                 if (e.getAction() == KeyEvent.ACTION_UP) {

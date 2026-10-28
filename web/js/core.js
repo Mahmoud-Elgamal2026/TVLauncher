@@ -283,3 +283,6 @@ document.addEventListener("click",e=>{ idleAt=Date.now(); const f=e.target.close
 document.addEventListener("contextmenu",e=>{ const f=e.target.closest(".f"); if(f){e.preventDefault();focus(f);openOptions(f)} });
 document.addEventListener("mousemove",()=>{idleAt=Date.now()});
 window.addEventListener("error",e=>console.log("err",e.message));
+
+// called by Android when OK is held down (works on every WebView, including ones that turn OK into a click)
+window.onLongOk=function(){ clearTimeout(holdTimer); held=true; downOn=null; if(on("dlg")) return; if(focused&&hasOptions(focused)) openOptions(focused) };

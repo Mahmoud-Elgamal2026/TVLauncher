@@ -662,3 +662,10 @@ document.addEventListener("mousemove", () => {
   idleAt = Date.now();
 });
 window.addEventListener("error", (e) => console.log("err", e.message));
+window.onLongOk = function() {
+  clearTimeout(holdTimer);
+  held = true;
+  downOn = null;
+  if (on("dlg")) return;
+  if (focused && hasOptions(focused)) openOptions(focused);
+};
