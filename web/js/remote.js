@@ -89,7 +89,10 @@ async function checkUpdates(manual){
   if(!NA){ if(manual) A.toast(L("updNone")); return }
   if(!S.repo){ if(manual) A.toast(L("updNoRepo")); return }
   try{
-    const r=JSON.parse(await natAsync("checkUpdate",S.repo));
+    // everyone gets the "stable" release (tested on the developer's box); beta boxes get every build
+    let r=null;
+    if(S.channel!=="beta"&&NA.checkUpdatePath){ try{ r=JSON.parse(await natAsync("checkUpdatePath",S.repo,"releases/tags/stable")) }catch(e){ r=null } }
+    if(!r||!r.latest) r=JSON.parse(await natAsync("checkUpdate",S.repo));
     store.set("lastUpdCheck",Date.now());
     if(r.latest>r.current&&r.url){
       const go=()=>{ banner("⬇️",L("updDownloading"),r.tag); nat("installUpdate",r.url) };

@@ -939,9 +939,13 @@ public class MainActivity extends Activity {
 
         /** repo = "owner/name"; answers {latest, current, url, notes} through window.__cb. */
         @JavascriptInterface
-        public void checkUpdate(String repo, String id) {
+        public void checkUpdate(String repo, String id) { checkUpdatePath(repo, "releases/latest", id); }
+
+        /** Same as checkUpdate but for any release path, e.g. "releases/tags/stable" (version read from its name). */
+        @JavascriptInterface
+        public void checkUpdatePath(String repo, String path, String id) {
             new Thread(() -> {
-                try (InputStream in = open("https://api.github.com/repos/" + repo + "/releases/latest")) {
+                try (InputStream in = open("https://api.github.com/repos/" + repo + "/" + path)) {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     byte[] buf = new byte[8192]; int n;
                     while ((n = in.read(buf)) > 0) bos.write(buf, 0, n);
@@ -949,6 +953,7 @@ public class MainActivity extends Activity {
                     String tag = rel.optString("tag_name", "");
                     int latest = 0;
                     try { latest = Integer.parseInt(tag.replaceAll("[^0-9]", "")); } catch (Exception ignored) {}
+                    if (latest == 0) try { latest = Integer.parseInt(rel.optString("name", "").replaceAll("[^0-9]", "")); tag = "v" + latest; } catch (Exception ignored) {}
                     String url = "";
                     JSONArray as = rel.optJSONArray("assets");
                     if (as != null) for (int i = 0; i < as.length(); i++) {

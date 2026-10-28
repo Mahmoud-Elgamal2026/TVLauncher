@@ -1,0 +1,28 @@
+name: Promote stable
+# Edit stable.txt (e.g. "v76") to publish that tested build to everyone:
+# it is copied to the "stable" release, which boxes on the stable channel update from.
+on:
+  push:
+    branches: [main]
+    paths: [stable.txt]
+  workflow_dispatch:
+permissions: { contents: write }
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          TAG=$(tr -d ' \r\n' < stable.txt)
+          gh release download "$TAG" -p "TVLauncher-v*.apk" -D out
+          cp out/TVLauncher-v*.apk TVLauncher.apk
+          echo "TAG=$TAG" >> $GITHUB_ENV
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: stable
+          name: Stable ${{ env.TAG }}
+          body: Stable ${{ env.TAG }} — tested build for everyone
+          prerelease: true
+          make_latest: false
+          files: TVLauncher.apk

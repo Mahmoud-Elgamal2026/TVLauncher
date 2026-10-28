@@ -247,7 +247,15 @@ function checkUpdates(manual) {
       return;
     }
     try {
-      const r = JSON.parse(yield natAsync("checkUpdate", S.repo));
+      let r = null;
+      if (S.channel !== "beta" && NA.checkUpdatePath) {
+        try {
+          r = JSON.parse(yield natAsync("checkUpdatePath", S.repo, "releases/tags/stable"));
+        } catch (e) {
+          r = null;
+        }
+      }
+      if (!r || !r.latest) r = JSON.parse(yield natAsync("checkUpdate", S.repo));
       store.set("lastUpdCheck", Date.now());
       if (r.latest > r.current && r.url) {
         const go = () => {

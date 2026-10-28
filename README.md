@@ -6,7 +6,7 @@
 
 | | الرابط |
 |---|---|
-| 📺 **اللانشر (للتي في بوكس)** | https://github.com/Mahmoud-Elgamal2026/TVLauncher/releases/latest/download/TVLauncher.apk |
+| 📺 **اللانشر (للتي في بوكس)** | https://github.com/Mahmoud-Elgamal2026/TVLauncher/releases/download/stable/TVLauncher.apk |
 | 📱 **ريموت الموبايل (Phone Remote)** | https://github.com/Mahmoud-Elgamal2026/TVLauncher/releases/download/phone/PhoneRemote.apk |
 
 اللينكين دول ثابتين وبيجيبوا آخر نسخة دايماً.

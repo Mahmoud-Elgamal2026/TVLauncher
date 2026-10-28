@@ -131,3 +131,71 @@ activators.unshift((el) => {
   }
   return false;
 });
+DEF.channel = "stable";
+Object.assign(T.ar, { chan: "قناة التحديث", chStable: "مستقرة (للناس)", chBeta: "تجريبية (كل نسخة جديدة)" });
+Object.assign(T.en, { chan: "Update channel", chStable: "Stable (everyone)", chBeta: "Beta (every new build)" });
+const _lifeSetCh = window.lifeSettings;
+window.lifeSettings = function() {
+  return (_lifeSetCh ? _lifeSetCh() : "") + sec("🧪 " + L("chan"), field("", seg("channel", [["stable", L("chStable")], ["beta", L("chBeta")]])));
+};
+Object.assign(DEF, { usage2: {}, favAuto: false });
+Object.assign(T.ar, { usTitle: "📊 استخدامي (آخر ٧ أيام)", usNone: "لسه مفيش بيانات — افتح تطبيقاتك وارجع بعد شوية", favAuto: "رتّب المفضلة حسب الأكتر استخدام", hr: " س", mn: " د" });
+Object.assign(T.en, { usTitle: "📊 My usage (last 7 days)", usNone: "No data yet — use your apps and come back later", favAuto: "Sort favorites by most used", hr: "h", mn: "m" });
+let usOpen = null;
+const _launchU = launch;
+launch = function(pkg) {
+  usOpen = { pkg, t: Date.now() };
+  return _launchU.apply(this, arguments);
+};
+function usClose() {
+  if (!usOpen) return;
+  const m = Math.min(360, (Date.now() - usOpen.t) / 6e4);
+  const pkg = usOpen.pkg;
+  usOpen = null;
+  if (m < 0.3) return;
+  const day = Math.floor(Date.now() / 864e5), u = Object.assign({}, S.usage2 || {});
+  const r = u[pkg] || {};
+  r[day] = (r[day] || 0) + m;
+  Object.keys(r).forEach((d) => {
+    if (+d < day - 6) delete r[d];
+  });
+  u[pkg] = r;
+  S.usage2 = u;
+  if (S.favAuto) favSort();
+}
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) usClose();
+});
+window.addEventListener("focus", usClose);
+function usTotals() {
+  const u = S.usage2 || {}, day = Math.floor(Date.now() / 864e5);
+  return Object.keys(u).map((p) => ({ p, m: Object.keys(u[p]).filter((d) => +d >= day - 6).reduce((a, d) => a + u[p][d], 0) })).filter((x) => x.m >= 1).sort((a, b) => b.m - a.m);
+}
+function favSort() {
+  const t = usTotals(), rank = {};
+  t.forEach((x, i) => rank[x.p] = i);
+  S.favs = (S.favs || []).slice().sort((a, b) => (rank[a] != null ? rank[a] : 999) - (rank[b] != null ? rank[b] : 999));
+  renderHome();
+}
+function usageDialog() {
+  const t = usTotals().slice(0, 15), fm = (m) => m >= 60 ? Math.floor(m / 60) + L("hr") + " " + Math.round(m % 60) + L("mn") : Math.round(m) + L("mn");
+  dialog(L("usTitle"), (t.length ? t.map((x) => {
+    const a = byPkg(x.p);
+    return { label: `${a ? appName(a) : x.p} — ${fm(x.m)}`, fn: () => {
+      if (a) launch(a.pkg);
+    } };
+  }) : [{ label: L("usNone"), fn: () => {
+  } }]).concat([{ icon: S.favAuto ? "✅" : "⬜", label: L("favAuto"), fn: () => {
+    S.favAuto = !S.favAuto;
+    if (S.favAuto) favSort();
+  } }]));
+}
+const _homeLookU = homeLookMenu;
+homeLookMenu = function() {
+  _homeLookU();
+  const box = $("dbox"), items = box._items, g = box.querySelector(".mgrid,.dlist");
+  if (!items || !g) return;
+  items.splice(items.length - 1, 0, { icon: "📊", label: L("usTitle"), fn: () => setTimeout(usageDialog, 30) });
+  g.innerHTML = items.map((it, i) => `<button class="btn f${it.pri ? " pri" : ""}" data-di="${i}">${it.icon ? `<b>${esc(it.icon)}</b>` : ""}${esc(it.label)}</button>`).join("");
+  focus(g.querySelector(".f"));
+};
