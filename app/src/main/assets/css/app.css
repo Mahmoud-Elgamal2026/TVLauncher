@@ -632,7 +632,7 @@ body.simple #matchRow,body.simple #watchRow,body.simple #favChRow,body.simple #h
 body.simple h2[data-row=matchRow],body.simple h2[data-row=watchRow],body.simple h2[data-row=favChRow]{display:none!important}
 
 /* ===== widget board ===== */
-body.simple #quickRow,body.simple #recentRow,body.simple #allAppsW,body.simple #folderRow,body.simple .dockx,body.simple h2[data-row=quickRow],body.simple h2[data-row=recentRow],body.simple h2[data-row=allAppsW],body.simple h2[data-row=folderRow]{display:none!important}
+body.simple #quickRow,body.simple #recentRow,body.simple #allAppsW,body.simple .dockx,body.simple h2[data-row=quickRow],body.simple h2[data-row=recentRow],body.simple h2[data-row=allAppsW]{display:none!important}
 .hwboard{display:flex;flex-wrap:wrap;gap:1.4vw;padding:1vh 4vw 2vh}
 html[dir=ltr].nofg .hwboard > * + *{margin-left:1.4vw}
 html[dir=rtl].nofg .hwboard > * + *{margin-right:1.4vw}
@@ -722,3 +722,22 @@ body[data-favsz=s] #favRow .app{width:11.5vw!important}
 body[data-favsz=m] #favRow .app{width:15vw!important}
 body[data-favsz=l] #favRow .app{width:19vw!important}
 body[data-favsz] #favRow{gap:1.4vw}
+/* home pages */
+.hpager{gap:1vw;padding:.4vh 1vw 1vh;justify-content:flex-start}
+.hpager .btn{font-size:1.7vh;padding:.7vh 1.2vw}
+body[data-hpage="1"] #home .scroll > *:not(#homePager):not(#homeApps){display:none!important}
+body[data-hpage="2"] #home .scroll > *:not(#homePager):not(#libFavH):not(#libFavRow):not(#ytH):not(#ytRow):not(#homeMineEmpty){display:none!important}
+body:not([data-hpage="1"]) #homeApps{display:none}
+.hpapps{padding:1vh 1vw}
+#homeMineEmpty:empty{display:none}
+/* hero banner widget */
+.hw.sz4{width:100%}
+.hw.hw-hero{height:30vh;background-size:cover;background-position:center;padding:0}
+.hw.hw-hero .hwt{display:none}
+.herobox{height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:2.4vh 2vw;background:linear-gradient(0deg,rgba(0,0,0,.65),rgba(0,0,0,0) 70%)}
+.herobox .hbig{font-size:7vh;font-weight:700;line-height:1}
+.herobox .hsub{font-size:2.1vh;opacity:.9;margin-top:.4vh}
+.herobox .hrow{display:flex;gap:2vw;font-size:2.1vh;margin-top:1vh}
+html[dir=ltr].nofg .herobox .hrow > * + *{margin-left:2vw}
+html[dir=rtl].nofg .herobox .hrow > * + *{margin-right:2vw}
+body.simple .tab[data-page="apps"]{display:none!important}

@@ -132,7 +132,7 @@ const HWT = {
 Object.keys(HWT).forEach((l) => Object.assign(T[l], HWT[l]));
 const HW_TYPES = [["clock", "🕒", "hwClock"], ["weather", "⛅", "hwWeather"], ["prayer", "🕌", "hwPrayer"], ["matches", "⚽", "hwMatches"], ["boost", "🚀", "hwBoost"], ["mon", "📊", "hwMon"], ["yt", "▶️", "hwYt"], ["azkar", "📿", "hwAzkar"], ["cal", "📅", "hwCal"], ["note", "📝", "hwNote"]];
 const HW_STYLES = ["glass", "solid", "accent", "grad", "clear"], HW_STNAME = { glass: "stGlass", solid: "stSolid", accent: "stAccent", grad: "stGrad", clear: "stClear" };
-const hwList = () => Array.isArray(S.hw) ? S.hw : [];
+let hwList = () => Array.isArray(S.hw) ? S.hw : [];
 const hwSave = (l) => {
   S.hw = l.map((x) => Object.assign({}, x));
   renderHW();

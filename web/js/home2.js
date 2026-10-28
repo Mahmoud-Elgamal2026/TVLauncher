@@ -1,0 +1,67 @@
+// ================= Home 2: pages, hero widget, folders, time-aware order, wall-clock screensaver, layout lock =================
+Object.assign(DEF,{homePage:0,smartHome:true,homeLock:false,heroImg:"",heroDay:""});
+Object.assign(T.ar,{hpMain:"🏠 الرئيسية",hpApps:"📱 تطبيقاتي",hpMine:"⭐ مكتبتي",hwHero:"الواجهة الكبيرة",smartHome:"الرئيسية بتتغيّر مع الوقت",hoLock:"🔒 تثبيت الشكل",locked:"الشكل مقفول — افتحه من «شكل الرئيسية»",
+  hoLockOn:"مقفول",hoLockOff:"مفتوح",mineEmpty:"اضغط OK مطوّل على أي فيلم أو قارئ في المكتبة يظهر هنا",hoSmart:"ترتيب حسب الوقت"});
+Object.assign(T.en,{hpMain:"🏠 Home",hpApps:"📱 My apps",hpMine:"⭐ My library",hwHero:"Hero banner",smartHome:"Home changes with the time of day",hoLock:"🔒 Lock layout",locked:"Layout is locked — unlock it in “Home look”",
+  hoLockOn:"Locked",hoLockOff:"Unlocked",mineEmpty:"Long-press any film or reciter in the library to pin it here",hoSmart:"Order by time of day"});
+
+// ---- 1) pages inside Home (dots on top; left/right on the dots switches)
+(function(){ const sh=$("shelf"); if(!sh) return; const d=document.createElement("div"); d.id="homePager"; d.className="inline hpager"; sh.parentNode.insertBefore(d,sh);
+  const g=document.createElement("div"); g.id="homeApps"; g.className="grid hpapps"; $("home").querySelector(".scroll").appendChild(g);
+  const m=document.createElement("p"); m.id="homeMineEmpty"; m.className="hint"; $("home").querySelector(".scroll").appendChild(m) })();
+const HP=["hpMain","hpApps","hpMine"];
+function renderPager(){ const d=$("homePager"); if(!d) return;
+  d.innerHTML=HP.map((k,i)=>`<button class="btn sm f${i===(+S.homePage||0)?" on":""}" data-hpage="${i}">${esc(L(k))}</button>`).join("") }
+function applyPage(){ const p=+S.homePage||0, sc=$("home").querySelector(".scroll"); document.body.dataset.hpage=p;
+  if(p===1){ $("homeApps").innerHTML=visibleApps().slice().sort((a,b)=>appName(a).localeCompare(appName(b))).map(tile).join("") } else $("homeApps").innerHTML="";
+  $("homeMineEmpty").textContent=p===2&&!(S.libFav||[]).length?L("mineEmpty"):""; if(sc) sc.scrollTop=0 }
+activators.unshift(el=>{ if(el.dataset&&el.dataset.hpage!=null){ S.homePage=+el.dataset.hpage; renderPager(); applyPage(); focus(document.querySelector(`[data-hpage="${S.homePage}"]`)); return true } return false });
+// moving left/right across the page buttons switches page right away
+focusHooks.push(el=>{ if(el.dataset&&el.dataset.hpage!=null&&+el.dataset.hpage!==(+S.homePage||0)){ S.homePage=+el.dataset.hpage; renderPager(); applyPage(); focus(document.querySelector(`[data-hpage="${S.homePage}"]`)) } });
+
+// ---- 2) hero banner widget: today's photo + big clock + next prayer + weather
+HW_TYPES.unshift(["hero","🌄","hwHero"]);
+async function heroImage(){ const d=new Date().toDateString(); if(S.heroImg&&S.heroDay===d) return;
+  try{ const r=await A.fetchJSON("https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US"); const i=r.images&&r.images[0]; if(!i) return;
+    let u="https://www.bing.com"+i.urlbase+"_1920x1080.jpg"; if(NA&&NA.cacheImage){ try{ u=await natAsync("cacheImage",u,1280)||u }catch(e){} }
+    S.heroImg=u; S.heroDay=d; renderHW() }catch(e){} }
+const _hwBodyH=hwBody; hwBody=function(w){ if(w.t!=="hero") return _hwBodyH(w);
+  const d=new Date(), np=S.prayerOn&&window.nextPrayer&&typeof prayers!=="undefined"&&prayers.length?nextPrayer():null;
+  return `<div class="herobox"><div class="hbig">${esc(fmtTime(d))}</div><div class="hsub">${esc(fmtDate(d))}</div>
+    <div class="hrow">${np?`<span>🕌 ${esc(L("prayers")[np.i])} ${esc(fmtTime(np.t))}</span>`:""}${typeof weatherNow!=="undefined"&&weatherNow?`<span>${esc(weatherNow.i)} ${esc(weatherNow.t)}°</span>`:""}</div></div>` };
+const _hwCardH=hwCard; hwCard=function(w){ let h=_hwCardH(w); if(w.t==="hero"){ if(!S.heroImg) heroImage(); h=h.replace('class="hw f hw-hero','style="background-image:url(\''+esc(S.heroImg||"")+'\')" class="hw f hw-hero') } return h };
+
+// ---- 3) folders show on the simple home too (made from an app's long-press → "add to folder")
+document.body.classList.add("showfolders");
+
+// ---- 4) time-aware order (display only; your saved order stays)
+const _hwListT=hwList;
+function smartOrder(l){ if(!S.smartHome||hwEdit.on) return l; const h=new Date().getHours(), live=typeof matches!=="undefined"&&matches.some(e=>evState(e)==="live");
+  const pri=t=>t==="hero"?-10:live&&t==="matches"?-5:(h>=4&&h<11)&&(t==="azkarA"||t==="wird"||t==="weather")?-3:(h>=20||h<2)&&(t==="live"||t==="cont")?-3:(h>=15&&h<19)&&t==="azkarA"?-2:0;
+  return l.map((w,i)=>({w,i})).sort((a,b)=>(pri(a.w.t)-pri(b.w.t))||(a.i-b.i)).map(x=>live&&x.w.t==="matches"?Object.assign({},x.w,{sz:3}):x.w) }
+const _renderHWT=renderHW; renderHW=function(){ const real=S.hw; const tmp=smartOrder(_hwListT()); const b=$("hwBoard");
+  // draw the smart order without saving it
+  hwList=()=>tmp; try{ _renderHWT.apply(this,arguments) }finally{ hwList=_hwListT } };
+
+// ---- 5) wall-clock screensaver: the frame shows big clock, prayer, weather and dhikr by default
+if(!S.frameLaySeeded){ S.frameLaySeeded=true; S.frameLay=Object.assign({clock:{s:1.8,x:4,y:58},prayer:{s:1.4},weather:{s:1.4},azkar:{on:true,s:1.2}},S.frameLay||{}) }
+
+// ---- 6) lock the layout (needs the PIN to unlock when one is set)
+function lockedNow(){ if(!S.homeLock) return false; A.toast("🔒 "+L("locked")); return true }
+const _hwMenuL=hwMenu; hwMenu=function(id){ if(lockedNow()) return; _hwMenuL(id) };
+const _hwAddL=hwAddMenu; hwAddMenu=function(){ if(lockedNow()) return; _hwAddL() };
+const _hwEditL=hwEditStart; hwEditStart=function(){ if(lockedNow()) return; _hwEditL() };
+const _hwPresetL=hwPresetMenu; hwPresetMenu=function(){ if(lockedNow()) return; _hwPresetL() };
+const _homeLookL=homeLookMenu; homeLookMenu=function(){ _homeLookL();
+  const box=$("dbox"), items=box._items, g=box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
+  items.splice(items.length-1,0,
+    {icon:"🕒",label:L("hoSmart")+": "+L(S.smartHome?"hoShow":"hoHide"),keep:1,fn:()=>{ S.smartHome=!S.smartHome; renderHW(); setTimeout(homeLookMenu,30) }},
+    {icon:"🔒",label:L("hoLock")+": "+L(S.homeLock?"hoLockOn":"hoLockOff"),keep:1,fn:()=>{ const flip=()=>{ S.homeLock=!S.homeLock; setTimeout(homeLookMenu,30) }; if(S.homeLock&&S.pin) guard(true,flip); else flip() }});
+  g.innerHTML=items.map((it,i)=>`<button class="btn f${it.pri?" pri":""}" data-di="${i}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };
+// app long-press: moving favorites is blocked while locked
+optionHandlers.unshift(el=>{ if(S.homeLock&&el.closest&&el.closest("#favRow")&&el.dataset.pkg){ dialog(appName(byPkg(el.dataset.pkg)||{name:el.dataset.pkg}),[{label:L("open"),pri:1,fn:()=>launch(el.dataset.pkg)},{label:L("cancel"),fn:()=>{}}]); return true } return false });
+
+// first run of this version: put the hero on top
+if(!S.heroSeeded){ S.heroSeeded=true; if(!hwList().some(w=>w.t==="hero")) S.hw=[{id:"hero",t:"hero",sz:4,st:"clear"}].concat(hwList().filter(w=>w.t!=="clock")) }
+const _renderHomeP=renderHome; renderHome=function(){ _renderHomeP.apply(this,arguments); renderPager(); applyPage() }; window.renderHome=renderHome;
+setTimeout(()=>{ renderPager(); applyPage() },0);
