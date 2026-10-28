@@ -610,3 +610,14 @@ html[dir=rtl].nofg #spDays > * + *{margin-right:1vw}
 .sph{margin:2vh 2vw 1vh;font-size:2.2vh;opacity:.85}
 .sprow{flex-wrap:wrap;gap:1.2vw;padding:0 2vw}
 #sports .hint{padding:4vh 2vw;opacity:.7}
+
+body[data-anim=glow] #animBg i{width:70vw;height:70vh;border-radius:50%;opacity:.35;background:radial-gradient(closest-side,rgba(110,160,255,.55),transparent);animation:anDrift 30s ease-in-out infinite!important}
+body[data-anim=glow] #animBg i:nth-child(1){left:-15vw;top:-25vh}
+body[data-anim=glow] #animBg i:nth-child(2){right:-20vw;bottom:-30vh;opacity:.25;animation-duration:38s!important;animation-direction:reverse!important}
+body[data-anim=glow] #animBg i:nth-child(n+3){display:none}
+body[data-anim=lanterns] #animBg i{top:-12vh;width:5vh;height:8vh;border-radius:40% 40% 30% 30%;background:radial-gradient(circle at 50% 60%,#ffd27a,#d9822b 60%,rgba(120,50,0,.0) 75%);box-shadow:0 0 4vh rgba(255,190,90,.6);animation:anSway 7s ease-in-out infinite alternate!important;transform-origin:50% -10vh}
+body[data-anim=lanterns] #animBg i:nth-child(1){left:12vw;top:-6vh}body[data-anim=lanterns] #animBg i:nth-child(2){left:38vw;animation-delay:1.5s!important;top:-9vh}
+body[data-anim=lanterns] #animBg i:nth-child(3){left:63vw;animation-delay:3s!important;top:-5vh}body[data-anim=lanterns] #animBg i:nth-child(4){left:86vw;animation-delay:4.5s!important;top:-8vh}
+@keyframes anSway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes kenBurns{from{transform:scale(1) translate(0,0)}to{transform:scale(1.08) translate(-1.5%,-1%)}}
+body.livewall[data-page=home] #wall{animation:kenBurns 45s ease-in-out infinite alternate!important;will-change:transform}

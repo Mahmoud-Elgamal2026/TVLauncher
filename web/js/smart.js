@@ -90,7 +90,7 @@ const _onTgB=window.onTg; window.onTg=(chat,from,text)=>{
 const _tgCmdB=tgCmd; tgCmd=function(t){ if(/^\/?(نسخة|نسخه|backup)$/i.test(String(t).trim())) return tgBackup(true)?"💾 ✅":tgt("nf"); return _tgCmdB.apply(this,arguments) };
 
 // ================= Animated backgrounds (transform/opacity only, light on weak boxes) =================
-DEF.anim="off";
+DEF.anim="auto";
 const AN={ar:{anim:"خلفية متحركة",anAurora:"شفق",anStars:"نجوم",anWaves:"موج",anBokeh:"فقاعات نور"},en:{anim:"Animated background",anAurora:"Aurora",anStars:"Stars",anWaves:"Waves",anBokeh:"Bokeh"}};
 Object.keys(AN).forEach(l=>Object.assign(T[l],AN[l]));
 const _applyLookA=applyLook; applyLook=function(){ _applyLookA.apply(this,arguments); document.body.dataset.anim=S.anim||"off" };
@@ -123,3 +123,38 @@ window.boostNow=boostNow;
 activators.push(el=>{ if(el.id==="boostBtn"||el.id==="boostTile"){ boostNow(); return true } return false });
 if(typeof ACTIONS==="function"){ const _AB=ACTIONS; ACTIONS=()=>[["🚀",L("boost"),boostNow]].concat(_AB()) }
 const _tgCmdBo=tgCmd; tgCmd=function(t){ if(/^\/?(سرّع|سرع|تسريع|boost)$/i.test(String(t).trim())){ boostNow(); return "🚀" } return _tgCmdBo.apply(this,arguments) };
+
+// ================= Live themes: every theme comes with its own moving background =================
+const LIVE_OF={apple:"aurora",google:"glow",shield:"glow",bravia:"waves",tizen:"waves",smarthub:"bokeh",webos:"bokeh",webos22:"aurora",firetv:"glow",roku:"bokeh",
+  patchwall:"aurora",xbox:"glow",ps5:"waves",wmc:"waves",plex:"bokeh",kodi:"stars",classic:"aurora",light:"bokeh",neon:"aurora",startpage:"stars",dock:"waves",amoled:"stars",ramadan:"lanterns",vidaa:"aurora"};
+Object.assign(T.ar,{anAuto:"حسب الثيم (حي)",anGlow:"توهج",anLant:"فوانيس",liveWall:"حركة بطيئة للخلفية",autoClean:"تنضيف تلقائي من اللاج",cleaned:"اتنضف تلقائي"});
+Object.assign(T.en,{anAuto:"Per theme (live)",anGlow:"Glow",anLant:"Lanterns",liveWall:"Slow wallpaper motion",autoClean:"Auto-clean lag",cleaned:"Auto-cleaned"});
+DEF.liveWall=true; DEF.autoClean=true;
+const animOf=()=>{ const a=S.anim||"auto"; return a==="auto"?(LIVE_OF[S.theme]||"aurora"):a };
+const _applyLookL=applyLook; applyLook=function(){ _applyLookL.apply(this,arguments); document.body.dataset.anim=animOf(); document.body.classList.toggle("livewall",!!S.liveWall) };
+AFTER.liveWall=applyLook; document.body.dataset.anim=animOf(); document.body.classList.toggle("livewall",!!S.liveWall);
+window.lifeSettings=function(){
+  return sec("✨ "+L("anim"),field("",seg("anim",[["auto","🎨 "+L("anAuto")],["off",L("off")],["aurora","🌌 "+L("anAurora")],["stars","✨ "+L("anStars")],["waves","🌊 "+L("anWaves")],["bokeh","🔆 "+L("anBokeh")],["glow","💡 "+L("anGlow")],["lanterns","🏮 "+L("anLant")]]))
+    +field(L("liveWall"),onoff("liveWall"))+field(L("autoClean"),onoff("autoClean")))+(_lifeSetA?_lifeSetA():"") };
+
+// ================= Auto self-clean: keeps the launcher light without the user doing anything =================
+let lastClean=0, cleaning=false;
+function busyNow(){ if(on("player")||on("dlg")) return true; const v=document.querySelectorAll("video"); for(let i=0;i<v.length;i++) if(!v[i].paused) return true; return false }
+async function autoClean(hard){
+  if(!S.autoClean||cleaning||!NA) return; if(!hard&&busyNow()) return; cleaning=true;
+  try{
+    const freed=+(nat("selfClean")||0);
+    if(typeof spCache!=="undefined") Object.keys(spCache).forEach(k=>delete spCache[k]);
+    document.querySelectorAll(".page:not(.on) .row img,.page:not(.on) .grid img").forEach(i=>{ if(i.getBoundingClientRect().width===0&&i.src&&i.src.indexOf("http")===0){ i.dataset.src=i.src } });
+    let mi={}; try{ mi=JSON.parse(nat("memInfo")||"{}") }catch(e){}
+    let killed=0; if(hard||(mi.total&&mi.avail/mi.total<.15)) killed=+(nat("cleanRam")||0);
+    lastClean=Date.now();
+    if(hard||killed||freed>20*1048576) banner("🧹",L("cleaned"),freed>1048576?Math.round(freed/1048576)+" MB":"",2500);
+  }catch(e){} cleaning=false;
+}
+window.autoClean=autoClean;
+window.onLowMem=lvl=>{ if(Date.now()-lastClean>60000) autoClean(lvl>=15) };
+setInterval(()=>{ if(Date.now()-lastClean>20*60000) autoClean(false) },60000);
+// a frozen-feeling UI (main thread blocked > 1.5 s) triggers a clean too
+let lagLast=Date.now(), lagHits=0;
+setInterval(()=>{ const d=Date.now()-lagLast-1000; lagLast=Date.now(); if(d>1500){ if(++lagHits>=2&&Date.now()-lastClean>120000){ lagHits=0; autoClean(false) } } else lagHits=Math.max(0,lagHits-1) },1000);

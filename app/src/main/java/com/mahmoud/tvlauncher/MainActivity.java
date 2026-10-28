@@ -144,6 +144,12 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() { inFront = false; super.onPause(); }
 
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (level >= TRIM_MEMORY_RUNNING_LOW) js("window.onLowMem&&onLowMem(" + level + ")");
+    }
+
     /** Called on a server thread: hands the phone's command to the page and waits for its answer. */
     private String remoteCall(String json) {
         final String id = "r" + remoteSeq.incrementAndGet();
@@ -1248,6 +1254,27 @@ public class MainActivity extends Activity {
             JSONObject o = new JSONObject();
             try { o.put("avail", mi.availMem); o.put("total", mi.totalMem); o.put("low", mi.lowMemory); } catch (Exception ignored) {}
             return o.toString();
+        }
+
+        /** Light self-clean: old cache files, old slideshow photos, stale icons, WebView RAM. Returns freed bytes. */
+        @JavascriptInterface
+        public long selfClean() {
+            long[] n = {0};
+            long dayAgo = System.currentTimeMillis() - 86400000L;
+            File[] c = getCacheDir().listFiles();
+            if (c != null) for (File f : c) if (f.lastModified() < dayAgo) deleteRec(f, n);
+            trimDir(new File(getFilesDir(), "wall"), 40, n);
+            trimDir(new File(getFilesDir(), "icons"), 400, n);
+            ui.post(() -> { if (web != null) { web.freeMemory(); web.clearHistory(); } });
+            System.gc();
+            return n[0];
+        }
+
+        private void trimDir(File d, int keep, long[] n) {
+            File[] fs = d.listFiles();
+            if (fs == null || fs.length <= keep) return;
+            java.util.Arrays.sort(fs, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
+            for (int i = keep; i < fs.length; i++) { n[0] += fs[i].length(); fs[i].delete(); }
         }
 
         /** Stops background processes of other apps (what a non-root app is allowed to do). */

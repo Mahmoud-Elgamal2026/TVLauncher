@@ -93,6 +93,9 @@ js "closeDialog();S.anim='aurora';S.favs=apps.slice(0,4).map(a=>a.pkg);applyLook
 js "S.anim='off';applyLook()" 1
 # mic button on the remote opens voice search (no crash)
 js "showPage('sports')" 15; shot 53-sports; js "console.log('TVL|sports-tab|'+(document.querySelectorAll('#spDays .btn').length===3&&document.getElementById('spBody').innerHTML.length>20?'PASS':'FAIL')+'|'+document.querySelectorAll('#spBody .match').length+' matches')" 1
+js "S.anim='auto';S.theme='ramadan';applyLook();renderHome();showPage('home')" 3; shot 54-live-ramadan
+js "console.log('TVL|live-theme|'+(document.body.dataset.anim==='lanterns'&&getComputedStyle(document.querySelector('#animBg i')).animationName!=='none'?'PASS':'FAIL')+'|anim='+document.body.dataset.anim+' name='+getComputedStyle(document.querySelector('#animBg i')).animationName)" 1
+js "S.theme='apple';applyLook();autoClean(true).then(function(){console.log('TVL|self-clean|'+(lastClean>0?'PASS':'FAIL')+'|lastClean='+lastClean)})" 4
 key SEARCH; sleep 3; shot 51-voice; key BACK; sleep 1
 # volume keys show the on-screen bar
 key VOLUME_UP; sleep 0.5; shot 52-vol-osd
