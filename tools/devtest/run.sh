@@ -20,7 +20,7 @@ chk(){ js "(function(){var r=focused&&focused.getBoundingClientRect();var pg=doc
 key(){ for k in "$@"; do adb shell input keyevent $k; sleep 0.5; done; }
 shot 00-boot
 # real remote: walk the tabs, enter pages, move left/right/down
-js "closeDialog();S.iptvOn=true;applyIptv();S.setupSeen=true;S.lite=true;S.perfChosen=true;S.favs=apps.slice(0,6).map(a=>a.pkg);S.recent=apps.slice(6,10).map(a=>a.pkg);applyLook();renderHome();showPage('home');focus(document.querySelector('.tab[data-page=home]'))" 3
+js "closeDialog();S.simple=false;applySimple();S.iptvOn=true;applyIptv();S.setupSeen=true;S.lite=true;S.perfChosen=true;S.favs=apps.slice(0,6).map(a=>a.pkg);S.recent=apps.slice(6,10).map(a=>a.pkg);applyLook();renderHome();showPage('home');focus(document.querySelector('.tab[data-page=home]'))" 3
 shot 01-home-tab
 key DPAD_DOWN; shot 02-home-down
 key DPAD_RIGHT DPAD_RIGHT DPAD_LEFT; shot 03-home-right; chk 03 home

@@ -376,7 +376,7 @@ function boot() {
   focus(document.querySelector(".tab.on") || document.querySelector(".tab"));
   if (!S.iptvOn) {
     setTimeout(weather, 3e3);
-    setTimeout(loadSports, S.lite ? 2e4 : 4e3);
+    if (!S.simple) setTimeout(loadSports, S.lite ? 2e4 : 4e3);
   } else if (!S.lite) {
     setTimeout(() => {
       weather();
@@ -447,3 +447,24 @@ setInterval(() => {
   if (!S.iptvOn) applyIptv();
 }, 4e3);
 setTimeout(applyIptv, 0);
+DEF.simple = true;
+Object.assign(T.ar, { simple: "واجهة بسيطة", simpleSub: "الرئيسية والتطبيقات والإعدادات بس — أخف وأسرع" });
+Object.assign(T.en, { simple: "Simple interface", simpleSub: "Home, Apps and Settings only — lighter and faster" });
+function applySimple() {
+  ["files", "store", "sports"].forEach((p) => {
+    const t = document.querySelector(`.tab[data-page="${p}"]`);
+    if (t) t.style.display = S.simple ? "none" : "";
+  });
+  document.body.classList.toggle("simple", !!S.simple);
+  if (S.simple && document.querySelector("#files.on,#store.on,#sports.on")) showPage("home");
+  applyIptv();
+}
+AFTER.simple = () => {
+  applySimple();
+  if (!S.simple) loadSports();
+  renderHome();
+};
+setTimeout(applySimple, 0);
+setInterval(() => {
+  if (S.simple) applySimple();
+}, 5e3);

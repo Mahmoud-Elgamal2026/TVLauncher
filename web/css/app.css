@@ -522,3 +522,8 @@ body.livewall[data-page=home] #wall{animation:kenBurns 45s ease-in-out infinite 
 /* fast mode: no full-screen blurred picture behind the focus (very heavy on old GPUs), no wallpaper motion */
 body.lite #shelfImg{display:none!important}
 body.lite.livewall #wall{animation:none!important}
+
+/* simple mode: only the essentials on the home screen */
+body.simple #matchRow,body.simple #watchRow,body.simple #favChRow,body.simple #habitRow,body.simple #ramCard{display:none!important}
+
+body.simple h2[data-row=matchRow],body.simple h2[data-row=watchRow],body.simple h2[data-row=favChRow]{display:none!important}

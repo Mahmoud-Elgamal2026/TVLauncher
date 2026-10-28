@@ -171,7 +171,7 @@ function boot(){
   // show the home screen first; network and heavy work follow once it is on screen
   applyLook(); applyLang(); loadApps(); syncKeyMap(); status(); tick();
   focus(document.querySelector(".tab.on")||document.querySelector(".tab"));
-  if(!S.iptvOn){ setTimeout(weather,3000); setTimeout(loadSports,S.lite?20000:4000) }
+  if(!S.iptvOn){ setTimeout(weather,3000); if(!S.simple) setTimeout(loadSports,S.lite?20000:4000) }
   else if(!S.lite){ setTimeout(()=>{ weather(); loadLists().then(()=>setTimeout(loadEpg,1500)) },250); setTimeout(loadSports,4000) }
   else {
     // slow box: the home screen comes first; channels load when needed (or a bit later if the home shows favorite channels), the guide only on the TV page
@@ -199,3 +199,16 @@ function applyIptv(){ ["tv","vod"].forEach(p=>{ const t=document.querySelector(`
 AFTER.iptvOn=()=>{ applyIptv(); renderHome() };
 const _updVodL=window.updVodTab; setInterval(()=>{ if(!S.iptvOn) applyIptv() },4000);
 setTimeout(applyIptv,0);
+
+// ================= Simple mode: Home + Apps + Settings only =================
+DEF.simple=true;
+Object.assign(T.ar,{simple:"واجهة بسيطة",simpleSub:"الرئيسية والتطبيقات والإعدادات بس — أخف وأسرع"});
+Object.assign(T.en,{simple:"Simple interface",simpleSub:"Home, Apps and Settings only — lighter and faster"});
+function applySimple(){
+  ["files","store","sports"].forEach(p=>{ const t=document.querySelector(`.tab[data-page="${p}"]`); if(t) t.style.display=S.simple?"none":"" });
+  document.body.classList.toggle("simple",!!S.simple);
+  if(S.simple&&document.querySelector("#files.on,#store.on,#sports.on")) showPage("home");
+  applyIptv();
+}
+AFTER.simple=()=>{ applySimple(); if(!S.simple) loadSports(); renderHome() };
+setTimeout(applySimple,0); setInterval(()=>{ if(S.simple) applySimple() },5000);

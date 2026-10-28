@@ -136,7 +136,7 @@ const animOf=()=>{ const a=S.anim||"auto"; if(a!=="auto") return a; const x=LIVE
 const _applyLookL=applyLook; applyLook=function(){ _applyLookL.apply(this,arguments); document.body.dataset.anim=animOf(); document.body.classList.toggle("livewall",!!S.liveWall) };
 AFTER.liveWall=applyLook; document.body.dataset.anim=animOf(); document.body.classList.toggle("livewall",!!S.liveWall);
 window.lifeSettings=function(){
-  return sec("📺 "+L("iptvOn"),field(L("iptvOnSub"),onoff("iptvOn")))+sec("✨ "+L("anim"),field("",seg("anim",[["auto","🎨 "+L("anAuto")],["off",L("off")],["aurora","🌌 "+L("anAurora")],["stars","✨ "+L("anStars")],["waves","🌊 "+L("anWaves")],["bokeh","🔆 "+L("anBokeh")],["glow","💡 "+L("anGlow")],["lanterns","🏮 "+L("anLant")]]))
+  return sec("🪶 "+L("simple"),field(L("simpleSub"),onoff("simple")))+sec("📺 "+L("iptvOn"),field(L("iptvOnSub"),onoff("iptvOn")))+sec("✨ "+L("anim"),field("",seg("anim",[["auto","🎨 "+L("anAuto")],["off",L("off")],["aurora","🌌 "+L("anAurora")],["stars","✨ "+L("anStars")],["waves","🌊 "+L("anWaves")],["bokeh","🔆 "+L("anBokeh")],["glow","💡 "+L("anGlow")],["lanterns","🏮 "+L("anLant")]]))
     +field(L("liveWall"),onoff("liveWall"))+field(L("autoClean"),onoff("autoClean")))+(_lifeSetA?_lifeSetA():"") };
 
 // ================= Auto self-clean: keeps the launcher light without the user doing anything =================
