@@ -19,7 +19,7 @@ var __async = (__this, __arguments, generator) => {
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
-Object.assign(DEF, { repo: "", autoUpdate: true, guard: true, remoteOn: true });
+Object.assign(DEF, { repo: "Mahmoud-Elgamal2026/TVLauncher", autoUpdate: true, guard: true, remoteOn: true });
 const KEYMAP_REMOTE = { up: "ArrowUp", down: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", ok: "Enter", back: "GoBack" };
 function pressKey(k) {
   idleAt = Date.now();

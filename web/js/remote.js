@@ -1,6 +1,6 @@
 "use strict";
 // ================= extra settings defaults =================
-Object.assign(DEF,{repo:"",autoUpdate:true,guard:true,remoteOn:true});
+Object.assign(DEF,{repo:"Mahmoud-Elgamal2026/TVLauncher",autoUpdate:true,guard:true,remoteOn:true});
 
 // ================= phone control: TV side =================
 const KEYMAP_REMOTE={up:"ArrowUp",down:"ArrowDown",left:"ArrowLeft",right:"ArrowRight",ok:"Enter",back:"GoBack"};
