@@ -135,10 +135,22 @@ applyLook = function() {
   _applyLookW.apply(this, arguments);
   setTimeout(applyWidgets, 0);
 };
+function focusKey(el) {
+  if (!el) return null;
+  const row = el.parentElement && el.parentElement.id;
+  for (const a of ["pkg", "chu", "wk", "folder", "froot", "fi", "scat", "page", "act"]) if (el.dataset && el.dataset[a] != null) return { row, sel: `[data-${a.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase())}="${String(el.dataset[a]).replace(/"/g, '\\"')}"]` };
+  return el.id ? { row, sel: "#" + el.id } : null;
+}
 const _renderHomeW = renderHome;
 renderHome = function() {
+  const k = focusKey(focused);
   _renderHomeW.apply(this, arguments);
   applyWidgets();
+  if (k && (!focused || !document.body.contains(focused))) {
+    const box = k.row && document.getElementById(k.row);
+    const el = box && box.querySelector(k.sel) || document.querySelector(k.sel);
+    focus(el && el.offsetParent !== null ? el : fallbackFocus());
+  }
 };
 function widgetMenu() {
   const l = lay();

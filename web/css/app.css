@@ -406,3 +406,4 @@ body.lite.lighttheme .btn.pri,body.lite.lighttheme .it.sel,body.lite.lighttheme 
 
 /* mixed Arabic/English names (e.g. "[Not 24/7]") keep their own direction */
 #shelfTitle,#shelfSub,.app .nm,.app .lbl,.chrow .cn,#pName,#pNow,.it,.bt,.bx{unicode-bidi:plaintext}
+html[dir=rtl] #shelfTitle,html[dir=rtl] #shelfSub,html[dir=rtl] .it,html[dir=rtl] .bt,html[dir=rtl] .bx,html[dir=rtl] #pName,html[dir=rtl] #pNow{text-align:right}html[dir=ltr] #shelfTitle,html[dir=ltr] #shelfSub,html[dir=ltr] .it,html[dir=ltr] .bt,html[dir=ltr] .bx,html[dir=ltr] #pName,html[dir=ltr] #pNow{text-align:left}
