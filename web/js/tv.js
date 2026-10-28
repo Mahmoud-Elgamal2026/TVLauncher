@@ -17,8 +17,10 @@ function detectCountry(c){
   for(const k of COUNTRIES) if(k.re.test(t)||k.re2.test(t)) return k.ar;
   return "";
 }
+const tvgUrls=new Set();
 function parseM3U(txt,listName){
   const out=[]; let cur=null;
+  const hdr=(txt.slice(0,600).match(/(?:x-tvg-url|url-tvg)="([^"]+)"/)||[])[1]; if(hdr) hdr.split(",").forEach(u=>{ u=u.trim(); if(/^https?:/.test(u)) tvgUrls.add(u) });
   for(let l of txt.split(/\r?\n/)){
     l=l.trim();
     if(l.startsWith("#EXTINF")){
@@ -39,7 +41,8 @@ async function loadLists(){
   const res=await Promise.allSettled(lists.map((l,i)=>l.type==="xtream"?loadXtreamLive(l,i):A.fetchText(l.url).then(t=>parseM3U(t,l.name))));
   const seen=new Set();
   res.forEach((r,i)=>{ if(r.status!=="fulfilled"){ A.toast(L("loadErr")+": "+lists[i].name); return }
-    r.value.forEach(c=>{ if(seen.has(c.url)) return; seen.add(c.url);
+    const dead=new Set(S.deadHidden||[]);
+    r.value.forEach(c=>{ if(seen.has(c.url)||dead.has(c.url)) return; seen.add(c.url);
       // files (mp4/mkv...) from M3U lists go to the movies library, live streams stay in the receiver
       if(!c.xt&&/\.(mp4|mkv|avi|mov|m4v|webm)(\?|$)/i.test(c.url)) m3uVod.push({kind:"movie",name:c.name,url:c.url,poster:c.logo,cat:c.group||lists[i].name});
       else channels.push(c) }) });
@@ -53,13 +56,27 @@ async function loadLists(){
   if(S.autoCheck&&channels.length&&Date.now()-S.lastCheck>7*86400000) runCheck(true);
 }
 function epgUrl(){ if(S.epg) return S.epg; const x=xtLists()[0]; return x?`${xtBase(x)}/xmltv.php?username=${encodeURIComponent(x.user)}&password=${encodeURIComponent(x.pass)}`:"" }
+// guide = your own EPG (or Xtream's) + guides announced by the playlists + known guides for the free country packs
+const PACK_EPG={"countries/eg.m3u":["https://raw.githubusercontent.com/globetvapp/epg/main/Egypt/egypt1.xml","https://raw.githubusercontent.com/globetvapp/epg/main/Egypt/egypt2.xml"],
+  "countries/sa.m3u":["https://raw.githubusercontent.com/globetvapp/epg/main/Saudiarabia/saudiarabia1.xml","https://raw.githubusercontent.com/globetvapp/epg/main/Saudiarabia/saudiarabia2.xml"],
+  "countries/ae.m3u":["https://raw.githubusercontent.com/globetvapp/epg/main/Uae/uae1.xml"],"languages/ara.m3u":["https://raw.githubusercontent.com/globetvapp/epg/main/Egypt/egypt1.xml","https://raw.githubusercontent.com/globetvapp/epg/main/Saudiarabia/saudiarabia1.xml"]};
+const epgKey=s=>String(s||"").toLowerCase().replace(/\(.*?\)|\[.*?\]|\b(hd|fhd|uhd|sd|4k|tv|channel|قناة)\b|\.[a-z]{2}(@.*)?$/g,"").replace(/[^a-z0-9\u0600-\u06ff]/g,"");
+let epgNorm={};
 async function loadEpg(){
-  const u=epgUrl(); if(!u){epg={};return}
-  try{ epg=await A.fetchEpg(u); renderChannels(); renderHome() }catch(e){ if(NA) A.toast("EPG: "+L("loadErr")) }
+  const urls=[]; const u=epgUrl(); if(u) urls.push(u);
+  S.lists.forEach(l=>{ Object.keys(PACK_EPG).forEach(k=>{ if(l.url&&l.url.indexOf(k)>=0) PACK_EPG[k].forEach(x=>urls.push(x)) }) });
+  tvgUrls.forEach(x=>urls.push(x));
+  const list=urls.filter((x,i)=>urls.indexOf(x)===i).slice(0,6);
+  if(!list.length){ epg={}; epgNorm={}; return }
+  const res=await Promise.all(list.map(x=>A.fetchEpg(x).catch(()=>null)));
+  const merged={}; res.forEach(r=>{ if(r) Object.keys(r).forEach(k=>{ if(!merged[k]) merged[k]=r[k] }) });
+  epg=merged; epgNorm={}; Object.keys(merged).forEach(k=>{ const n=epgKey(k); if(n&&!epgNorm[n]) epgNorm[n]=merged[k] });
+  if(!Object.keys(merged).length&&u&&NA) A.toast("EPG: "+L("loadErr"));
+  renderChannels(); renderHome();
 }
 setInterval(loadEpg,3*3600000);
 function nowNext(c){
-  const l=epg[c.id]||epg[c.name]; if(!l) return [];
+  const l=epg[c.id]||epg[c.name]||epgNorm[epgKey(c.id)]||epgNorm[epgKey(c.name)]; if(!l) return [];
   const t=Date.now(); const i=l.findIndex(p=>p[0]<=t&&p[1]>t); return i<0?[]:[l[i],l[i+1]];
 }
 window.nowNext=nowNext;

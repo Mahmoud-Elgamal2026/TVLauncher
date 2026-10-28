@@ -88,6 +88,13 @@ js "console.log('TVL|frame-photo|'+(/url\(/.test(document.getElementById('frameA
 key BACK; sleep 1
 # settings categories with the remote
 js "showPage('settings');renderSettings();focus(document.querySelector('#setCats .it'))" 2; key DPAD_DOWN DPAD_DOWN; shot 48-settings-cats; key DPAD_LEFT; shot 49-settings-cat-open
+# new home: smart row + all-apps widget + boost tile, animated background
+js "closeDialog();S.anim='aurora';S.favs=apps.slice(0,4).map(a=>a.pkg);applyLook();renderHome();showPage('home');focus(document.getElementById('boostTile'))" 3; shot 50-home-new
+js "S.anim='off';applyLook()" 1
+# mic button on the remote opens voice search (no crash)
+key SEARCH; sleep 3; shot 51-voice; key BACK; sleep 1
+# volume keys show the on-screen bar
+key VOLUME_UP; sleep 0.5; shot 52-vol-osd
 # full self-test (network, IPTV, recording, radio, files ...)
 adb push selftest.built.js /sdcard/Download/selftest.js
 js "var s=document.createElement('script');s.src='file:///sdcard/Download/selftest.js';s.onerror=function(){console.log('TVL|load-selftest|FAIL|script load error')};document.body.appendChild(s)" 5

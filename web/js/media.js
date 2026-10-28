@@ -161,8 +161,8 @@ function tgCmd(t){
     if(!c) return tgt("nf"); if(on("frame")) stopFrame(); playUrl(c.url); return "📺 "+c.name }
   if(is("next","الجاية","الجايه","+")){ if(on("player")) zap(1); return tgt("ok") }
   if(is("prev","اللي","السابقة","-")){ if(on("player")) zap(-1); return tgt("ok") }
-  if(is("vol+","صوت+")){ A.volume(1); A.volume(1); return "🔊" }
-  if(is("vol-","صوت-")){ A.volume(-1); A.volume(-1); return "🔉" }
+  if(is("vol+","صوت+")){ A.volume("up"); A.volume("up"); return "🔊" }
+  if(is("vol-","صوت-")){ A.volume("down"); A.volume("down"); return "🔉" }
   if(is("stop","وقف","وقّف")){ if(on("player")) stopPlayer(); return tgt("ok") }
   if(is("home","رئيسية","الرئيسية")){ pressKey("home"); return tgt("ok") }
   if(is("back","رجوع")){ pressKey("back"); return "" }
@@ -288,3 +288,17 @@ const _renderGroupsP=renderGroups; renderGroups=function(){ _renderGroupsP.apply
   const g=$("groups"); if(g&&channels.length) g.insertAdjacentHTML("afterbegin",`<div class="it f packbtn" tabindex="0" id="packsBtn">📦 ${esc(L("listsBtn"))}</div>`) };
 activators.push(el=>{ if(el.id==="packsBtn"){ packsMenu(); return true } return false });
 window.packsMenu=packsMenu;
+
+// ---------- one-press removal of dead channels (they can be brought back) ----------
+DEF.deadHidden=[];
+MT.ar.rmDead="احذف القنوات الواقفة";MT.en.rmDead="Remove dead channels";MT.ar.rmDeadDone="اتشالت";MT.en.rmDeadDone="Removed";
+MT.ar.restoreDead="رجّع القنوات اللي اتشالت";MT.en.restoreDead="Bring back removed channels";Object.keys(MT).forEach(l=>Object.assign(T[l],MT[l]));
+const deadNow=()=>channels.filter(c=>S.chStatus[c.url]===0);
+const _renderGroupsD=renderGroups; renderGroups=function(){ _renderGroupsD.apply(this,arguments); if(isKids()) return;
+  const d=deadNow().length, g=$("groups"), cb=$("checkBtn"); if(!g||!cb) return;
+  if(d) cb.insertAdjacentHTML("afterend",`<div class="it f" tabindex="0" id="rmDeadBtn">🧹 ${esc(L("rmDead"))} (${d})</div>`);
+  if((S.deadHidden||[]).length) g.insertAdjacentHTML("beforeend",`<div class="it f" tabindex="0" id="restoreDeadBtn">♻️ ${esc(L("restoreDead"))} (${S.deadHidden.length})</div>`) };
+activators.push(el=>{
+  if(el.id==="rmDeadBtn"){ const d=deadNow().map(c=>c.url); S.deadHidden=(S.deadHidden||[]).concat(d.filter(u=>(S.deadHidden||[]).indexOf(u)<0)); channels=channels.filter(c=>d.indexOf(c.url)<0); channels.forEach((c,i)=>c.no=i+1); curGroup="__all"; renderGroups(); banner("🧹",L("rmDeadDone"),d.length+"",2500); focus(document.querySelector("#groups .f")); return true }
+  if(el.id==="restoreDeadBtn"){ const n=S.deadHidden.length; S.deadHidden=[]; S.chStatus={}; banner("♻️",L("restoreDead"),n+"",2500); loadLists().then(()=>renderGroups()); return true }
+  return false });

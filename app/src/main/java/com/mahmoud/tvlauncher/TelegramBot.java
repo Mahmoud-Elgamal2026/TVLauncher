@@ -44,6 +44,8 @@ class TelegramBot {
                             }
                             continue;
                         }
+                        JSONObject doc = m.optJSONObject("document");
+                        if (doc != null) { sink.onMessage(m.getJSONObject("chat").getLong("id"), name(m.optJSONObject("from")), "__doc:" + doc.optString("file_id") + ":" + doc.optString("file_name")); continue; }
                         String text = m.optString("text", "");
                         if (!text.isEmpty()) sink.onMessage(m.getJSONObject("chat").getLong("id"), name(m.optJSONObject("from")), text);
                     }
@@ -75,6 +77,33 @@ class TelegramBot {
                 post("sendMessage", o);
             } catch (Throwable ignored) {}
         }).start();
+    }
+
+    /** Sends a small text file (e.g. the settings backup) as a document. */
+    void sendDocument(long chat, String fileName, String content, String caption) {
+        new Thread(() -> {
+            try {
+                String b = "----tvl" + System.currentTimeMillis();
+                HttpURLConnection c = (HttpURLConnection) new URL("https://api.telegram.org/bot" + token + "/sendDocument").openConnection();
+                c.setConnectTimeout(15000); c.setReadTimeout(30000); c.setDoOutput(true);
+                c.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + b);
+                try (OutputStream o = c.getOutputStream()) {
+                    String head = "--" + b + "\r\nContent-Disposition: form-data; name=\"chat_id\"\r\n\r\n" + chat + "\r\n"
+                        + "--" + b + "\r\nContent-Disposition: form-data; name=\"caption\"\r\n\r\n" + caption + "\r\n"
+                        + "--" + b + "\r\nContent-Disposition: form-data; name=\"document\"; filename=\"" + fileName + "\"\r\nContent-Type: application/json\r\n\r\n";
+                    o.write(head.getBytes("UTF-8")); o.write(content.getBytes("UTF-8")); o.write(("\r\n--" + b + "--\r\n").getBytes("UTF-8"));
+                }
+                read(c);
+            } catch (Throwable ignored) {}
+        }).start();
+    }
+
+    /** Downloads a file the user sent to the bot (used to restore a backup). */
+    String download(String fileId) throws Exception {
+        JSONObject r = new JSONObject(get("getFile?file_id=" + fileId, 20000)).getJSONObject("result");
+        HttpURLConnection c = (HttpURLConnection) new URL("https://api.telegram.org/file/bot" + token + "/" + r.getString("file_path")).openConnection();
+        c.setConnectTimeout(15000); c.setReadTimeout(30000);
+        return read(c);
     }
 
     private static String name(JSONObject f) { return f == null ? "" : f.optString("first_name", f.optString("username", "")); }

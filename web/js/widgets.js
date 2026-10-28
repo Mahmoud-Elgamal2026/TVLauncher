@@ -1,15 +1,15 @@
 // ================= Home widgets: move, resize, hide and reorder home sections (saved per theme) =================
 DEF.layouts={};
 const WT={ar:{wEdit:"ترتيب الرئيسية (ويدجت)",wEditSub:"اختار جزء عشان تحرّكه أو تخفيه أو تكبّره",wMove:"حرّك بالأسهم",wMoveHint:"الأسهم = تحريك · OK = حفظ · رجوع = إلغاء · 1/3 = أصغر/أكبر",wHide:"إخفاء",wShow:"إظهار",wBigger:"تكبير",wSmaller:"تصغير",wUp:"لفوق في الترتيب",wDown:"لتحت في الترتيب",wReset:"رجّعه لمكانه",wResetAll:"رجّع كل حاجة زي الأول",wHidden:"مخفي",wMoved:"متحرّك",
-    w_hero:"العنوان الكبير",w_watch:"كمّل المشاهدة",w_fav:"المفضلة",w_folders:"الفولدرات",w_matches:"ماتشات النهارده",w_favch:"القنوات المفضلة",w_quick:"اختصارات",w_recent:"آخر استخدام",w_clock:"الساعة والتاريخ",w_ticker:"الصلاة والماتشات",w_weather:"الطقس",w_sources:"المصادر",w_allapps:"زر كل التطبيقات"},
+    w_hero:"العنوان الكبير",w_allapps_w:"كل التطبيقات",w_smart:"مقترح ليك دلوقتي",w_watch:"كمّل المشاهدة",w_fav:"المفضلة",w_folders:"الفولدرات",w_matches:"ماتشات النهارده",w_favch:"القنوات المفضلة",w_quick:"اختصارات",w_recent:"آخر استخدام",w_clock:"الساعة والتاريخ",w_ticker:"الصلاة والماتشات",w_weather:"الطقس",w_sources:"المصادر",w_allapps:"زر كل التطبيقات"},
   en:{wEdit:"Arrange home (widgets)",wEditSub:"Pick a part to move, hide or resize",wMove:"Move with arrows",wMoveHint:"Arrows = move · OK = save · Back = cancel · 1/3 = smaller/bigger",wHide:"Hide",wShow:"Show",wBigger:"Bigger",wSmaller:"Smaller",wUp:"Earlier in order",wDown:"Later in order",wReset:"Put back",wResetAll:"Reset everything",wHidden:"hidden",wMoved:"moved",
-    w_hero:"Big title",w_watch:"Continue watching",w_fav:"Favorites",w_folders:"Folders",w_matches:"Today's matches",w_favch:"Favorite channels",w_quick:"Shortcuts",w_recent:"Recently used",w_clock:"Clock & date",w_ticker:"Prayer & matches bar",w_weather:"Weather",w_sources:"Sources",w_allapps:"All apps button"}};
+    w_hero:"Big title",w_allapps_w:"All apps",w_smart:"Suggested for now",w_watch:"Continue watching",w_fav:"Favorites",w_folders:"Folders",w_matches:"Today's matches",w_favch:"Favorite channels",w_quick:"Shortcuts",w_recent:"Recently used",w_clock:"Clock & date",w_ticker:"Prayer & matches bar",w_weather:"Weather",w_sources:"Sources",w_allapps:"All apps button"}};
 Object.keys(WT).forEach(l=>Object.assign(T[l],WT[l]));
 
 // id → [main element selector, heading selector (moves with it), flows in the home list?]
-const WIDGETS=[["hero","#shelf",null,1],["watch","#watchRow",'h2[data-row="watchRow"]',1],["fav","#favRow",'h2[data-i18n="favorites"]',1],["folders","#folderRow",'h2[data-row="folderRow"]',1],
+const WIDGETS=[["hero","#shelf",null,1],["smart","#smartRow",'h2[data-row="smartRow"]',1],["watch","#watchRow",'h2[data-row="watchRow"]',1],["fav","#favRow",'h2[data-i18n="favorites"]',1],["folders","#folderRow",'h2[data-row="folderRow"]',1],
   ["matches","#matchRow",'h2[data-row="matchRow"]',1],["favch","#favChRow",'h2[data-row="favChRow"]',1],["quick","#quickRow",'h2[data-row="quickRow"]',1],["recent","#recentRow",'h2[data-row="recentRow"]',1],
-  ["clock",".top .clock",null,0],["ticker","#ticker",null,0],["weather",".top .weather",null,0],["sources","#xSources",null,0],["allapps","#xAllApps",null,0]];
+  ["allapps_w","#allAppsW","#allAppsH",1],["clock",".top .clock",null,0],["ticker","#ticker",null,0],["weather",".top .weather",null,0],["sources","#xSources",null,0],["allapps","#xAllApps",null,0]];
 const wEl=w=>document.querySelector(w[1]), wHead=w=>w[2]&&document.querySelector(w[2]);
 function lay(){ const all=S.layouts||{}; if(all.__all) return all.__all; const any=all[S.theme]||Object.keys(all).map(k=>all[k]).find(v=>v&&Object.keys(v).length); return any||{} }
 function saveLay(l){ S.layouts={__all:l} }
@@ -103,3 +103,30 @@ setTimeout(applyWidgets,800);
 
 // Old TV WebViews turn the remote's OK button into a click instead of an Enter key: treat it as "save" while moving
 document.addEventListener("click",e=>{ if(!moving) return; e.preventDefault(); e.stopPropagation(); held=true; endMove(true) },true);
+
+// ================= Per-widget look: size, tile shape, display, names, background =================
+const WST={ar:{wStyle:"الشكل والعرض",stSize:"الحجم",stShape:"شكل البلاطة",stView:"طريقة العرض",stNames:"الأسماء",stBg:"الخلفية",
+    s_s:"صغير",s_m:"متوسط",s_l:"كبير",s_xl:"كبير جدًا",sh_wide:"عريض",sh_square:"مربع",sh_circle:"دايرة",sh_poster:"بوستر",sh_icon:"أيقونة بس",
+    v_row:"صف بيتحرك",v_grid:"شبكة",v_list:"قايمة",n_on:"دايمًا",n_focus:"وقت التحديد",n_off:"مخفية",b_card:"كارت",b_clear:"شفافة"},
+  en:{wStyle:"Shape & display",stSize:"Size",stShape:"Tile shape",stView:"Display",stNames:"Names",stBg:"Background",
+    s_s:"Small",s_m:"Medium",s_l:"Large",s_xl:"Extra large",sh_wide:"Wide",sh_square:"Square",sh_circle:"Circle",sh_poster:"Poster",sh_icon:"Icon only",
+    v_row:"Scrolling row",v_grid:"Grid",v_list:"List",n_on:"Always",n_focus:"On focus",n_off:"Hidden",b_card:"Card",b_clear:"Clear"}};
+Object.keys(WST).forEach(l=>Object.assign(T[l],WST[l]));
+const WSTYLE=[["size","stSize","📏",["","s","m","l","xl"],"s_"],["shape","stShape","🔷",["","wide","square","circle","poster","icon"],"sh_"],["view","stView","🧱",["","row","grid","list"],"v_"],
+  ["names","stNames","🔤",["","on","focus","off"],"n_"],["bg","stBg","🎴",["","card","clear"],"b_"]];
+const stLabel=(d,v)=>v?L(d[4]+v):(S.lang==="ar"?"حسب التصميم":"Design default");
+function applyWStyles(){ const l=lay(); WIDGETS.forEach(w=>{ if(!w[3]||w[0]==="hero") return; const e=wEl(w); if(!e) return; const st=(l[w[0]]||{}).st||{};
+  WSTYLE.forEach(d=>{ const k="w"+d[0]; if(st[d[0]]) e.setAttribute("data-"+k,st[d[0]]); else e.removeAttribute("data-"+k) }) });
+  document.querySelectorAll("#home .row .app").forEach(a=>{ a.__w=null; a.style.height="" }); if(window.__fixAspect) __fixAspect() }
+const _applyWidgetsS=applyWidgets; applyWidgets=function(){ _applyWidgetsS.apply(this,arguments); applyWStyles() };
+function styleMenu(w){
+  const id=w[0], st=((lay()[id]||{}).st)||{};
+  const items=WSTYLE.map(d=>({icon:d[2],label:L(d[1])+": "+stLabel(d,st[d[0]]),keep:1,fn:()=>{ const cur=((lay()[id]||{}).st)||{}, vals=d[3], nx=vals[(vals.indexOf(cur[d[0]]||"")+1)%vals.length];
+    const ns=Object.assign({},cur); if(nx) ns[d[0]]=nx; else delete ns[d[0]]; setW(id,{st:ns}); setTimeout(()=>{ const f=focused&&focused.dataset.di; styleMenu(w); const b=$("dbox").querySelector('[data-di="'+f+'"]'); if(b) focus(b) },20) }}));
+  items.push({label:L("done"),fn:()=>setTimeout(()=>widgetActions(w),30)});
+  dialog("🎨 "+L("w_"+id)+" · "+L("wStyle"),items,{grid:3});
+}
+const _widgetActionsS=widgetActions; widgetActions=function(w){ _widgetActionsS.apply(this,arguments); if(!w[3]||w[0]==="hero") return;
+  const box=$("dbox"), items=box._items, g=box.querySelector(".mgrid,.dlist"); if(!g) return;
+  items.splice(1,0,{icon:"🎨",label:L("wStyle"),fn:()=>setTimeout(()=>styleMenu(w),30)});
+  g.innerHTML=items.map((it,i)=>`<button class="btn f${it.pri?" pri":""}" data-di="${i}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };

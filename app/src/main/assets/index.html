@@ -7,11 +7,12 @@
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body data-theme="apple" data-size="m">
-<div id="shelfBg"></div><div id="wall"></div><div id="shelfImg"></div><div id="shade"></div>
+<div id="shelfBg"></div><div id="animBg"><i></i><i></i><i></i><i></i></div><div id="wall"></div><div id="shelfImg"></div><div id="shade"></div>
 
 <div class="top">
   <div class="left">
     <button class="qbtn f" id="profBtn"></button>
+    <button class="qbtn f" id="boostBtn">🚀</button>
     <button class="qbtn f" id="qBtn">⚡</button>
     <button class="qbtn f" id="searchBtn">🔍</button>
     <button class="qbtn f" id="browserBtn">🌐</button>
@@ -44,6 +45,7 @@
   <h2 data-i18n="favChannels" data-row="favChRow"></h2><div class="row" id="favChRow"></div>
   <h2 data-i18n="quick" data-row="quickRow"></h2><div class="row" id="quickRow"></div>
   <h2 data-i18n="recent" data-row="recentRow"></h2><div class="row" id="recentRow"></div>
+  <h2 data-row="allAppsW" id="allAppsH"></h2><div class="row" id="allAppsW"></div>
   <div class="dockx"><button class="btn f" id="xAllApps" data-i18n="xAll"></button><button class="btn f" id="xSources"><b>📺</b><span><span data-i18n="xSrc"></span><small>HDMI · TV</small></span></button></div>
 </div></section>
 
@@ -117,6 +119,7 @@
 <script src="js/widgets.js"></script>
 <script src="js/setcats.js"></script>
 <script src="js/framew.js"></script>
+<script src="js/smart.js"></script>
 <script>boot()</script>
 </body>
 </html>

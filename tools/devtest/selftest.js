@@ -6,7 +6,7 @@
   window.onerror=(m,src,l)=>{ log("js-error",false,m+" @"+(src||"").split("/").pop()+":"+l) };
   log("webview",true,navigator.userAgent.match(/Chrome\/[\d.]+/)+" · grid="+!document.documentElement.classList.contains("nogrid")+" · ar="+!document.documentElement.classList.contains("noar")+" · lite="+!!S.lite);
   await t("apps-loaded",async()=>[apps.length>0,apps.length+" apps"]);
-  await t("bridge-methods",async()=>{ const need=["fetchText","fetchEpg","checkStreams","resolveUrl","installApk","installBundled","hasBundled","listDir","storageRoots","mediaUrl","smbScan","recStart","recState","tgStart","bootFresh","isDefaultHome","homePackages","playAudio","stopAudio","memInfo","listPackages","shizukuState"];
+  await t("bridge-methods",async()=>{ const need=["fetchText","fetchEpg","checkStreams","resolveUrl","installApk","installBundled","hasBundled","listDir","storageRoots","mediaUrl","smbScan","recStart","recState","tgStart","bootFresh","isDefaultHome","homePackages","playAudio","stopAudio","memInfo","listPackages","shizukuState","closeApp","monitor","cacheImage","setTyping","scheduleWake","tgSendDoc","tgGetFile"];
     const miss=need.filter(m=>typeof NA[m]!=="function"); return [!miss.length,miss.length?"missing: "+miss.join(","):need.length+" ok"] });
   // ---- every page renders without errors and focus can enter it
   for(const p of ["home","apps","tv","vod","files","store","settings"]){
@@ -55,5 +55,18 @@
   await t("setup-wizard",async()=>{ setupWizard(); await wait(300); const n=$("dbox").querySelectorAll(".btn").length; closeDialog(); return [n>=5,n+" rows"] });
   await t("telegram-cmds",async()=>{ S.tgCode="111222"; S.tgChat=""; const out=[]; const o=window.tgSend; window.tgSend=(c,tx)=>out.push(tx); onTg("1","T","111222"); onTg("1","T","الحالة"); onTg("2","X","الحالة"); window.tgSend=o; S.tgChat=""; return [out.length===3&&/✅/.test(out[0]),out.map(x=>x.slice(0,20)).join(" / ")] });
   await t("lang-en",async()=>{ S.lang="en"; applyLang(); renderHome(); await wait(300); const ok=document.documentElement.dir==="ltr"; S.lang="ar"; applyLang(); renderHome(); return [ok,"switched and back"] });
+  // ---- the 10 new features
+  await t("epg-free-pack",async()=>{ S.lists=[{name:"eg",url:"https://iptv-org.github.io/iptv/countries/eg.m3u"}]; await loadLists(); await loadEpg(); const n=Object.keys(epg).length; const hit=channels.filter(c=>nowNext(c).length).length; return [n>0,n+" guide entries, "+hit+"/"+channels.length+" channels with now/next"] },120000);
+  await t("dead-remove",async()=>{ if(!channels.length) return [null,"no channels"]; S.chStatus={}; const st={}; st[channels[0].url]=0; S.chStatus=st; renderGroups(); const btn=$("rmDeadBtn"); if(!btn) return [false,"no button"]; const before=channels.length; activate(btn); await wait(300); const ok=channels.length===before-1&&S.deadHidden.length===1; S.deadHidden=[]; S.chStatus={}; return [ok,before+" → "+channels.length] });
+  await t("smart-row",async()=>{ S.habits={}; const p=apps[0]&&apps[0].pkg; if(!p) return [null,"no apps"]; for(let i=0;i<3;i++) habit("a:"+p); renderHome(); return [$("smartRow").children.length>0,$("smartRow").children.length+" suggested"] });
+  await t("osd",async()=>{ onVolOsd(7,15,false); await wait(100); const ok=$("osd").classList.contains("on")&&/7/.test($("osdT").textContent); return [ok,$("osdT").textContent] });
+  await t("voice-cmd",async()=>{ let got=""; const o=window.banner; window.banner=(a,b,c)=>{ got=c||"" }; onVoice("افتح "+appName(apps[0])); window.banner=o; await wait(500); return [/→/.test(got),got] });
+  await t("schedule",async()=>{ S.schedOn=true; S.schedWake="07:00"; schedSync(); S.schedOn=false; schedSync(); return [true,"armed+cancelled"] });
+  await t("ramadan-card",async()=>{ const old=S.ramadan; S.ramadan="on"; await wait(1500); const shown=$("ramCard").style.display!=="none"&&/:/.test($("ramCard").textContent); S.ramadan=old; return [shown||!prayers.length,shown?$("ramCard").textContent.slice(0,60):"prayers="+prayers.length] });
+  await t("boost",async()=>{ let got=""; const o=window.banner; window.banner=(a,b,c)=>{ if(a==="✅") got=c }; await boostNow(); window.banner=o; return [/MB/.test(got),got] },30000);
+  await t("all-apps-widget",async()=>{ renderHome(); return [!!$("boostTile")&&$("allAppsW").children.length>1,$("allAppsW").children.length+" tiles"] });
+  await t("widget-style",async()=>{ setW("fav",{st:{shape:"circle",size:"m"}}); await wait(100); const ok=$("favRow").getAttribute("data-wshape")==="circle"; saveLay({}); applyWidgets(); return [ok,"circle applied"] });
+  await t("anim-bg",async()=>{ S.anim="aurora"; applyLook(); showPage("home"); await wait(300); const ok=getComputedStyle($("animBg")).display==="block"; S.anim="off"; applyLook(); return [ok,"aurora"] });
+  await t("tg-backup-json",async()=>{ const j=JSON.parse(backupJson()); return [j.app==="tvlauncher"&&Object.keys(j.data).length>5,Object.keys(j.data).length+" keys"] });
   log("done",true,"");
 })();

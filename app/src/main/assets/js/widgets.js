@@ -16,6 +16,8 @@ const WT = {
     wHidden: "مخفي",
     wMoved: "متحرّك",
     w_hero: "العنوان الكبير",
+    w_allapps_w: "كل التطبيقات",
+    w_smart: "مقترح ليك دلوقتي",
     w_watch: "كمّل المشاهدة",
     w_fav: "المفضلة",
     w_folders: "الفولدرات",
@@ -45,6 +47,8 @@ const WT = {
     wHidden: "hidden",
     wMoved: "moved",
     w_hero: "Big title",
+    w_allapps_w: "All apps",
+    w_smart: "Suggested for now",
     w_watch: "Continue watching",
     w_fav: "Favorites",
     w_folders: "Folders",
@@ -62,6 +66,7 @@ const WT = {
 Object.keys(WT).forEach((l) => Object.assign(T[l], WT[l]));
 const WIDGETS = [
   ["hero", "#shelf", null, 1],
+  ["smart", "#smartRow", 'h2[data-row="smartRow"]', 1],
   ["watch", "#watchRow", 'h2[data-row="watchRow"]', 1],
   ["fav", "#favRow", 'h2[data-i18n="favorites"]', 1],
   ["folders", "#folderRow", 'h2[data-row="folderRow"]', 1],
@@ -69,6 +74,7 @@ const WIDGETS = [
   ["favch", "#favChRow", 'h2[data-row="favChRow"]', 1],
   ["quick", "#quickRow", 'h2[data-row="quickRow"]', 1],
   ["recent", "#recentRow", 'h2[data-row="recentRow"]', 1],
+  ["allapps_w", "#allAppsW", "#allAppsH", 1],
   ["clock", ".top .clock", null, 0],
   ["ticker", "#ticker", null, 0],
   ["weather", ".top .weather", null, 0],
@@ -285,3 +291,116 @@ document.addEventListener("click", (e) => {
   held = true;
   endMove(true);
 }, true);
+const WST = {
+  ar: {
+    wStyle: "الشكل والعرض",
+    stSize: "الحجم",
+    stShape: "شكل البلاطة",
+    stView: "طريقة العرض",
+    stNames: "الأسماء",
+    stBg: "الخلفية",
+    s_s: "صغير",
+    s_m: "متوسط",
+    s_l: "كبير",
+    s_xl: "كبير جدًا",
+    sh_wide: "عريض",
+    sh_square: "مربع",
+    sh_circle: "دايرة",
+    sh_poster: "بوستر",
+    sh_icon: "أيقونة بس",
+    v_row: "صف بيتحرك",
+    v_grid: "شبكة",
+    v_list: "قايمة",
+    n_on: "دايمًا",
+    n_focus: "وقت التحديد",
+    n_off: "مخفية",
+    b_card: "كارت",
+    b_clear: "شفافة"
+  },
+  en: {
+    wStyle: "Shape & display",
+    stSize: "Size",
+    stShape: "Tile shape",
+    stView: "Display",
+    stNames: "Names",
+    stBg: "Background",
+    s_s: "Small",
+    s_m: "Medium",
+    s_l: "Large",
+    s_xl: "Extra large",
+    sh_wide: "Wide",
+    sh_square: "Square",
+    sh_circle: "Circle",
+    sh_poster: "Poster",
+    sh_icon: "Icon only",
+    v_row: "Scrolling row",
+    v_grid: "Grid",
+    v_list: "List",
+    n_on: "Always",
+    n_focus: "On focus",
+    n_off: "Hidden",
+    b_card: "Card",
+    b_clear: "Clear"
+  }
+};
+Object.keys(WST).forEach((l) => Object.assign(T[l], WST[l]));
+const WSTYLE = [
+  ["size", "stSize", "📏", ["", "s", "m", "l", "xl"], "s_"],
+  ["shape", "stShape", "🔷", ["", "wide", "square", "circle", "poster", "icon"], "sh_"],
+  ["view", "stView", "🧱", ["", "row", "grid", "list"], "v_"],
+  ["names", "stNames", "🔤", ["", "on", "focus", "off"], "n_"],
+  ["bg", "stBg", "🎴", ["", "card", "clear"], "b_"]
+];
+const stLabel = (d, v) => v ? L(d[4] + v) : S.lang === "ar" ? "حسب التصميم" : "Design default";
+function applyWStyles() {
+  const l = lay();
+  WIDGETS.forEach((w) => {
+    if (!w[3] || w[0] === "hero") return;
+    const e = wEl(w);
+    if (!e) return;
+    const st = (l[w[0]] || {}).st || {};
+    WSTYLE.forEach((d) => {
+      const k = "w" + d[0];
+      if (st[d[0]]) e.setAttribute("data-" + k, st[d[0]]);
+      else e.removeAttribute("data-" + k);
+    });
+  });
+  document.querySelectorAll("#home .row .app").forEach((a) => {
+    a.__w = null;
+    a.style.height = "";
+  });
+  if (window.__fixAspect) __fixAspect();
+}
+const _applyWidgetsS = applyWidgets;
+applyWidgets = function() {
+  _applyWidgetsS.apply(this, arguments);
+  applyWStyles();
+};
+function styleMenu(w) {
+  const id = w[0], st = (lay()[id] || {}).st || {};
+  const items = WSTYLE.map((d) => ({ icon: d[2], label: L(d[1]) + ": " + stLabel(d, st[d[0]]), keep: 1, fn: () => {
+    const cur = (lay()[id] || {}).st || {}, vals = d[3], nx = vals[(vals.indexOf(cur[d[0]] || "") + 1) % vals.length];
+    const ns = Object.assign({}, cur);
+    if (nx) ns[d[0]] = nx;
+    else delete ns[d[0]];
+    setW(id, { st: ns });
+    setTimeout(() => {
+      const f = focused && focused.dataset.di;
+      styleMenu(w);
+      const b = $("dbox").querySelector('[data-di="' + f + '"]');
+      if (b) focus(b);
+    }, 20);
+  } }));
+  items.push({ label: L("done"), fn: () => setTimeout(() => widgetActions(w), 30) });
+  dialog("🎨 " + L("w_" + id) + " · " + L("wStyle"), items, { grid: 3 });
+}
+const _widgetActionsS = widgetActions;
+widgetActions = function(w) {
+  _widgetActionsS.apply(this, arguments);
+  if (!w[3] || w[0] === "hero") return;
+  const box = $("dbox"), items = box._items, g = box.querySelector(".mgrid,.dlist");
+  if (!g) return;
+  items.splice(1, 0, { icon: "🎨", label: L("wStyle"), fn: () => setTimeout(() => styleMenu(w), 30) });
+  g.innerHTML = items.map((it, i) => `<button class="btn f${it.pri ? " pri" : ""}" data-di="${i}">${it.icon ? `<b>${esc(it.icon)}</b>` : ""}${esc(it.label)}</button>`).join("");
+  focus(g.querySelector(".f"));
+};

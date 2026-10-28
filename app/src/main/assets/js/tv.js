@@ -47,9 +47,15 @@ function detectCountry(c) {
   for (const k of COUNTRIES) if (k.re.test(t) || k.re2.test(t)) return k.ar;
   return "";
 }
+const tvgUrls = /* @__PURE__ */ new Set();
 function parseM3U(txt, listName) {
   const out = [];
   let cur = null;
+  const hdr = (txt.slice(0, 600).match(/(?:x-tvg-url|url-tvg)="([^"]+)"/) || [])[1];
+  if (hdr) hdr.split(",").forEach((u) => {
+    u = u.trim();
+    if (/^https?:/.test(u)) tvgUrls.add(u);
+  });
   for (let l of txt.split(/\r?\n/)) {
     l = l.trim();
     if (l.startsWith("#EXTINF")) {
@@ -106,8 +112,9 @@ function loadLists() {
         A.toast(L("loadErr") + ": " + lists[i].name);
         return;
       }
+      const dead = new Set(S.deadHidden || []);
       r.value.forEach((c) => {
-        if (seen.has(c.url)) return;
+        if (seen.has(c.url) || dead.has(c.url)) return;
         seen.add(c.url);
         if (!c.xt && /\.(mp4|mkv|avi|mov|m4v|webm)(\?|$)/i.test(c.url)) m3uVod.push({ kind: "movie", name: c.name, url: c.url, poster: c.logo, cat: c.group || lists[i].name });
         else channels.push(c);
@@ -135,25 +142,52 @@ function epgUrl() {
   const x = xtLists()[0];
   return x ? `${xtBase(x)}/xmltv.php?username=${encodeURIComponent(x.user)}&password=${encodeURIComponent(x.pass)}` : "";
 }
+const PACK_EPG = {
+  "countries/eg.m3u": ["https://raw.githubusercontent.com/globetvapp/epg/main/Egypt/egypt1.xml", "https://raw.githubusercontent.com/globetvapp/epg/main/Egypt/egypt2.xml"],
+  "countries/sa.m3u": ["https://raw.githubusercontent.com/globetvapp/epg/main/Saudiarabia/saudiarabia1.xml", "https://raw.githubusercontent.com/globetvapp/epg/main/Saudiarabia/saudiarabia2.xml"],
+  "countries/ae.m3u": ["https://raw.githubusercontent.com/globetvapp/epg/main/Uae/uae1.xml"],
+  "languages/ara.m3u": ["https://raw.githubusercontent.com/globetvapp/epg/main/Egypt/egypt1.xml", "https://raw.githubusercontent.com/globetvapp/epg/main/Saudiarabia/saudiarabia1.xml"]
+};
+const epgKey = (s) => String(s || "").toLowerCase().replace(/\(.*?\)|\[.*?\]|\b(hd|fhd|uhd|sd|4k|tv|channel|قناة)\b|\.[a-z]{2}(@.*)?$/g, "").replace(/[^a-z0-9\u0600-\u06ff]/g, "");
+let epgNorm = {};
 function loadEpg() {
   return __async(this, null, function* () {
+    const urls = [];
     const u = epgUrl();
-    if (!u) {
+    if (u) urls.push(u);
+    S.lists.forEach((l) => {
+      Object.keys(PACK_EPG).forEach((k) => {
+        if (l.url && l.url.indexOf(k) >= 0) PACK_EPG[k].forEach((x) => urls.push(x));
+      });
+    });
+    tvgUrls.forEach((x) => urls.push(x));
+    const list = urls.filter((x, i) => urls.indexOf(x) === i).slice(0, 6);
+    if (!list.length) {
       epg = {};
+      epgNorm = {};
       return;
     }
-    try {
-      epg = yield A.fetchEpg(u);
-      renderChannels();
-      renderHome();
-    } catch (e) {
-      if (NA) A.toast("EPG: " + L("loadErr"));
-    }
+    const res = yield Promise.all(list.map((x) => A.fetchEpg(x).catch(() => null)));
+    const merged = {};
+    res.forEach((r) => {
+      if (r) Object.keys(r).forEach((k) => {
+        if (!merged[k]) merged[k] = r[k];
+      });
+    });
+    epg = merged;
+    epgNorm = {};
+    Object.keys(merged).forEach((k) => {
+      const n = epgKey(k);
+      if (n && !epgNorm[n]) epgNorm[n] = merged[k];
+    });
+    if (!Object.keys(merged).length && u && NA) A.toast("EPG: " + L("loadErr"));
+    renderChannels();
+    renderHome();
   });
 }
 setInterval(loadEpg, 3 * 36e5);
 function nowNext(c) {
-  const l = epg[c.id] || epg[c.name];
+  const l = epg[c.id] || epg[c.name] || epgNorm[epgKey(c.id)] || epgNorm[epgKey(c.name)];
   if (!l) return [];
   const t = Date.now();
   const i = l.findIndex((p) => p[0] <= t && p[1] > t);

@@ -122,6 +122,13 @@ public class MainActivity extends Activity {
 
     private void handleAction(Intent i) {
         if (i == null) return;
+        if (i.getBooleanExtra("wake", false)) {
+            i.removeExtra("wake");
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+            try { android.os.PowerManager pm = (android.os.PowerManager) getSystemService(POWER_SERVICE);
+                  pm.newWakeLock(android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK | android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP, "tvl:wake").acquire(15000); } catch (Throwable ignored) {}
+            ui.postDelayed(() -> js("window.onScheduledWake&&onScheduledWake()"), 1500);
+        }
         // Test builds only (debuggable): run a JS snippet sent by the automated device test over adb.
         // Release builds are not debuggable, so this is inert in the APK users install.
         String js64 = i.getStringExtra("js64");
@@ -187,6 +194,12 @@ public class MainActivity extends Activity {
             }
             return true;
         }
+        if ((c == KeyEvent.KEYCODE_SEARCH || c == KeyEvent.KEYCODE_VOICE_ASSIST) && !learningKey && prefs.getString("key_" + c, null) == null) {
+            if (e.getAction() == KeyEvent.ACTION_UP) js("window.A&&A.voice()");
+            return true;
+        }
+        if ((c == KeyEvent.KEYCODE_VOLUME_UP || c == KeyEvent.KEYCODE_VOLUME_DOWN || c == KeyEvent.KEYCODE_VOLUME_MUTE) && e.getAction() == KeyEvent.ACTION_DOWN)
+            ui.postDelayed(this::volOsd, 80);
         if (!isCoreKey(c)) {
             if (learningKey) {
                 if (e.getAction() == KeyEvent.ACTION_UP) {
@@ -202,6 +215,15 @@ public class MainActivity extends Activity {
             }
         }
         return super.dispatchKeyEvent(e);
+    }
+
+    /** Our own volume bar (the stock one is missing or tiny on many boxes). */
+    void volOsd() {
+        try {
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            boolean mute = android.os.Build.VERSION.SDK_INT >= 23 && am.isStreamMute(AudioManager.STREAM_MUSIC);
+            js("window.onVolOsd&&onVolOsd(" + am.getStreamVolume(AudioManager.STREAM_MUSIC) + "," + am.getStreamMaxVolume(AudioManager.STREAM_MUSIC) + "," + mute + ")");
+        } catch (Throwable ignored) {}
     }
 
     void postNotif(String json) { js("window.onSysNotif&&onSysNotif(" + JSONObject.quote(json) + ")"); }
@@ -453,7 +475,8 @@ public class MainActivity extends Activity {
             AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             if (am == null) return;
             int d = "up".equals(dir) ? AudioManager.ADJUST_RAISE : "down".equals(dir) ? AudioManager.ADJUST_LOWER : AudioManager.ADJUST_TOGGLE_MUTE;
-            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, d, AudioManager.FLAG_SHOW_UI);
+            am.adjustStreamVolume(AudioManager.STREAM_MUSIC, d, 0);
+            ui.postDelayed(MainActivity.this::volOsd, 80);
         }
 
         /** Clears this launcher's own cache (other apps' caches need system rights). */
@@ -635,6 +658,20 @@ public class MainActivity extends Activity {
             return o.toString();
         }
 
+
+        /** Daily wake-up (screen on + morning action). time = "HH:MM" or "" to cancel. */
+        @JavascriptInterface
+        public void scheduleWake(String hhmm) {
+            android.app.AlarmManager am = (android.app.AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent it = new Intent(MainActivity.this, WakeReceiver.class);
+            int fl = android.app.PendingIntent.FLAG_UPDATE_CURRENT | (android.os.Build.VERSION.SDK_INT >= 23 ? android.app.PendingIntent.FLAG_IMMUTABLE : 0);
+            android.app.PendingIntent pi = android.app.PendingIntent.getBroadcast(MainActivity.this, 77, it, fl);
+            am.cancel(pi);
+            prefs.edit().putString("wakeAt", hhmm == null ? "" : hhmm).apply();
+            if (hhmm == null || !hhmm.matches("\\d{1,2}:\\d{2}")) return;
+            WakeReceiver.arm(MainActivity.this, hhmm);
+        }
+
         // ---------- start-up: resume last channel ----------
         /** True once per boot, for the first launcher start within 10 minutes of the box turning on. */
         @JavascriptInterface
@@ -774,6 +811,16 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void tgSend(String chat, String text, String buttons) {
             try { if (tg != null) tg.send(Long.parseLong(chat), text, buttons); } catch (Throwable ignored) {}
+        }
+
+
+        @JavascriptInterface
+        public void tgSendDoc(String chat, String fileName, String content, String caption) {
+            try { if (tg != null) tg.sendDocument(Long.parseLong(chat), fileName, content, caption); } catch (Throwable ignored) {}
+        }
+        @JavascriptInterface
+        public void tgGetFile(final String fileId, final String id) {
+            new Thread(() -> { try { if (tg == null) throw new Exception("bot off"); callback(id, true, tg.download(fileId)); } catch (Throwable t) { callback(id, false, String.valueOf(t.getMessage())); } }).start();
         }
 
         // ---------- setup wizard ----------
@@ -1242,6 +1289,8 @@ public class MainActivity extends Activity {
                     x.setInput(in, null);
                     JSONObject out = new JSONObject();
                     String ch = null; long st = 0, en = 0; boolean inTitle = false; String title = null;
+                    // <channel id><display-name> aliases, so channels can also be matched by name
+                    HashMap<String, ArrayList<String>> names = new HashMap<>(); String chDef = null; boolean inName = false;
                     for (int ev = x.getEventType(); ev != org.xmlpull.v1.XmlPullParser.END_DOCUMENT; ev = x.next()) {
                         if (ev == org.xmlpull.v1.XmlPullParser.START_TAG) {
                             String n = x.getName();
@@ -1251,6 +1300,11 @@ public class MainActivity extends Activity {
                                 en = parse(String.valueOf(x.getAttributeValue(null, "stop")), z, pl);
                                 title = null;
                             } else if ("title".equals(n) && ch != null && title == null) inTitle = true;
+                            else if ("channel".equals(n)) chDef = x.getAttributeValue(null, "id");
+                            else if ("display-name".equals(n) && chDef != null) inName = true;
+                        } else if (ev == org.xmlpull.v1.XmlPullParser.TEXT && inName) {
+                            ArrayList<String> l = names.get(chDef); if (l == null) { l = new ArrayList<>(); names.put(chDef, l); }
+                            l.add(unescape(x.getText().trim())); inName = false;
                         } else if (ev == org.xmlpull.v1.XmlPullParser.TEXT && inTitle) {
                             title = x.getText(); inTitle = false;
                         } else if (ev == org.xmlpull.v1.XmlPullParser.END_TAG && "programme".equals(x.getName())) {
@@ -1260,6 +1314,10 @@ public class MainActivity extends Activity {
                             }
                             ch = null;
                         }
+                    }
+                    for (Map.Entry<String, ArrayList<String>> e : names.entrySet()) {
+                        JSONArray l = out.optJSONArray(e.getKey()); if (l == null) continue;
+                        for (String nm : e.getValue()) if (nm.length() > 0 && !out.has(nm)) out.put(nm, l);
                     }
                     callback(id, true, out.toString());
                 } catch (Throwable t) { callback(id, false, String.valueOf(t.getMessage())); }

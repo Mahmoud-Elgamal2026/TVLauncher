@@ -39,7 +39,7 @@
       // .app.match must not be overwritten by the generic .app rule
       var ms=d.querySelectorAll(".app.match"); for(var k=0;k<ms.length;k++){ ms[k].style.height=(ms[k].offsetWidth/(16/7))+"px" }
       // theme layouts with their own tile shapes (applied last so they win)
-      var SPEC=[['body[data-lay=poster][data-page=home] #favRow .app',2/3],['body[data-lay=grid][data-page=home] #favRow .app',16/9.6],['body[data-lay=bar][data-page=home] #favRow .app',16/9.6]];
+      var SPEC=[['#home .row[data-wshape=square] .app',1],['#home .row[data-wshape=circle] .app',1],['#home .row[data-wshape=icon] .app',1],['#home .row[data-wshape=poster] .app',2/3],['body[data-lay=poster][data-page=home] #favRow .app',2/3],['body[data-lay=grid][data-page=home] #favRow .app',16/9.6],['body[data-lay=bar][data-page=home] #favRow .app',16/9.6]];
       for(var q=0;q<SPEC.length;q++){ var se=d.querySelectorAll(SPEC[q][0]); for(var z=0;z<se.length;z++){ if(se[z].offsetWidth) se[z].style.height=(se[z].offsetWidth/SPEC[q][1])+"px" } }
       var xb=d.querySelector('body[data-lay=xbox][data-page=home] #favRow .app:first-child'); if(xb) xb.style.height="";
     };
@@ -48,7 +48,7 @@
     d.addEventListener("DOMContentLoaded",function(){
       // only re-measure when cards are added/removed or the look changes — not on every focus move
       new MutationObserver(later).observe(d.body,{childList:true,subtree:true});
-      new MutationObserver(later).observe(d.body,{attributes:true,attributeFilter:["data-theme","data-size","data-page","data-lay"]});
+      new MutationObserver(later).observe(d.body,{attributes:true,attributeFilter:["data-theme","data-size","data-page","data-lay","data-wshape","data-wsize","data-wview"]});
       w.addEventListener("resize",later); later();
     });
   }

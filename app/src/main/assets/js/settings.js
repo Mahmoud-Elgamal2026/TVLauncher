@@ -297,7 +297,7 @@ function editProfile(id) {
       } }
     ];
     if (p.kids) items.push(
-      { icon: "⏱️", label: `${L("limit")}: ${p.limit ? p.limit / 60 + " " + L("hr") : L("noLimit")}`, fn: () => dialog(L("limit"), [0, 60, 120, 180, 240].map((m) => ({ label: m ? m / 60 + " " + L("hr") : L("noLimit"), fn: () => {
+      { icon: "⏱️", label: `${L("limit")}: ${p.limit ? p.limit % 60 ? p.limit + " " + L("min") : p.limit / 60 + " " + L("hr") : L("noLimit")}`, fn: () => dialog(L("limit"), [0, 30, 60, 90, 120, 180, 240].map((m) => ({ label: m ? m / 60 + " " + L("hr") : L("noLimit"), fn: () => {
         updProfile(id, { limit: m });
         setTimeout(() => editProfile(id), 60);
       } })), { grid: 5 }) },

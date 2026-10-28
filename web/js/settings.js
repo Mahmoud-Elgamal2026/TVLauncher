@@ -131,7 +131,7 @@ function editProfile(id){
       {icon:p.kids?"👶":"🧑",label:p.kids?L("kids"):L("adult"),fn:()=>{ if(!p.kids&&!S.pin){A.toast(L("needPin"));return} if(id===S.cur&&!p.kids){A.toast(L("cancel"));return}
         updProfile(id,Object.assign({kids:!p.kids},p.kids?{}:KIDS_DEF,p.kids?{}:{allowedApps:p.allowedApps||[],allowedGroups:p.allowedGroups||[]})); setTimeout(()=>editProfile(id),60) }}];
     if(p.kids) items.push(
-      {icon:"⏱️",label:`${L("limit")}: ${p.limit?p.limit/60+" "+L("hr"):L("noLimit")}`,fn:()=>dialog(L("limit"),[0,60,120,180,240].map(m=>({label:m?m/60+" "+L("hr"):L("noLimit"),fn:()=>{updProfile(id,{limit:m});setTimeout(()=>editProfile(id),60)}})),{grid:5})},
+      {icon:"⏱️",label:`${L("limit")}: ${p.limit?(p.limit%60?p.limit+" "+L("min"):p.limit/60+" "+L("hr")):L("noLimit")}`,fn:()=>dialog(L("limit"),[0,30,60,90,120,180,240].map(m=>({label:m?m/60+" "+L("hr"):L("noLimit"),fn:()=>{updProfile(id,{limit:m});setTimeout(()=>editProfile(id),60)}})),{grid:5})},
       {icon:"🌙",label:`${L("bedtime")}: ${p.bedFrom?`${p.bedFrom}:00 → ${p.bedTo||7}:00`:L("off")}`,fn:()=>dialog(L("bedtime"),[[0,0],[20,7],[21,7],[22,7],[23,8]].map(([a,b])=>({label:a?`${a}:00 → ${b}:00`:L("off"),fn:()=>{updProfile(id,{bedFrom:a,bedTo:b});setTimeout(()=>editProfile(id),60)}})),{grid:5})},
       {icon:"📦",label:`${L("allowedApps")} (${(p.allowedApps||[]).length})`,fn:()=>multiSelect(L("allowedApps"),apps.map(a=>({k:a.pkg,l:appName(a)})),id,"allowedApps")},
       {icon:"📺",label:`${L("allowedGroups")} (${(p.allowedGroups||[]).length})`,fn:()=>multiSelect(L("allowedGroups"),[...countries.map(c=>({k:"c:"+c.n,l:"🌍 "+c.label})),...groups.map(g=>({k:"g:"+g.n,l:g.n}))],id,"allowedGroups")});

@@ -40,6 +40,9 @@
             <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>
         </receiver>
         <receiver android:name=".RecService$Alarm" android:exported="false" />
+        <receiver android:name=".WakeReceiver" android:exported="true">
+            <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>
+        </receiver>
         <service android:name=".RecService" android:exported="false" android:foregroundServiceType="dataSync" />
         <service android:name=".NotifService" android:exported="true"
             android:label="TV Launcher notifications"
