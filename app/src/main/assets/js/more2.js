@@ -32,8 +32,8 @@ Object.assign(T.ar, {
   evHijri: "رأس السنة الهجرية",
   evMawlid: "المولد النبوي",
   evAshura: "عاشوراء",
-  days: "يوم",
-  today: "النهارده"
+  evDays: "يوم",
+  evToday: "النهارده"
 });
 Object.assign(T.en, {
   libRadio: "Live Quran radio",
@@ -49,8 +49,8 @@ Object.assign(T.en, {
   evHijri: "Islamic new year",
   evMawlid: "Mawlid",
   evAshura: "Ashura",
-  days: "days",
-  today: "Today"
+  evDays: "days",
+  evToday: "Today"
 });
 LIB_CATS.splice(1, 0, ["radio", "📻", null], ["kidsar", "🧸", 'mediatype:movies AND (title:(كرتون OR سبيستون OR "افلام كرتون" OR "مدبلج") OR subject:(كرتون OR سبيستون OR "spacetoon")) AND NOT title:(تريلر OR اعلان)']);
 LIBN.radio = "libRadio";
@@ -127,7 +127,7 @@ hwBody = function(w) {
     }
     const l = (evCache || []).slice(0, w.sz > 2 ? 4 : w.sz > 1 ? 3 : 1);
     if (!l.length) return `<div class="hwico">🌙</div>`;
-    return `<div class="hwml">${l.map((e) => `<div class="hwm"><span class="tn" style="text-align:start">${esc(L(e.k))}</span><b>${e.d ? e.d + " " + esc(L("days")) : esc(L("today"))}</b></div>`).join("")}</div>`;
+    return `<div class="hwml">${l.map((e) => `<div class="hwm"><span class="tn" style="text-align:start">${esc(L(e.k))}</span><b>${e.d ? e.d + " " + esc(L("evDays")) : esc(L("evToday"))}</b></div>`).join("")}</div>`;
   }
   if (w.t === "azkarA") {
     const h = (/* @__PURE__ */ new Date()).getHours(), m = h < 15;

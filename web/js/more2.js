@@ -1,8 +1,8 @@
 // ================= Quran radio, Arabic cartoons, Islamic events countdown, morning/evening azkar =================
 Object.assign(T.ar,{libRadio:"إذاعات القرآن مباشر",libKidsAr:"كرتون عربي",hwEvents:"المناسبات الجاية",hwAzkarA:"أذكار الصباح والمساء",azM:"أذكار الصباح",azE:"أذكار المساء",
-  evRamadan:"رمضان",evEidF:"عيد الفطر",evArafa:"يوم عرفة",evEidA:"عيد الأضحى",evHijri:"رأس السنة الهجرية",evMawlid:"المولد النبوي",evAshura:"عاشوراء",days:"يوم",today:"النهارده"});
+  evRamadan:"رمضان",evEidF:"عيد الفطر",evArafa:"يوم عرفة",evEidA:"عيد الأضحى",evHijri:"رأس السنة الهجرية",evMawlid:"المولد النبوي",evAshura:"عاشوراء",evDays:"يوم",evToday:"النهارده"});
 Object.assign(T.en,{libRadio:"Live Quran radio",libKidsAr:"Arabic cartoons",hwEvents:"Upcoming occasions",hwAzkarA:"Morning & evening azkar",azM:"Morning azkar",azE:"Evening azkar",
-  evRamadan:"Ramadan",evEidF:"Eid al-Fitr",evArafa:"Arafah day",evEidA:"Eid al-Adha",evHijri:"Islamic new year",evMawlid:"Mawlid",evAshura:"Ashura",days:"days",today:"Today"});
+  evRamadan:"Ramadan",evEidF:"Eid al-Fitr",evArafa:"Arafah day",evEidA:"Eid al-Adha",evHijri:"Islamic new year",evMawlid:"Mawlid",evAshura:"Ashura",evDays:"days",evToday:"Today"});
 
 // ---- 1) live Quran radio stations (mp3quran.net)
 LIB_CATS.splice(1,0,["radio","📻",null],["kidsar","🧸",'mediatype:movies AND (title:(كرتون OR سبيستون OR "افلام كرتون" OR "مدبلج") OR subject:(كرتون OR سبيستون OR "spacetoon")) AND NOT title:(تريلر OR اعلان)']);
@@ -33,7 +33,7 @@ HW_TYPES.push(["events","🌙","hwEvents"],["azkarA","🌅","hwAzkarA"]);
 const _hwBodyE=hwBody; hwBody=function(w){
   if(w.t==="events"){ const today=Math.floor(Date.now()/86400000); if(evDay!==today){ evCache=nextEvents(4); evDay=today }
     const l=(evCache||[]).slice(0,w.sz>2?4:w.sz>1?3:1); if(!l.length) return `<div class="hwico">🌙</div>`;
-    return `<div class="hwml">${l.map(e=>`<div class="hwm"><span class="tn" style="text-align:start">${esc(L(e.k))}</span><b>${e.d?e.d+" "+esc(L("days")):esc(L("today"))}</b></div>`).join("")}</div>` }
+    return `<div class="hwml">${l.map(e=>`<div class="hwm"><span class="tn" style="text-align:start">${esc(L(e.k))}</span><b>${e.d?e.d+" "+esc(L("evDays")):esc(L("evToday"))}</b></div>`).join("")}</div>` }
   if(w.t==="azkarA"){ const h=new Date().getHours(), m=h<15; return `<div class="hwico">${m?"🌅":"🌇"}</div><div class="hwsub">${esc(L(m?"azM":"azE"))}</div><div class="hwsub dim">OK ▶</div>` }
   return _hwBodyE(w) };
 // ---- 3) widget: play morning/evening azkar (audio from the open archive)

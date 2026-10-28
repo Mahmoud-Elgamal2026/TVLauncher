@@ -707,3 +707,12 @@ html[dir=rtl].nofg .hwtools > * + *{margin-right:.8vw}
 body.hwedit .hw{outline:.3vh dashed rgba(255,255,255,.5);outline-offset:.4vh}
 .hw.grabbed{outline:.5vh solid #ffd54a!important;transform:scale(1.08) rotate(-1deg)!important;box-shadow:0 2vh 5vh rgba(0,0,0,.7)!important}
 .lbchips{flex-wrap:wrap;gap:.8vw;padding:1vh 1vw}
+/* simple home: compact header, widgets on a clean 4-column grid that fills the row */
+body.simple #shelf{height:auto!important;min-height:0;padding:0 1vw .5vh}
+body.simple #shelfTitle{font-size:3.4vh!important}body.simple #shelfSub{display:none}
+.hwboard{padding:.6vh 1vw 1.6vh;gap:1.2vw;justify-content:flex-start;box-sizing:border-box;width:100%}
+.hw{height:22vh}
+.hw.sz1{width:calc(25% - .9vw)}
+.hw.sz2{width:calc(50% - .6vw)}
+.hw.sz3{width:calc(75% - .3vw)}
+.hwboard .hw.hwadd{height:22vh}
