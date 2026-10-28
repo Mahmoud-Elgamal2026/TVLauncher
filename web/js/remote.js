@@ -96,7 +96,7 @@ window.onUpdateProgress=p=>{
   else if(p===100) banner("✅",L("updReady"));
   else if(p%25===0&&p>0) banner("⬇️",L("updDownloading"),p+"%",2500);
 };
-setInterval(()=>{ if(S.autoUpdate&&Date.now()-store.get("lastUpdCheck",0)>12*3600000) checkUpdates(false) },10*60000);
+setInterval(()=>{ if(S.autoUpdate&&Date.now()-store.get("lastUpdCheck",0)>3600000) checkUpdates(false) },5*60000); setTimeout(()=>{ if(S.autoUpdate) checkUpdates(false) },60000);
 
 // ================= sleep: really turn the screen off when the helper is on =================
 const _setSleep=setSleep;

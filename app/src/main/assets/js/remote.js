@@ -230,8 +230,11 @@ window.onUpdateProgress = (p) => {
   else if (p % 25 === 0 && p > 0) banner("⬇️", L("updDownloading"), p + "%", 2500);
 };
 setInterval(() => {
-  if (S.autoUpdate && Date.now() - store.get("lastUpdCheck", 0) > 12 * 36e5) checkUpdates(false);
-}, 10 * 6e4);
+  if (S.autoUpdate && Date.now() - store.get("lastUpdCheck", 0) > 36e5) checkUpdates(false);
+}, 5 * 6e4);
+setTimeout(() => {
+  if (S.autoUpdate) checkUpdates(false);
+}, 6e4);
 const _setSleep = setSleep;
 setSleep = function(m) {
   _setSleep(m);
