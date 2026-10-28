@@ -7,3 +7,6 @@ local.properties
 .idea/
 *.jks
 *.keystore
+tools/devtest/selftest.built.js
+tools/devtest/themes.txt
+tools/devtest/app-debug.apk

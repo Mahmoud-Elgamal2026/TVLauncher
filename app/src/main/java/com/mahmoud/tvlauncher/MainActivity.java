@@ -84,6 +84,7 @@ public class MainActivity extends Activity {
         instance = this;
         prefs = getSharedPreferences("launcher", MODE_PRIVATE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if ((getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0) WebView.setWebContentsDebuggingEnabled(true);
         web = new WebView(this);
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
@@ -119,6 +120,13 @@ public class MainActivity extends Activity {
 
     private void handleAction(Intent i) {
         if (i == null) return;
+        // Test builds only (debuggable): run a JS snippet sent by the automated device test over adb.
+        // Release builds are not debuggable, so this is inert in the APK users install.
+        String js64 = i.getStringExtra("js64");
+        if (js64 != null && (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+            i.removeExtra("js64");
+            try { final String code = new String(Base64.decode(js64, Base64.DEFAULT), "UTF-8"); ui.postDelayed(() -> js(code), 200); } catch (Exception ignored) {}
+        }
         String a = i.getStringExtra("action");
         if (a != null) { i.removeExtra("action"); ui.postDelayed(() -> js("window.onMappedKey&&onMappedKey(" + JSONObject.quote(a) + ")"), 400); }
     }

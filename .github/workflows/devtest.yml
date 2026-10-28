@@ -1,0 +1,51 @@
+name: Device test (Android 7.1 TV emulator)
+on:
+  push:
+    branches: [devtest]
+permissions:
+  contents: write
+jobs:
+  devtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm ci || npm install
+      - run: npm run build
+      - run: npx esbuild tools/devtest/selftest.js --target=chrome53 --outfile=tools/devtest/selftest.built.js
+      - run: node -e "const fs=require('fs');const s=fs.readFileSync('web/js/themes.js','utf8');const ids=[...s.matchAll(/\{id:\"([a-z0-9-]+)\"/g)].map(m=>m[1]);fs.writeFileSync('tools/devtest/themes.txt',ids.join('\n'))"
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.7' }
+      - name: Bundle Shizuku
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          url=$(curl -sfL -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/RikkaApps/Shizuku/releases/latest | python3 -c "import json,sys;a=[x['browser_download_url'] for x in json.load(sys.stdin)['assets'] if x['name'].endswith('.apk')];print(a[0] if a else '')")
+          if [ -n "$url" ]; then curl -sfL -o app/src/main/assets/shizuku.apk "$url"; fi
+      - run: gradle assembleDebug --no-daemon && cp app/build/outputs/apk/debug/app-debug.apk tools/devtest/
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - name: Run on Android 7.1 TV emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 25
+          target: android-tv
+          arch: x86
+          profile: tv_1080p
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: cd tools/devtest && bash run.sh
+      - run: cd tools/devtest && zip -r ../../devtest-${{ github.run_number }}.zip devtest-out
+        if: always()
+      - uses: softprops/action-gh-release@v2
+        if: always()
+        with:
+          tag_name: devtest-${{ github.run_number }}
+          name: Device test ${{ github.run_number }}
+          prerelease: true
+          files: devtest-${{ github.run_number }}.zip
