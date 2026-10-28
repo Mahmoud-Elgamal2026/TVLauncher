@@ -88,7 +88,7 @@ layers.unshift({test:()=>!!moving,key:e=>{
   if(k==="ArrowLeft") moving.x-=step; else if(k==="ArrowRight") moving.x+=step;
   else if(k==="ArrowUp") moving.y-=step; else if(k==="ArrowDown") moving.y+=step;
   else if(k==="1"||k==="-") moving.s=Math.max(.5,+(moving.s-.1).toFixed(2)); else if(k==="3"||k==="+") moving.s=Math.min(1.8,+(moving.s+.1).toFixed(2));
-  else if(k==="Enter"||k===" "){ held=true; endMove(true); return true }
+  else if(k==="Enter"||k===" "||e.keyCode===13||e.keyCode===23){ held=true; endMove(true); return true }
   else if(isBack(k)){ endMove(false); return true }
   else return true;
   moving.x=Math.max(-5,Math.min(98,moving.x)); moving.y=Math.max(0,Math.min(96,moving.y));
@@ -100,3 +100,6 @@ if(typeof ACTIONS==="function"){ const _AW=ACTIONS; ACTIONS=()=>_AW().concat([["
 const _lookSec=window.lifeSettings;
 window.widgetSettings=()=>sec("🧩 "+L("wEdit"),field(L("wEditSub"),`<div class="inline"><button class="btn pri f" id="wEditBtn">🧩 ${L("wEdit")}</button></div>`));
 setTimeout(applyWidgets,800);
+
+// Old TV WebViews turn the remote's OK button into a click instead of an Enter key: treat it as "save" while moving
+document.addEventListener("click",e=>{ if(!moving) return; e.preventDefault(); e.stopPropagation(); held=true; endMove(true) },true);

@@ -37,7 +37,8 @@
   await t("player-menu",async()=>{ playerMenu(); await wait(300); const n=$("dbox")._items.length; closeDialog(); return [n>3,n+" items (record="+$("dbox").innerHTML.indexOf("⏺")+")"] });
   await t("iptv-stop",async()=>{ stopPlayer(); await wait(300); return [!$("player").classList.contains("on"),"stopped"] });
   // ---- recording a public HLS stream for ~25s
-  await t("record",async()=>{ nat("recStart","https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8","SelfTest",1); await wait(25000); const st=JSON.parse(nat("recState")); const a=st.active[0]; if(a) nat("recStop",a.id); return [!!(a&&a.bytes>100000),a?(a.bytes+" bytes → "+a.file):"no active job "+JSON.stringify(st).slice(0,150)] },60000);
+  await t("record",async()=>{ nat("recStart","https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8","SelfTest",1); await wait(20000); const st=JSON.parse(nat("recState")); const a=st.active[0]; if(a) nat("recStop",a.id); await wait(1500);
+    const files=JSON.parse(await natAsync("listDir",st.dir)).filter(f=>/^SelfTest/.test(f.name)); const big=files.filter(f=>f.size>100000); return [big.length>0,big.length?big[0].name+" "+big[0].size+" bytes":"no file in "+st.dir] },60000);
   // ---- files
   await t("files-roots",async()=>{ const r=JSON.parse(nat("storageRoots")); return [r.length>0,r.map(x=>x.path).join(" ")] });
   await t("files-list",async()=>{ nat("askStorageAccess"); await wait(1500); try{ const l=JSON.parse(await natAsync("listDir","/sdcard")); return [true,l.length+" entries"] }catch(e){ return [null,"no storage permission on emulator: "+e.message] } });

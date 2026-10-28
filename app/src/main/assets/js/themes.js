@@ -191,6 +191,8 @@ ${b} #favRow .app .nm,${b} #recentRow .app .nm{font-size:1.5vh}
 ${b} #favRow .app .badge,${b} #recentRow .app .badge{display:none}
 ${b} #favRow .app.f.focus,${b} #recentRow .app.f.focus{transform:scale(1.12);box-shadow:0 0 0 .35vh #fff,0 1.2vh 2.6vh rgba(0,0,0,.6)}
 ${b} #shelfTitle{font-weight:500}`;
+  if (t.classicAtv || t.vidaa || t.lay === "bar") c += `
+${b} .app.match{background:rgba(10,12,24,.55)!important;color:#fff}${b} .app.match *{color:#fff}`;
   if (t.classicAtv) c += `
 ${b} #shelfImg,${b} #shade{display:none}
 ${b} #shelf{height:3vh;padding:0}${b} #shelfTitle,${b} #shelfSub{display:none}
