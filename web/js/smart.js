@@ -129,8 +129,10 @@ const LIVE_OF={apple:"aurora",google:"glow",shield:"glow",bravia:"waves",tizen:"
   patchwall:"aurora",xbox:"glow",ps5:"waves",wmc:"waves",plex:"bokeh",kodi:"stars",classic:"aurora",light:"bokeh",neon:"aurora",startpage:"stars",dock:"waves",amoled:"stars",ramadan:"lanterns",vidaa:"aurora"};
 Object.assign(T.ar,{anAuto:"حسب الثيم (حي)",anGlow:"توهج",anLant:"فوانيس",liveWall:"حركة بطيئة للخلفية",autoClean:"تنضيف تلقائي من اللاج",cleaned:"اتنضف تلقائي"});
 Object.assign(T.en,{anAuto:"Per theme (live)",anGlow:"Glow",anLant:"Lanterns",liveWall:"Slow wallpaper motion",autoClean:"Auto-clean lag",cleaned:"Auto-cleaned"});
-DEF.liveWall=true; DEF.autoClean=true;
-const animOf=()=>{ const a=S.anim||"auto"; return a==="auto"?(LIVE_OF[S.theme]||"aurora"):a };
+DEF.liveWall=false; DEF.autoClean=true;
+// on weak boxes (fast mode) "auto" uses only the cheap effects; big moving gradients are skipped
+const CHEAP={stars:1,lanterns:1,off:1};
+const animOf=()=>{ const a=S.anim||"auto"; if(a!=="auto") return a; const x=LIVE_OF[S.theme]||"aurora"; return S.lite&&!CHEAP[x]?"stars":x };
 const _applyLookL=applyLook; applyLook=function(){ _applyLookL.apply(this,arguments); document.body.dataset.anim=animOf(); document.body.classList.toggle("livewall",!!S.liveWall) };
 AFTER.liveWall=applyLook; document.body.dataset.anim=animOf(); document.body.classList.toggle("livewall",!!S.liveWall);
 window.lifeSettings=function(){

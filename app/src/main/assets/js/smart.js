@@ -390,11 +390,14 @@ const LIVE_OF = {
 };
 Object.assign(T.ar, { anAuto: "حسب الثيم (حي)", anGlow: "توهج", anLant: "فوانيس", liveWall: "حركة بطيئة للخلفية", autoClean: "تنضيف تلقائي من اللاج", cleaned: "اتنضف تلقائي" });
 Object.assign(T.en, { anAuto: "Per theme (live)", anGlow: "Glow", anLant: "Lanterns", liveWall: "Slow wallpaper motion", autoClean: "Auto-clean lag", cleaned: "Auto-cleaned" });
-DEF.liveWall = true;
+DEF.liveWall = false;
 DEF.autoClean = true;
+const CHEAP = { stars: 1, lanterns: 1, off: 1 };
 const animOf = () => {
   const a = S.anim || "auto";
-  return a === "auto" ? LIVE_OF[S.theme] || "aurora" : a;
+  if (a !== "auto") return a;
+  const x = LIVE_OF[S.theme] || "aurora";
+  return S.lite && !CHEAP[x] ? "stars" : x;
 };
 const _applyLookL = applyLook;
 applyLook = function() {
