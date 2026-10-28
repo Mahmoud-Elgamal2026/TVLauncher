@@ -275,7 +275,7 @@ renderLib = function() {
         $("libCats").innerHTML = "";
         return libMsg("🔒 " + L("kidsLibOff") + ` (${S.kidsLibFrom}:00 – ${S.kidsLibTo}:00)`);
       }
-      if (libCat !== "quran" && libCat !== "cartoon") libCat = "cartoon";
+      if (libCat !== "quran" && libCat !== "cartoon" && libCat !== "kidsar") libCat = "cartoon";
     }
     return _renderLibM.apply(this, arguments);
   });

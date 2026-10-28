@@ -82,7 +82,7 @@ const _libCatsM=libCatsHtml; libCatsHtml=function(){ if(!isKids()) return _libCa
   return LIB_CATS.filter(c=>c[0]==="quran"||c[0]==="cartoon").map(c=>`<div class="it f${c[0]===libCat?" on":""}" tabindex="0" data-libcat="${c[0]}">${c[1]} ${esc(L(LIBN[c[0]]))}</div>`).join("") };
 const _renderLibM=renderLib; renderLib=async function(){
   if(isKids()){ const hr=new Date().getHours(); if(hr<+S.kidsLibFrom||hr>=+S.kidsLibTo){ $("libCats").innerHTML=""; return libMsg("🔒 "+L("kidsLibOff")+` (${S.kidsLibFrom}:00 – ${S.kidsLibTo}:00)`) }
-    if(libCat!=="quran"&&libCat!=="cartoon") libCat="cartoon" }
+    if(libCat!=="quran"&&libCat!=="cartoon"&&libCat!=="kidsar") libCat="cartoon" }
   return _renderLibM.apply(this,arguments) };
 
 // settings + home hook
