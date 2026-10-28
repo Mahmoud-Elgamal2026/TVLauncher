@@ -2,7 +2,10 @@
 Object.assign(DEF,{hijri:true,hijriAdj:0,ramadan:"auto",radio:null});
 
 // ================= Hijri date =================
+const hijriMemo={};
 function hijriParts(d){
+  const mk=d.toDateString()+"|"+(S.hijriAdj||0)+"|"+S.lang; if(hijriMemo[mk]!==undefined) return hijriMemo[mk]; const r=hijriParts0(d); hijriMemo[mk]=r; return r }
+function hijriParts0(d){
   d=new Date(d.getTime()+(+S.hijriAdj||0)*86400000);
   for(const cal of ["islamic-umalqura","islamic"]){
     try{ const loc=(S.lang==="ar"?"ar-EG":"en")+"-u-ca-"+cal+"-nu-latn";

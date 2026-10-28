@@ -260,14 +260,25 @@ tickers.push(() => {
   });
 });
 let sportsTried = false;
+const hwTry = {};
 function hwNeed() {
   if (hwHas("matches") && !sportsTried) {
     sportsTried = true;
     S.sportsOn = true;
     loadSports().then(() => renderHW());
   }
-  if (hwHas("weather") && !weatherNow && typeof weather === "function") setTimeout(weather, 500);
-  if (hwHas("weather") && typeof loadForecast === "function" && typeof forecast !== "undefined" && !forecast.length) setTimeout(() => loadForecast().then(() => renderHW()), 1500);
+  const now = Date.now();
+  if (hwHas("weather") && !weatherNow && typeof weather === "function" && now - (hwTry.w || 0) > 6e5) {
+    hwTry.w = now;
+    setTimeout(weather, 500);
+  }
+  if (hwHas("weather") && typeof loadForecast === "function" && typeof forecast !== "undefined" && !forecast.length && now - (hwTry.f || 0) > 6e5) {
+    hwTry.f = now;
+    setTimeout(() => loadForecast().then(() => {
+      if (forecast.length) renderHW();
+    }, () => {
+    }), 1500);
+  }
   if (hwHas("prayer") && !S.prayerOn) {
     S.prayerOn = true;
     if (typeof computePrayers === "function") computePrayers();

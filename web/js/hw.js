@@ -87,11 +87,13 @@ tickers.push(()=>{ if(!document.querySelector("#home.on")||on("frame")||on("dlg"
   hwList().forEach(w=>{ if(w.t==="yt"||w.t==="note") return; if(w.t==="weather"&&hwTickN%6) return; if(w.t==="matches"&&hwTickN%12) return;
     const e=document.querySelector(`#hwBoard [data-hw="${w.id}"] .hwb`); if(e){ const html=hwBody(w); if(e.innerHTML!==html) e.innerHTML=html } }) });
 // data each widget needs, fetched only when that widget is on the board
-let sportsTried=false;
+let sportsTried=false; const hwTry={};
 function hwNeed(){
   if(hwHas("matches")&&!sportsTried){ sportsTried=true; S.sportsOn=true; loadSports().then(()=>renderHW()) }
-  if(hwHas("weather")&&!weatherNow&&typeof weather==="function") setTimeout(weather,500);
-  if(hwHas("weather")&&typeof loadForecast==="function"&&typeof forecast!=="undefined"&&!forecast.length) setTimeout(()=>loadForecast().then(()=>renderHW()),1500);
+  const now=Date.now();
+  // each source is tried at most once every 10 minutes (no retry loop when offline)
+  if(hwHas("weather")&&!weatherNow&&typeof weather==="function"&&now-(hwTry.w||0)>600000){ hwTry.w=now; setTimeout(weather,500) }
+  if(hwHas("weather")&&typeof loadForecast==="function"&&typeof forecast!=="undefined"&&!forecast.length&&now-(hwTry.f||0)>600000){ hwTry.f=now; setTimeout(()=>loadForecast().then(()=>{ if(forecast.length) renderHW() },()=>{}),1500) }
   if(hwHas("prayer")&&!S.prayerOn){ S.prayerOn=true; if(typeof computePrayers==="function") computePrayers() }
   if(hwHas("yt")) ytLoad(false);
 }

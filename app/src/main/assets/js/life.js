@@ -20,7 +20,15 @@ var __async = (__this, __arguments, generator) => {
   });
 };
 Object.assign(DEF, { hijri: true, hijriAdj: 0, ramadan: "auto", radio: null });
+const hijriMemo = {};
 function hijriParts(d) {
+  const mk = d.toDateString() + "|" + (S.hijriAdj || 0) + "|" + S.lang;
+  if (hijriMemo[mk] !== void 0) return hijriMemo[mk];
+  const r = hijriParts0(d);
+  hijriMemo[mk] = r;
+  return r;
+}
+function hijriParts0(d) {
   d = new Date(d.getTime() + (+S.hijriAdj || 0) * 864e5);
   for (const cal of ["islamic-umalqura", "islamic"]) {
     try {
