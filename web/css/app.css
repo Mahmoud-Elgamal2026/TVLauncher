@@ -654,3 +654,4 @@ body[data-hpage="1"] #home .scroll > #folderRow{display:flex!important}
 /* medium widgets are a third of the row: tighter content */
 .hw.sz2 .hwpt{gap:.4vw}.hw.sz2 .hwpt span{padding:.3vh .35vw;font-size:1.25vh}.hw.sz2 .hwpt b{font-size:1.5vh}
 .hw.sz2 .hwbig{font-size:4.6vh}
+body:not(.showadv) #setScroll .sec.advsec{display:none!important}

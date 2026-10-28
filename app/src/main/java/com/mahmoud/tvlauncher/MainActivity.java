@@ -185,6 +185,8 @@ public class MainActivity extends Activity {
     }
 
     /** Key learning (for remote-button mapping) and mapped buttons, before the WebView sees them. */
+    private final Runnable okHold = () -> { if (!okLong) { okLong = true; js("window.onLongOk&&onLongOk()"); } };
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
         int c = e.getKeyCode();
@@ -193,9 +195,11 @@ public class MainActivity extends Activity {
         if ((c == KeyEvent.KEYCODE_DPAD_CENTER || c == KeyEvent.KEYCODE_ENTER || c == KeyEvent.KEYCODE_NUMPAD_ENTER)
                 && !typingText) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
-                if (e.getRepeatCount() == 0) okLong = false;
-                else if (!okLong) { okLong = true; js("window.onLongOk&&onLongOk()"); }
+                // hold = 450 ms by our own clock (many TV remotes send their first repeat late, which made the menu feel slow)
+                if (e.getRepeatCount() == 0) { okLong = false; ui.removeCallbacks(okHold); ui.postDelayed(okHold, 450); }
+                else if (!okLong) { ui.removeCallbacks(okHold); okLong = true; js("window.onLongOk&&onLongOk()"); }
             } else if (e.getAction() == KeyEvent.ACTION_UP) {
+                ui.removeCallbacks(okHold);
                 if (!okLong) js("window.onShortOk&&onShortOk()");
                 okLong = false;
             }
