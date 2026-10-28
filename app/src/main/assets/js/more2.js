@@ -89,10 +89,22 @@ libCatsHtml = function() {
   return h + `<div class="it f${libCat === "kidsar" ? " on" : ""}" tabindex="0" data-libcat="kidsar">🧸 ${esc(L("libKidsAr"))}</div>`;
 };
 const EVENTS = [[9, 1, "evRamadan"], [10, 1, "evEidF"], [12, 9, "evArafa"], [12, 10, "evEidA"], [1, 1, "evHijri"], [1, 10, "evAshura"], [3, 12, "evMawlid"]];
+let hijFmt = null;
+function hijMD(dt) {
+  try {
+    if (!hijFmt) hijFmt = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura-nu-latn", { month: "numeric", day: "numeric" });
+    const p = hijFmt.format(new Date(dt.getTime() + (+S.hijriAdj || 0) * 864e5)).match(/(\d+)\D+(\d+)/);
+    return p ? { month: +p[1], day: +p[2] } : null;
+  } catch (e) {
+    return null;
+  }
+}
 function nextEvents(n) {
+  const today = (/* @__PURE__ */ new Date()).toDateString();
+  if (S.evC && S.evC.d === today) return S.evC.l;
   const out = [], seen = {};
   for (let d = 0; d < 400 && out.length < n; d++) {
-    const dt = new Date(Date.now() + d * 864e5), h = hijriParts(dt);
+    const dt = new Date(Date.now() + d * 864e5), h = hijMD(dt);
     if (!h) break;
     const e = EVENTS.find((x) => x[0] === h.month && x[1] === h.day);
     if (e && !seen[e[2]]) {
@@ -100,6 +112,7 @@ function nextEvents(n) {
       out.push({ k: e[2], d });
     }
   }
+  S.evC = { d: today, l: out };
   return out;
 }
 let evCache = null, evDay = -1;

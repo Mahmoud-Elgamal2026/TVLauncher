@@ -21,10 +21,13 @@ const _libCatsK=libCatsHtml; libCatsHtml=function(){ const h=_libCatsK(); if(!is
 
 // ---- 2) widget: countdown to the next Islamic occasions
 const EVENTS=[[9,1,"evRamadan"],[10,1,"evEidF"],[12,9,"evArafa"],[12,10,"evEidA"],[1,1,"evHijri"],[1,10,"evAshura"],[3,12,"evMawlid"]];
-function nextEvents(n){ const out=[], seen={};
-  for(let d=0;d<400&&out.length<n;d++){ const dt=new Date(Date.now()+d*86400000), h=hijriParts(dt); if(!h) break;
+let hijFmt=null;
+function hijMD(dt){ try{ if(!hijFmt) hijFmt=new Intl.DateTimeFormat("en-u-ca-islamic-umalqura-nu-latn",{month:"numeric",day:"numeric"});
+  const p=hijFmt.format(new Date(dt.getTime()+(+S.hijriAdj||0)*86400000)).match(/(\d+)\D+(\d+)/); return p?{month:+p[1],day:+p[2]}:null }catch(e){ return null } }
+function nextEvents(n){ const today=new Date().toDateString(); if(S.evC&&S.evC.d===today) return S.evC.l; const out=[], seen={};
+  for(let d=0;d<400&&out.length<n;d++){ const dt=new Date(Date.now()+d*86400000), h=hijMD(dt); if(!h) break;
     const e=EVENTS.find(x=>x[0]===h.month&&x[1]===h.day); if(e&&!seen[e[2]]){ seen[e[2]]=1; out.push({k:e[2],d}) } }
-  return out }
+  S.evC={d:today,l:out}; return out }
 let evCache=null, evDay=-1;
 HW_TYPES.push(["events","🌙","hwEvents"],["azkarA","🌅","hwAzkarA"]);
 const _hwBodyE=hwBody; hwBody=function(w){

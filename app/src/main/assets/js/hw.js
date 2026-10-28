@@ -245,8 +245,9 @@ function renderHW() {
 }
 let hwTickN = 0;
 tickers.push(() => {
-  if (!document.querySelector("#home.on") || on("frame")) return;
+  if (!document.querySelector("#home.on") || on("frame") || on("dlg") || on("player")) return;
   hwTickN++;
+  if (hwTickN % 2) return;
   hwList().forEach((w) => {
     if (w.t === "yt" || w.t === "note") return;
     if (w.t === "weather" && hwTickN % 6) return;

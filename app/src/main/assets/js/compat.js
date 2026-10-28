@@ -128,6 +128,8 @@
     d.addEventListener("DOMContentLoaded", function() {
       new MutationObserver(function(ms) {
         for (var i = 0; i < ms.length; i++) {
+          var tg = ms[i].target;
+          if (tg && tg.closest && tg.closest("#hwBoard,#banners,#ticker,#fwBox,#ramCard,#shelf,.hwb")) continue;
           var a = ms[i].addedNodes;
           for (var j = 0; j < a.length; j++) if (a[j].nodeType === 1 && a[j].tagName !== "IMG" && a[j].tagName !== "SPAN" && a[j].tagName !== "B") {
             later();

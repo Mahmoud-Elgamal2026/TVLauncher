@@ -49,7 +49,7 @@
     w.__fixAspect=later;
     d.addEventListener("DOMContentLoaded",function(){
       // only re-measure when cards are added/removed or the look changes — not on every focus move
-      new MutationObserver(function(ms){ for(var i=0;i<ms.length;i++){ var a=ms[i].addedNodes; for(var j=0;j<a.length;j++) if(a[j].nodeType===1&&a[j].tagName!=="IMG"&&a[j].tagName!=="SPAN"&&a[j].tagName!=="B"){ later(); return } } }).observe(d.body,{childList:true,subtree:true});
+      new MutationObserver(function(ms){ for(var i=0;i<ms.length;i++){ var tg=ms[i].target; if(tg&&tg.closest&&tg.closest("#hwBoard,#banners,#ticker,#fwBox,#ramCard,#shelf,.hwb")) continue; var a=ms[i].addedNodes; for(var j=0;j<a.length;j++) if(a[j].nodeType===1&&a[j].tagName!=="IMG"&&a[j].tagName!=="SPAN"&&a[j].tagName!=="B"){ later(); return } } }).observe(d.body,{childList:true,subtree:true});
       new MutationObserver(later).observe(d.body,{attributes:true,attributeFilter:["data-theme","data-size","data-page","data-lay","data-wshape","data-wsize","data-wview"]});
       w.addEventListener("resize",later); later();
     });
