@@ -9,6 +9,8 @@ adb install -r -g app-debug.apk || adb install -r app-debug.apk
 adb shell pm grant $PKG android.permission.READ_EXTERNAL_STORAGE 2>/dev/null; adb shell pm grant $PKG android.permission.WRITE_EXTERNAL_STORAGE 2>/dev/null
 adb shell dumpsys package com.google.android.webview | grep -m1 versionName > $OUT/webview.txt; adb shell dumpsys package com.android.webview | grep -m1 versionName >> $OUT/webview.txt
 adb logcat -c
+adb logcat -v brief chromium:I AndroidRuntime:E ActivityManager:W '*:S' > $OUT/logcat_full.txt 2>/dev/null &
+LOGPID=$!
 adb shell am start -n $PKG/.MainActivity
 sleep 25
 adb exec-out screencap -p > $OUT/shots/00-first-start.png
@@ -93,7 +95,7 @@ for i in $(seq 1 60); do sleep 5; adb logcat -d -s chromium:I | grep -q "TVL|don
 shot 40-after-selftest
 js "showPage('tv');renderGroups&&renderGroups();focus(document.querySelector('#channels .f')||document.querySelector('#groups .f'))" 3; shot 41-iptv-channels
 key DPAD_CENTER; sleep 12; shot 42-iptv-playing; key BACK; sleep 1
-adb logcat -d -s chromium:* AndroidRuntime:E ActivityManager:W > $OUT/logcat.txt
+kill $LOGPID 2>/dev/null; sleep 1; cp $OUT/logcat_full.txt $OUT/logcat.txt
 grep -o 'TVL|[^"]*' $OUT/logcat.txt | sed 's/", source.*//' > $OUT/results.txt; cat $OUT/extra.txt >> $OUT/results.txt 2>/dev/null
 grep -E 'Uncaught|FATAL|TypeError|ReferenceError|SyntaxError' $OUT/logcat.txt > $OUT/errors.txt
 cat $OUT/results.txt; echo ERRORS; cat $OUT/errors.txt | head -40
