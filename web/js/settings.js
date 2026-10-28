@@ -27,8 +27,9 @@ function renderSettings(){
     field(L("frameStyle"),seg("frameStyle",[["gallery",L("fsGallery")],["art",L("fsArt")],["clock",L("fsClock")]]))+
     field(L("frameSrc"),seg("frameSrc",[["mine",`${L("srcMine")} (${S.frames.length})`],["online",L("srcOnline")],["grad",L("srcGrad")]]).replace(/<\/div>$/,
       `<button class="btn f" id="addPhotos">➕ ${L("addPhotos")}</button>${S.frames.length?`<button class="btn f" id="clearPhotos">🗑 ${L("remove")} (${S.frames.length})</button>`:""}</div>`))+
-    field(L("frameEvery"),seg("frameEvery",[[1,"1 "+L("min")],[5,"5 "+L("min")],[15,"15 "+L("min")],[30,"30 "+L("min")]]))+
-    field(L("frameWidgets"),`<div class="inline">${[["clock","wClock"],["weather","wWeather"],["prayer","wPrayer"],["match","wMatch"]].map(([k,l])=>`<button class="btn f${S.fw[k]?" pri":""}" data-tog="fw:${k}">${L(l)}</button>`).join("")}</div>`))+
+    field(L("frameEvery"),seg("frameSec",[[15,"15 "+L("sec")],[30,"30 "+L("sec")],[60,"1 "+L("min")],[300,"5 "+L("min")]]))+
+    (S.frameSrc==="online"?field(L("fCat"),seg("frameCat",[["bing","🌍 "+L("fcBing")],["nature","🌳 "+L("wNature")],["space","🌌 "+L("wSpace")],["islamic architecture","🕌 "+L("wMosque")],["city","🏙 "+L("wCity")],["ocean","🌊 "+L("wSea")]])):"")+
+    field(L("frameWidgets"),`<div class="inline"><button class="btn pri f" id="fwEditBtn">🧩 ${L("fwEdit")}</button></div>`))+
   sec(L("sWeather"),field(L("city"),inputRow("cityInp",S.city,"Cairo","citySave")))+
   sec(L("sPrayer"),
     field(L("prayerOn"),onoff("prayerOn"))+(pr?field("",`<div class="inline">${pr}</div>`):"")+

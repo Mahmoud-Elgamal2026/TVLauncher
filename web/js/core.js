@@ -286,3 +286,9 @@ window.addEventListener("error",e=>console.log("err",e.message));
 
 // called by Android when OK is held down (works on every WebView, including ones that turn OK into a click)
 window.onLongOk=function(){ clearTimeout(holdTimer); held=true; downOn=null; if(on("dlg")) return; if(focused&&hasOptions(focused)) openOptions(focused) };
+
+// short OK press from Android: replay it as a normal Enter press so every screen (dialogs, player, frame, typing) behaves as before
+window.onShortOk=function(){ const a=document.activeElement; const tgt=a&&a.tagName==="INPUT"?a:document;
+  tgt.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true})); tgt.dispatchEvent(new KeyboardEvent("keyup",{key:"Enter",bubbles:true})) };
+document.addEventListener("focusin",e=>{ if(e.target&&e.target.tagName==="INPUT") nat("setTyping",true) });
+document.addEventListener("focusout",e=>{ if(e.target&&e.target.tagName==="INPUT") nat("setTyping",false) });

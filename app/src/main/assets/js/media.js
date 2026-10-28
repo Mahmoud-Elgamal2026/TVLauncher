@@ -589,15 +589,26 @@ activators.push((el) => {
   return false;
 });
 const FREE_PACKS = [
-  ["eg", "🇪🇬", { ar: "قنوات مصر", en: "Egypt" }, "countries/eg.m3u"],
-  ["ara", "🌍", { ar: "قنوات عربية", en: "Arabic channels" }, "languages/ara.m3u"],
+  ["world", "🌍", { ar: "قنوات عالمية مختارة (Free-TV)", en: "World picks (Free-TV)" }, "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8"],
+  ["eg", "🇪🇬", { ar: "مصر", en: "Egypt" }, "countries/eg.m3u"],
+  ["ara", "🕌", { ar: "كل القنوات العربية", en: "All Arabic" }, "languages/ara.m3u"],
   ["sa", "🇸🇦", { ar: "السعودية", en: "Saudi Arabia" }, "countries/sa.m3u"],
   ["ae", "🇦🇪", { ar: "الإمارات", en: "UAE" }, "countries/ae.m3u"],
-  ["rel", "🕌", { ar: "قنوات دينية", en: "Religious" }, "categories/religious.m3u"],
-  ["kids", "🧸", { ar: "أطفال", en: "Kids" }, "categories/kids.m3u"]
+  ["news", "📰", { ar: "أخبار عالمية", en: "World news" }, "categories/news.m3u"],
+  ["sports", "⚽", { ar: "رياضة", en: "Sports" }, "categories/sports.m3u"],
+  ["movies", "🎬", { ar: "أفلام", en: "Movies" }, "categories/movies.m3u"],
+  ["series", "📺", { ar: "مسلسلات", en: "Series" }, "categories/series.m3u"],
+  ["docu", "🌋", { ar: "وثائقي", en: "Documentary" }, "categories/documentary.m3u"],
+  ["music", "🎵", { ar: "موسيقى", en: "Music" }, "categories/music.m3u"],
+  ["kids", "🧸", { ar: "أطفال", en: "Kids" }, "categories/kids.m3u"],
+  ["rel", "📿", { ar: "قنوات دينية", en: "Religious" }, "categories/religious.m3u"],
+  ["en", "🇬🇧", { ar: "قنوات إنجليزي", en: "English" }, "languages/eng.m3u"]
 ];
+const packUrl = (p) => /^https?:/.test(p[3]) ? p[3] : "https://iptv-org.github.io/iptv/" + p[3];
 MT.ar.freeTitle = "مفيش اشتراك IPTV؟ ضيف قنوات مجانية بضغطة";
 MT.en.freeTitle = "No IPTV subscription? Add free channels in one press";
+MT.ar.freePacks = "قنوات مجانية جاهزة";
+MT.en.freePacks = "Ready-made free channels";
 MT.ar.freeNote = "قنوات مجانية متاحة للعامة من مشروع iptv-org — مش كلها شغالة طول الوقت، واللانشر بيعلّم على الواقفة";
 MT.en.freeNote = "Free public channels from the iptv-org project — not all are always up; the launcher marks dead ones";
 MT.ar.freeAdded = "اتضافت";
@@ -607,7 +618,7 @@ MT.en.ownList = "or add your own subscription in Settings";
 Object.keys(MT).forEach((l) => Object.assign(T[l], MT[l]));
 function freePackHtml() {
   return `<div class="freebox"><div class="sec"><h3>📺 ${esc(L("freeTitle"))}</h3><div class="inline">${FREE_PACKS.map((p) => {
-    const on2 = S.lists.some((l) => l.url && l.url.indexOf(p[3]) >= 0);
+    const on2 = S.lists.some((l) => l.url === packUrl(p));
     return `<button class="btn f${on2 ? " pri" : ""}" data-freepack="${p[0]}">${p[1]} ${esc(p[2][S.lang] || p[2].en)}${on2 ? " ✓" : ""}</button>`;
   }).join("")}</div><div class="sub" style="margin-top:1.2vh">${esc(L("freeNote"))}</div>
   <div class="inline" style="margin-top:1.2vh"><button class="btn f" id="ownList">⚙️ ${esc(L("ownList"))}</button></div></div></div>`;
@@ -623,7 +634,16 @@ activators.push((el) => {
   if (el.dataset.freepack) {
     const p = FREE_PACKS.find((x) => x[0] === el.dataset.freepack);
     if (!p) return true;
-    const url = "https://iptv-org.github.io/iptv/" + p[3];
+    const url = packUrl(p);
+    if (S.lists.some((x) => x.url === url)) {
+      S.lists = S.lists.filter((x) => x.url !== url);
+      banner("📺", "−", p[2][S.lang] || p[2].en, 2e3);
+      loadLists().then(() => {
+        renderGroups();
+        if ($("settings").classList.contains("on")) renderSettings();
+      });
+      return true;
+    }
     const l = S.lists;
     if (!l.some((x) => x.url === url)) {
       l.push({ name: p[1] + " " + (p[2][S.lang] || p[2].en), url });
@@ -736,4 +756,8 @@ tgCmd = function(t) {
   if (!a) return tgt("nf");
   closeOne(a.pkg);
   return "✖ " + appName(a);
+};
+const _mediaSettingsF = window.mediaSettings;
+window.mediaSettings = function() {
+  return sec("📺 " + L("freePacks"), freePackHtml().replace(/<\/?div class="freebox">/g, "").replace(/<div class="sec"><h3>[^<]*<\/h3>/, "<div>")) + _mediaSettingsF();
 };

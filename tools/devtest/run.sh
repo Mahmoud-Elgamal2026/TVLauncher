@@ -80,6 +80,12 @@ js "closeDialog();S.recent=[];showPage('apps');focus(document.querySelector('#ap
 adb shell input keyevent --longpress DPAD_CENTER; sleep 2; shot 46-longpress
 js "console.log('TVL|long-press|'+((on('dlg')&&!S.recent.length)?'PASS':'FAIL')+'|dialog='+on('dlg')+' launched='+S.recent.length)" 1
 key BACK
+# frame 2.0: real photos (Bing, cached at screen size) + widgets incl. device monitor
+js "closeDialog();S.frameSrc='online';S.frameCat='bing';S.frameLay={mon:{on:true},azkar:{on:true}};startFrame()" 20; shot 47-frame
+js "console.log('TVL|frame-photo|'+(/url\(/.test(document.getElementById('frameA').style.background+document.getElementById('frameB').style.background)&&/file:|http/.test(document.getElementById('frameA').style.background+document.getElementById('frameB').style.background)?'PASS':'FAIL')+'|'+(document.getElementById('frameA').style.background||document.getElementById('frameB').style.background).slice(0,90)+' mon='+document.getElementById('fw_mon').textContent.slice(0,60))" 1
+key BACK; sleep 1
+# settings categories with the remote
+js "showPage('settings');renderSettings();focus(document.querySelector('#setCats .it'))" 2; key DPAD_DOWN DPAD_DOWN; shot 48-settings-cats; key DPAD_LEFT; shot 49-settings-cat-open
 # full self-test (network, IPTV, recording, radio, files ...)
 adb push selftest.built.js /sdcard/Download/selftest.js
 js "var s=document.createElement('script');s.src='file:///sdcard/Download/selftest.js';s.onerror=function(){console.log('TVL|load-selftest|FAIL|script load error')};document.body.appendChild(s)" 5

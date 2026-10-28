@@ -74,6 +74,7 @@ public class MainActivity extends Activity {
     private SharedPreferences prefs;
     private TelegramBot tg;
     private boolean okLong = false;
+    private volatile boolean typingText = false;
     private WebView web;
     private final Map<String, String> iconCache = new HashMap<>();
     private final Handler ui = new Handler(Looper.getMainLooper());
@@ -173,13 +174,18 @@ public class MainActivity extends Activity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
         int c = e.getKeyCode();
-        // Long-press OK = options menu. Detected here because old WebViews turn OK into an instant click.
-        if (c == KeyEvent.KEYCODE_DPAD_CENTER || c == KeyEvent.KEYCODE_ENTER || c == KeyEvent.KEYCODE_NUMPAD_ENTER) {
+        // OK button: decided here (short press vs hold) because old WebViews turn OK into an instant click,
+        // which opened apps even when the user meant to hold for the options menu. On-screen keyboards pass through.
+        if ((c == KeyEvent.KEYCODE_DPAD_CENTER || c == KeyEvent.KEYCODE_ENTER || c == KeyEvent.KEYCODE_NUMPAD_ENTER)
+                && !typingText) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
-                if (e.getRepeatCount() == 0) { okLong = false; }
+                if (e.getRepeatCount() == 0) okLong = false;
                 else if (!okLong) { okLong = true; js("window.onLongOk&&onLongOk()"); }
-                if (okLong) return true;
-            } else if (e.getAction() == KeyEvent.ACTION_UP && okLong) { okLong = false; return true; }
+            } else if (e.getAction() == KeyEvent.ACTION_UP) {
+                if (!okLong) js("window.onShortOk&&onShortOk()");
+                okLong = false;
+            }
+            return true;
         }
         if (!isCoreKey(c)) {
             if (learningKey) {
@@ -600,6 +606,33 @@ public class MainActivity extends Activity {
             if (pkg == null || pkg.equals(getPackageName())) return false;
             try { ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).killBackgroundProcesses(pkg); return true; }
             catch (Throwable t) { return false; }
+        }
+
+
+        /** The page tells us while a text field has the keyboard, so OK/Enter reach it untouched. */
+        @JavascriptInterface
+        public void setTyping(boolean on) { typingText = on; }
+
+
+        /** Live numbers for the device monitor widget: CPU %, RAM, network bytes, free storage. */
+        @JavascriptInterface
+        public String monitor() {
+            JSONObject o = new JSONObject();
+            try {
+                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getMemoryInfo(mi);
+                o.put("ramUsed", mi.totalMem - mi.availMem).put("ramTotal", mi.totalMem);
+                o.put("rx", android.net.TrafficStats.getTotalRxBytes()).put("tx", android.net.TrafficStats.getTotalTxBytes());
+                StatFs st = new StatFs(Environment.getDataDirectory().getPath());
+                o.put("diskFree", st.getAvailableBytes()).put("diskTotal", st.getTotalBytes());
+                try (BufferedReader r = new BufferedReader(new java.io.FileReader("/proc/stat"))) {
+                    String[] p = r.readLine().trim().split("\\s+"); long idle = Long.parseLong(p[4]) + Long.parseLong(p[5]), tot = 0;
+                    for (int k = 1; k < p.length && k < 9; k++) tot += Long.parseLong(p[k]);
+                    o.put("cpuTot", tot).put("cpuIdle", idle);
+                } catch (Throwable ignored) {}
+                o.put("t", System.currentTimeMillis());
+            } catch (Throwable ignored) {}
+            return o.toString();
         }
 
         // ---------- start-up: resume last channel ----------

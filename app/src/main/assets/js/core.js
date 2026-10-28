@@ -670,3 +670,15 @@ window.onLongOk = function() {
   if (on("dlg")) return;
   if (focused && hasOptions(focused)) openOptions(focused);
 };
+window.onShortOk = function() {
+  const a = document.activeElement;
+  const tgt = a && a.tagName === "INPUT" ? a : document;
+  tgt.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  tgt.dispatchEvent(new KeyboardEvent("keyup", { key: "Enter", bubbles: true }));
+};
+document.addEventListener("focusin", (e) => {
+  if (e.target && e.target.tagName === "INPUT") nat("setTyping", true);
+});
+document.addEventListener("focusout", (e) => {
+  if (e.target && e.target.tagName === "INPUT") nat("setTyping", false);
+});
