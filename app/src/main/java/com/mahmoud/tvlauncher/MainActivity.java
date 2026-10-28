@@ -109,6 +109,7 @@ public class MainActivity extends Activity {
         remote = new RemoteServer(getAssets(), code, this::remoteCall);
         if (prefs.getBoolean("remoteOn", true)) remote.start();
         handleAction(getIntent());
+        ui.postDelayed(watchdog, 30000);
         try {
             rikka.shizuku.Shizuku.addRequestPermissionResultListener((reqCode, grant) -> js("window.onShizuku&&onShizuku()"));
             rikka.shizuku.Shizuku.addBinderReceivedListenerSticky(() -> js("window.onShizuku&&onShizuku()"));
@@ -194,6 +195,8 @@ public class MainActivity extends Activity {
             }
             return true;
         }
+        // Emergency exit: holding Back ~1.5 s restarts the interface (stops any stuck channel), whatever the page is doing
+        if (c == KeyEvent.KEYCODE_BACK && e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 20) { restartUi("back-hold"); return true; }
         if ((c == KeyEvent.KEYCODE_SEARCH || c == KeyEvent.KEYCODE_VOICE_ASSIST) && !learningKey && prefs.getString("key_" + c, null) == null) {
             if (e.getAction() == KeyEvent.ACTION_UP) js("window.A&&A.voice()");
             return true;
@@ -218,6 +221,19 @@ public class MainActivity extends Activity {
     }
 
     /** Our own volume bar (the stock one is missing or tiny on many boxes). */
+    /** Reloads the web interface: stops playback and frees everything the page held. */
+    void restartUi(String why) {
+        try { stopRadioMp(); } catch (Throwable ignored) {}
+        ui.post(() -> { try { web.stopLoading(); web.loadUrl("file:///android_asset/index.html"); Toast.makeText(this, "↻", Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {} });
+        lastPing = System.currentTimeMillis() + 20000;
+    }
+    // Watchdog: the page pings every 2 s; if it stops answering for 12 s while on screen, reload it.
+    private volatile long lastPing = 0;
+    private final Runnable watchdog = new Runnable() { @Override public void run() {
+        if (inFront && lastPing > 0 && System.currentTimeMillis() - lastPing > 25000) restartUi("watchdog");
+        ui.postDelayed(this, 4000);
+    } };
+
     void volOsd() {
         try {
             AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -321,18 +337,25 @@ public class MainActivity extends Activity {
         if (iconCache.containsKey(pkg)) return iconCache.get(pkg);
         String out = "";
         try {
-            Drawable d = null;
-            try { d = pm.getApplicationBanner(pkg); } catch (Exception ignored) {}
-            if (d == null) d = ri.loadIcon(pm);
-            int w = Math.max(1, Math.min(d.getIntrinsicWidth() > 0 ? d.getIntrinsicWidth() : 192, 320));
-            int h = Math.max(1, Math.min(d.getIntrinsicHeight() > 0 ? d.getIntrinsicHeight() : 192, 320));
-            Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-            Canvas c = new Canvas(bmp);
-            d.setBounds(0, 0, w, h);
-            d.draw(c);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.PNG, 90, bos);
-            out = "data:image/png;base64," + Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
+            // icons are drawn once per app version and kept as files: later starts just point at them (fast cold start)
+            long ver = 0; try { ver = pm.getPackageInfo(pkg, 0).lastUpdateTime; } catch (Exception ignored) {}
+            File dir = new File(getFilesDir(), "icons"); dir.mkdirs();
+            File f = new File(dir, pkg + "_" + ver + ".png");
+            if (!f.exists() || f.length() == 0) {
+                File[] old = dir.listFiles((dd, n) -> n.startsWith(pkg + "_")); if (old != null) for (File o : old) o.delete();
+                Drawable d = null;
+                try { d = pm.getApplicationBanner(pkg); } catch (Exception ignored) {}
+                if (d == null) d = ri.loadIcon(pm);
+                int w = Math.max(1, Math.min(d.getIntrinsicWidth() > 0 ? d.getIntrinsicWidth() : 192, 320));
+                int h = Math.max(1, Math.min(d.getIntrinsicHeight() > 0 ? d.getIntrinsicHeight() : 192, 320));
+                Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+                Canvas c = new Canvas(bmp);
+                d.setBounds(0, 0, w, h);
+                d.draw(c);
+                try (OutputStream o = new java.io.FileOutputStream(f)) { bmp.compress(Bitmap.CompressFormat.PNG, 90, o); }
+                bmp.recycle();
+            }
+            out = Uri.fromFile(f).toString();
         } catch (Exception ignored) {}
         iconCache.put(pkg, out);
         return out;
@@ -822,6 +845,10 @@ public class MainActivity extends Activity {
         public void tgGetFile(final String fileId, final String id) {
             new Thread(() -> { try { if (tg == null) throw new Exception("bot off"); callback(id, true, tg.download(fileId)); } catch (Throwable t) { callback(id, false, String.valueOf(t.getMessage())); } }).start();
         }
+
+
+        @JavascriptInterface
+        public void ping() { lastPing = System.currentTimeMillis(); }
 
         // ---------- setup wizard ----------
         @JavascriptInterface

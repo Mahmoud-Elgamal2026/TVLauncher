@@ -687,3 +687,5 @@ document.addEventListener("focusin", (e) => {
 document.addEventListener("focusout", (e) => {
   if (e.target && e.target.tagName === "INPUT") nat("setTyping", false);
 });
+setInterval(() => nat("ping"), 2e3);
+nat("ping");

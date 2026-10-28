@@ -294,3 +294,6 @@ window.onShortOk=function(){ const a=document.activeElement; const tgt=a&&a.tagN
   tgt.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true})); tgt.dispatchEvent(new KeyboardEvent("keyup",{key:"Enter",bubbles:true})) };
 document.addEventListener("focusin",e=>{ if(e.target&&e.target.tagName==="INPUT") nat("setTyping",true) });
 document.addEventListener("focusout",e=>{ if(e.target&&e.target.tagName==="INPUT") nat("setTyping",false) });
+
+// heartbeat for the native watchdog (reloads the page if it ever freezes)
+setInterval(()=>nat("ping"),2000); nat("ping");

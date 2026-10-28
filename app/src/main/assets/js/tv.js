@@ -142,32 +142,53 @@ function epgUrl() {
   const x = xtLists()[0];
   return x ? `${xtBase(x)}/xmltv.php?username=${encodeURIComponent(x.user)}&password=${encodeURIComponent(x.pass)}` : "";
 }
-const PACK_EPG = {
-  "countries/eg.m3u": ["https://raw.githubusercontent.com/globetvapp/epg/main/Egypt/egypt1.xml", "https://raw.githubusercontent.com/globetvapp/epg/main/Egypt/egypt2.xml"],
-  "countries/sa.m3u": ["https://raw.githubusercontent.com/globetvapp/epg/main/Saudiarabia/saudiarabia1.xml", "https://raw.githubusercontent.com/globetvapp/epg/main/Saudiarabia/saudiarabia2.xml"],
-  "countries/ae.m3u": ["https://raw.githubusercontent.com/globetvapp/epg/main/Uae/uae1.xml"],
-  "languages/ara.m3u": ["https://raw.githubusercontent.com/globetvapp/epg/main/Egypt/egypt1.xml", "https://raw.githubusercontent.com/globetvapp/epg/main/Saudiarabia/saudiarabia1.xml"]
-};
+const EPG_CAND = (cc) => [`https://epgshare01.online/epgshare01/epg_ripper_${cc.toUpperCase()}1.xml.gz`, `https://iptv-epg.org/files/epg-${cc}.xml.gz`, `https://epg.pw/xmltv/epg_${cc.toUpperCase()}.xml`];
+const PACK_EPG = { "countries/eg.m3u": [EPG_CAND("eg")], "countries/sa.m3u": [EPG_CAND("sa")], "countries/ae.m3u": [EPG_CAND("ae")], "languages/ara.m3u": [EPG_CAND("eg"), EPG_CAND("sa"), EPG_CAND("ae")] };
 const epgKey = (s) => String(s || "").toLowerCase().replace(/\(.*?\)|\[.*?\]|\b(hd|fhd|uhd|sd|4k|tv|channel|قناة)\b|\.[a-z]{2}(@.*)?$/g, "").replace(/[^a-z0-9\u0600-\u06ff]/g, "");
 let epgNorm = {};
+DEF.epgOk = {};
+function fetchFirst(cands) {
+  return __async(this, null, function* () {
+    const ok = S.epgOk || {};
+    const order = cands.slice().sort((a, b) => (ok[b] || 0) - (ok[a] || 0));
+    for (const u of order) {
+      try {
+        const r = yield A.fetchEpg(u);
+        if (r && Object.keys(r).length) {
+          const o = Object.assign({}, S.epgOk || {});
+          o[u] = Date.now();
+          S.epgOk = o;
+          return r;
+        }
+      } catch (e) {
+      }
+    }
+    return null;
+  });
+}
 function loadEpg() {
   return __async(this, null, function* () {
-    const urls = [];
+    const jobs = [];
     const u = epgUrl();
-    if (u) urls.push(u);
+    if (u) jobs.push([u]);
     S.lists.forEach((l) => {
       Object.keys(PACK_EPG).forEach((k) => {
-        if (l.url && l.url.indexOf(k) >= 0) PACK_EPG[k].forEach((x) => urls.push(x));
+        if (l.url && l.url.indexOf(k) >= 0) PACK_EPG[k].forEach((c) => jobs.push(c));
       });
     });
-    tvgUrls.forEach((x) => urls.push(x));
-    const list = urls.filter((x, i) => urls.indexOf(x) === i).slice(0, 6);
+    tvgUrls.forEach((x) => jobs.push([x]));
+    const seen = {}, list = jobs.filter((j) => {
+      const k = j.join("|");
+      if (seen[k]) return false;
+      seen[k] = 1;
+      return true;
+    }).slice(0, 6);
     if (!list.length) {
       epg = {};
       epgNorm = {};
       return;
     }
-    const res = yield Promise.all(list.map((x) => A.fetchEpg(x).catch(() => null)));
+    const res = yield Promise.all(list.map(fetchFirst));
     const merged = {};
     res.forEach((r) => {
       if (r) Object.keys(r).forEach((k) => {
@@ -243,11 +264,23 @@ function chRow(c) {
     <span class="nm2"><b>${S.favCh.some((x) => x.url === c.url) ? "⭐ " : ""}${esc(c.name)}</b>${n ? `<small>${esc(n[2])}</small>` : c.cty ? `<small>${esc(c.cty)} · ${esc(c.group)}</small>` : `<small>${esc(c.group || "")}</small>`}</span>
     <span class="st">${c.xt && c.xt.arch ? "📼 " : ""}${st === 1 ? "🟢" : st === 0 ? "🔴" : ""}</span></div>`;
 }
+let chShown = 0;
+focusHooks.push((el) => {
+  if (!el.dataset || !el.dataset.chu || !el.closest("#channels")) return;
+  const rows = $("channels").children;
+  if ([].indexOf.call(rows, el) < rows.length - 8) return;
+  if (chShown < playList.length) {
+    const more = playList.slice(chShown, chShown + 200);
+    chShown += more.length;
+    $("channels").insertAdjacentHTML("beforeend", more.map(chRow).join(""));
+  }
+});
 function renderChannels() {
   if (!channels.length && !S.favCh.length) return;
   const list = currentList();
   playList = list;
-  $("channels").innerHTML = list.length ? list.slice(0, 1500).map(chRow).join("") : `<div class="empty">${L("noRes")}</div>`;
+  chShown = Math.min(list.length, 200);
+  $("channels").innerHTML = list.length ? list.slice(0, chShown).map(chRow).join("") : `<div class="empty">${L("noRes")}</div>`;
 }
 function selectGroup(g) {
   const locked = S.lockedGroups.includes(g);
@@ -274,11 +307,44 @@ function showPreview(c) {
   clearTimeout(pvTimer);
   if (S.preview && !S.lite && c.url !== pvUrl) pvTimer = setTimeout(() => pvPlay(c), 900);
 }
+const nativeHls = () => {
+  const e = S.engine || "auto";
+  if (e === "hls") return false;
+  const can = !!document.createElement("video").canPlayType("application/vnd.apple.mpegurl");
+  return e === "native" ? can : can && ((window.__chromeVer || 99) < 75 || S.lite);
+};
 function attach(video, url, old, opts) {
   if (old) old.destroy();
   video.onerror = null;
+  if (/\.m3u8(\?|$)/i.test(url) && nativeHls() && !(opts && opts.__forceHls)) {
+    let done = false;
+    const fb = () => {
+      if (done) return;
+      done = true;
+      video.onerror = null;
+      clearTimeout(t);
+      if (window.Hls && Hls.isSupported() && video.__url === url) {
+        const h = attach(video, url, null, Object.assign({}, opts || {}, { __forceHls: 1 }));
+        if (video === $("video")) hls = h;
+        else pvHls = h;
+      }
+    };
+    const t = setTimeout(() => {
+      if (video.readyState < 2 && video.__url === url) fb();
+    }, 9e3);
+    video.__url = url;
+    video.onerror = fb;
+    video.onplaying = video.onplaying || null;
+    video.src = url;
+    video.play().catch(() => {
+    });
+    return null;
+  }
+  video.__url = url;
   if (/\.m3u8(\?|$)/i.test(url) && window.Hls && Hls.isSupported()) {
-    const h = new Hls(Object.assign({ maxBufferLength: 20, backBufferLength: 10 }, opts || {}));
+    const o2 = Object.assign({ maxBufferLength: S.lite ? 12 : 20, backBufferLength: S.lite ? 4 : 10, maxMaxBufferLength: 30, enableWorker: true, startLevel: S.lite ? 0 : -1, capLevelToPlayerSize: true }, opts || {});
+    delete o2.__forceHls;
+    const h = new Hls(o2);
     h.loadSource(url);
     h.attachMedia(video);
     h.on(Hls.Events.ERROR, (e, d) => {

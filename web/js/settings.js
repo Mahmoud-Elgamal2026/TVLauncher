@@ -170,6 +170,6 @@ function boot(){
   setTimeout(()=>{ weather(); loadLists().then(()=>setTimeout(loadEpg,1500)) },250);
   setTimeout(loadSports,4000);
   if(window.__chromeVer&&window.__chromeVer<55) setTimeout(()=>banner("⚠️",L("webview"),L("webviewOld"),15000),3000);
-  setTimeout(()=>{ if(!$("settings").classList.contains("on")) renderSettings() },2500);
+  setTimeout(()=>{ if(!$("settings").classList.contains("on")) renderSettings() },9000);
 }
 setInterval(tick,5000); setInterval(status,20000);

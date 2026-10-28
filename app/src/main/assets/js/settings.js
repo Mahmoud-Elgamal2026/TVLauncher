@@ -372,7 +372,7 @@ function boot() {
   if (window.__chromeVer && window.__chromeVer < 55) setTimeout(() => banner("⚠️", L("webview"), L("webviewOld"), 15e3), 3e3);
   setTimeout(() => {
     if (!$("settings").classList.contains("on")) renderSettings();
-  }, 2500);
+  }, 9e3);
 }
 setInterval(tick, 5e3);
 setInterval(status, 2e4);

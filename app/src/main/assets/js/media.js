@@ -18,7 +18,7 @@ var __async = (__this, __arguments, generator) => {
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
-Object.assign(DEF, { bootPlay: false, shares: [], tgToken: "", tgChat: "", tgCode: "" });
+Object.assign(DEF, { engine: "auto", bootPlay: false, shares: [], tgToken: "", tgChat: "", tgCode: "" });
 const MT = {
   ar: {
     files: "ملفاتي",
@@ -511,8 +511,9 @@ function tgCmd(t) {
 }
 window.mediaSettings = function() {
   const linked = !!S.tgChat;
+  const eng = sec("▶️ " + (S.lang === "ar" ? "مشغّل القنوات" : "Channel player"), field(S.lang === "ar" ? "تلقائي = مشغّل الجهاز على البوكسات الضعيفة (أخف ومبيهنجش)" : "Auto = the device's hardware player on weak boxes (lighter, no freezes)", seg("engine", [["auto", S.lang === "ar" ? "تلقائي" : "Auto"], ["native", S.lang === "ar" ? "مشغّل الجهاز" : "Device player"], ["hls", "hls.js"]])));
   if (!S.tgCode) S.tgCode = String(1e5 + Math.floor(Math.random() * 9e5));
-  return sec(L("sBoot"), field(L("bootPlay"), onoff("bootPlay"))) + sec(
+  return eng + sec(L("sBoot"), field(L("bootPlay"), onoff("bootPlay"))) + sec(
     "✈️ " + L("sTg"),
     field(L("tgToken"), inputRow("tgTokInp", S.tgToken, "123456:ABC-DEF...", "tgTokSave")) + field("", `<pre class="code" dir="auto" style="white-space:pre-wrap">${esc(L("tgHow"))}</pre>`) + (S.tgToken ? field("", `<div class="inline">${linked ? `<span class="btn sm">✅ ${L("tgLinked")}</span><button class="btn f" id="tgUnlink">${L("tgUnlink")}</button>` : `<span class="btn sm">${L("tgCode")}: <b style="font-size:2.6vh" dir="ltr">${esc(S.tgCode)}</b></span>`}</div>`) : "")
   ) + sec("⏺ " + L("rec"), field(L("recDir"), recDirSeg()));

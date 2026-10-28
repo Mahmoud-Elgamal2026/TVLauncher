@@ -1,5 +1,5 @@
 // ================= Files (USB / storage / network), recording, start-up channel, Telegram =================
-Object.assign(DEF,{bootPlay:false,shares:[],tgToken:"",tgChat:"",tgCode:""});
+Object.assign(DEF,{engine:"auto",bootPlay:false,shares:[],tgToken:"",tgChat:"",tgCode:""});
 const MT={
   ar:{files:"ملفاتي",fInternal:"التخزين الداخلي",fUsb:"فلاشة",fNet:"أجهزة الشبكة",fScan:"دوّر على أجهزة الشبكة",fScanning:"بدوّر على الأجهزة اللي على الراوتر...",fNone:"مفيش أجهزة بتشارك ملفات. على الكمبيوتر: كليك يمين على الفولدر ← Properties ← Sharing ← Share",
     fAdd:"إضافة كمبيوتر",fHost:"عنوان الجهاز (IP أو الاسم)",fUser:"اسم المستخدم (فاضي = Guest)",fPass:"الباسورد",fRecs:"التسجيلات",fEmpty:"الفولدر فاضي",fDenied:"مش قادر أفتح الفولدر — اسمح بقراية الملفات",fAllow:"اسمح بقراية الملفات",
@@ -177,8 +177,8 @@ function tgCmd(t){
 
 // ---------- settings ----------
 window.mediaSettings=function(){
-  const linked=!!S.tgChat; if(!S.tgCode) S.tgCode=String(100000+Math.floor(Math.random()*900000));
-  return sec(L("sBoot"),field(L("bootPlay"),onoff("bootPlay")))+
+  const linked=!!S.tgChat; const eng=sec("▶️ "+(S.lang==="ar"?"مشغّل القنوات":"Channel player"),field(S.lang==="ar"?"تلقائي = مشغّل الجهاز على البوكسات الضعيفة (أخف ومبيهنجش)":"Auto = the device's hardware player on weak boxes (lighter, no freezes)",seg("engine",[["auto",S.lang==="ar"?"تلقائي":"Auto"],["native",S.lang==="ar"?"مشغّل الجهاز":"Device player"],["hls","hls.js"]]))); if(!S.tgCode) S.tgCode=String(100000+Math.floor(Math.random()*900000));
+  return eng+sec(L("sBoot"),field(L("bootPlay"),onoff("bootPlay")))+
     sec("✈️ "+L("sTg"),
       field(L("tgToken"),inputRow("tgTokInp",S.tgToken,"123456:ABC-DEF...","tgTokSave"))+
       field("",`<pre class="code" dir="auto" style="white-space:pre-wrap">${esc(L("tgHow"))}</pre>`)+
