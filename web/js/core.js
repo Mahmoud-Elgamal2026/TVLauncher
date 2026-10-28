@@ -185,6 +185,8 @@ function move(dir){
   let pool=visibleFocusables();
   // from a tab: left/right stay on the tab bar, down goes into the open page only
   if(onTab&&(dir==="left"||dir==="right")) pool=pool.filter(e=>e.classList.contains("tab"));
+  // inside a page: left/right never jump up to the tabs or header buttons
+  if(!onTab&&(dir==="left"||dir==="right")){ const pg=focused.closest(".page"); if(pg) pool=pool.filter(e=>pg.contains(e)); else if(focused.closest(".top")) pool=pool.filter(e=>!!e.closest(".top")) }
   if(onTab&&dir==="down"){ const pg=document.querySelector(".page.on"); if(pg){ const inPage=pool.filter(e=>pg.contains(e)); if(inPage.length) pool=inPage } }
   for(const e of pool){
     if(e===focused) continue;
@@ -197,6 +199,9 @@ function move(dir){
     if(main<=0) continue;
     const s=main+cross*2.2; if(s<bs){bs=s;best=e}
   }
+  // from a tab, down (or up when the tabs sit at the bottom) always enters the open page
+  if(onTab&&!best&&(dir==="down"||dir==="up")){ const pg=document.querySelector(".page.on"); if(pg){ const f=[...pg.querySelectorAll(".f")].find(e=>e.offsetParent!==null||getComputedStyle(e).position==="fixed"); if(f) best=f } }
+  if(onTab&&dir==="up"&&best&&best.closest(".page")&&document.querySelector(".tabs").getBoundingClientRect().top<innerHeight/2) best=null;
   // never jump to a different tab by moving up out of a page: go to the open one
   if(best&&!onTab&&best.classList.contains("tab")&&!best.classList.contains("on")) best=document.querySelector(".tab.on")||best;
   if(best) focus(best);
