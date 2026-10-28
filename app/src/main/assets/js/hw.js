@@ -415,7 +415,8 @@ function hwAddMenu() {
   dialog("🧩 " + L("hwAdd"), HW_TYPES.map((t) => ({ icon: t[1], label: L(t[2]) + (hwHas(t[0]) && t[0] !== "note" ? " ✓" : ""), fn: () => {
     if (hwHas(t[0]) && t[0] !== "note") return;
     const id = t[0] + (t[0] === "note" ? Date.now() % 1e5 : "");
-    hwSave(hwList().concat([{ id, t: t[0], sz: t[0] === "clock" || t[0] === "prayer" || t[0] === "matches" ? 2 : 1, st: "glass" }]));
+    const nw = { id, t: t[0], sz: t[0] === "hero" ? 4 : t[0] === "clock" || t[0] === "prayer" || t[0] === "matches" ? 2 : 1, st: t[0] === "hero" ? "clear" : "glass" };
+    hwSave(t[0] === "hero" ? [nw].concat(hwList()) : hwList().concat([nw]));
     setTimeout(() => {
       const e = document.querySelector(`#hwBoard [data-hw="${id}"]`) || document.querySelector("#ytRow .f");
       if (e) focus(e);
