@@ -366,7 +366,7 @@ function loadHls() {
 window.loadHls = loadHls;
 function boot() {
   autoPerf();
-  setTimeout(loadHls, 4e3);
+  if (!S.lite) setTimeout(loadHls, 4e3);
   applyLook();
   applyLang();
   loadApps();
@@ -374,15 +374,50 @@ function boot() {
   status();
   tick();
   focus(document.querySelector(".tab.on") || document.querySelector(".tab"));
-  setTimeout(() => {
-    weather();
-    loadLists().then(() => setTimeout(loadEpg, 1500));
-  }, 250);
-  setTimeout(loadSports, 4e3);
+  if (!S.lite) {
+    setTimeout(() => {
+      weather();
+      loadLists().then(() => setTimeout(loadEpg, 1500));
+    }, 250);
+    setTimeout(loadSports, 4e3);
+  } else {
+    setTimeout(weather, 3e3);
+    if ((S.favCh || []).length || S.bootPlay) setTimeout(() => {
+      if (!listsLoaded) loadListsOnce();
+    }, 6e3);
+    setTimeout(loadSports, 2e4);
+  }
   if (window.__chromeVer && window.__chromeVer < 55) setTimeout(() => banner("⚠️", L("webview"), L("webviewOld"), 15e3), 3e3);
-  setTimeout(() => {
+  if (!S.lite) setTimeout(() => {
     if (!$("settings").classList.contains("on")) renderSettings();
   }, 9e3);
 }
 setInterval(tick, 5e3);
 setInterval(status, 2e4);
+let listsLoaded = false, listsP = null;
+function loadListsOnce() {
+  if (listsP) return listsP;
+  if (channels.length) {
+    listsLoaded = true;
+    listsP = Promise.resolve();
+    return listsP;
+  }
+  listsP = loadLists().then(() => {
+    listsLoaded = true;
+    setTimeout(loadEpg, S.lite ? 4e3 : 1500);
+  });
+  return listsP;
+}
+const _tvEnterL = pageHooks["tv:enter"];
+pageHooks["tv:enter"] = function() {
+  if (_tvEnterL) _tvEnterL();
+  if (S.lite && !listsP) {
+    loadListsOnce();
+    loadHls();
+  }
+};
+const _vodEnterL = pageHooks["vod:enter"];
+pageHooks["vod:enter"] = function() {
+  if (_vodEnterL) _vodEnterL();
+  if (S.lite && !listsP) loadListsOnce();
+};
