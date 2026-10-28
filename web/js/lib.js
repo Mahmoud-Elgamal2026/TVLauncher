@@ -39,7 +39,7 @@ async function renderLib(){
   if(!items){ libMsg(L("libLoading"));
     const cat=LIB_CATS.find(c=>c[0]===libCat), q=libQ?`(${libQ}) AND mediatype:(movies OR audio)`:cat[2];
     try{ const r=await A.fetchJSON("https://archive.org/advancedsearch.php?q="+encodeURIComponent(q)+"&fl[]=identifier&fl[]=title&fl[]=mediatype&fl[]=year&sort[]=downloads+desc&rows=200&output=json");
-      items=((r.response||{}).docs||[]).filter(d=>!libBlocked(Array.isArray(d.title)?d.title[0]:d.title||"")).map(d=>({id:d.identifier,title:Array.isArray(d.title)?d.title[0]:d.title||d.identifier,mt:d.mediatype,year:d.year})); libCache[key]=items }catch(e){ items=[] } }
+      items=((r.response||{}).docs||[]).filter(d=>!libBlocked(Array.isArray(d.title)?d.title[0]:d.title||"")).map(d=>({id:d.identifier,title:Array.isArray(d.title)?d.title[0]:d.title||d.identifier,mt:d.mediatype,year:d.year})); items=libClean(items); libCache[key]=items }catch(e){ return libMsg("⚠️ "+(S.lang==="ar"?"مش قادر يوصل للمكتبة دلوقتي — جرّب تاني بعد شوية":"Can't reach the library right now — try again shortly")) } }
   if(!items.length) return libMsg(L("libEmpty"));
   $("libMain").innerHTML=`<div class="lbgrid">${items.map(i=>libCard({attr:`data-arch="${esc(i.id)}"`,img:"https://archive.org/services/img/"+i.id,title:i.title,sub:i.year?String(i.year):""})).join("")}</div>`;
 }
@@ -87,7 +87,7 @@ pageHooks["lib:enter"]=()=>{ if(!$("libMain").innerHTML) renderLib() };
 LIB_CATS.push(["search","🔍",""]); LIBN.search="libSearch";
 
 // keep the library family-safe: drop war footage, armed-group releases and propaganda that sometimes shows up in open archives
-const LIB_BLOCK=/جيش|إصدار|اصدار|مؤسسة|تحرير|معركة|غزو|مجاهد|جهاد|انغماس|الدولة الإسلامية|الدولة الاسلامية|ولاية|استشهاد|عملية|قصف|سرايا|كتائب|فصائل|كتيبة|طلائع|أحرار|احرار|isis|daesh|jihad|mujahid|militant|\+18|sex|xxx/i;
+const LIB_BLOCK=/صهيون|اسرائيل|إسرائيل|يهود|جيش|إصدار|اصدار|مؤسسة|تحرير|معركة|غزو|مجاهد|جهاد|انغماس|الدولة الإسلامية|الدولة الاسلامية|ولاية|استشهاد|عملية|قصف|سرايا|كتائب|فصائل|كتيبة|طلائع|أحرار|احرار|isis|daesh|jihad|mujahid|militant|\+18|sex|xxx/i;
 function libBlocked(t){ return LIB_BLOCK.test(String(t||"")) }
 
 // plays: quick filters by star, then the full list (up to 300)
@@ -97,9 +97,9 @@ const _renderLibP=renderLib; renderLib=async function(){
   $("libCats").innerHTML=libCatsHtml(); const key="plays|"+libQ; let items=libCache[key];
   if(!items){ libMsg(L("libLoading"));
     const q=LIB_CATS.find(c=>c[0]==="plays")[2]+(libQ?` AND (title:("${libQ}") OR subject:("${libQ}") OR description:("${libQ}"))`:"");
-    try{ const r=await A.fetchJSON("https://archive.org/advancedsearch.php?q="+encodeURIComponent(q)+"&fl[]=identifier&fl[]=title&fl[]=year&sort[]=downloads+desc&rows=300&output=json");
+    try{ const r=await A.fetchJSON("https://archive.org/advancedsearch.php?q="+encodeURIComponent(q)+"&fl[]=identifier&fl[]=title&fl[]=year&sort[]=downloads+desc&rows=150&output=json");
       const seen={}; items=((r.response||{}).docs||[]).map(d=>({id:d.identifier,title:Array.isArray(d.title)?d.title[0]:d.title||d.identifier,year:d.year}))
-        .filter(i=>!libBlocked(i.title)).filter(i=>{ const k=i.title.replace(/[^\u0600-\u06ff]/g,"").slice(0,25); if(seen[k]) return false; seen[k]=1; return true }); libCache[key]=items }catch(e){ items=[] } }
+        .filter(i=>!libBlocked(i.title)); items=libClean(items); libCache[key]=items }catch(e){ return libMsg("⚠️ "+(S.lang==="ar"?"مش قادر يوصل للمكتبة دلوقتي — جرّب تاني بعد شوية":"Can't reach the library right now")) } }
   const chips=`<div class="inline lbchips"><button class="btn f${!libQ?" on":""}" data-playstar="">${S.lang==="ar"?"الكل":"All"}</button>${PLAY_STARS.map(n=>`<button class="btn f${libQ===n?" on":""}" data-playstar="${esc(n)}">${esc(n)}</button>`).join("")}</div>`;
   $("libMain").innerHTML=chips+(items.length?`<div class="lbgrid">${items.map(i=>libCard({attr:`data-arch="${esc(i.id)}"`,img:"https://archive.org/services/img/"+i.id,title:i.title,sub:i.year?String(i.year):""})).join("")}</div>`:`<p class="hint">${esc(L("libEmpty"))}</p>`);
 };
@@ -108,7 +108,7 @@ activators.unshift(el=>{ if(el.dataset&&el.dataset.playstar!=null){ libQ=el.data
 // ---- free streaming apps: one row in the library; opens the app, or its store page when missing
 const FREE_APPS=[["Tubi","com.tubitv","🎬"],["Pluto TV","tv.pluto.android","📺"],["شاهد Shahid","net.mbc.shahidTV","🇸🇦"],["Watch It","com.watchit.tv","🇪🇬"],["YouTube","com.google.android.youtube.tv","▶️"],["Plex","com.plexapp.android","🍿"]];
 const _renderLibF=renderLib; renderLib=async function(){ await _renderLibF.apply(this,arguments);
-  if(libCat!=="quran"&&libCat!=="arabic") return;
+  return;
   const h=`<h3 class="sph">${S.lang==="ar"?"📺 تطبيقات أفلام ببلاش":"📺 Free movie apps"}</h3><div class="lbgrid small">${FREE_APPS.map(a=>libCard({attr:`data-freeapp="${a[1]}"`,icon:a[2],title:a[0],sub:A.isInstalled(a[1])?(S.lang==="ar"?"افتح":"Open"):(S.lang==="ar"?"نزّل من المتجر":"Install")})).join("")}</div>`;
   $("libMain").insertAdjacentHTML("afterbegin",h) };
 activators.unshift(el=>{ if(el.dataset&&el.dataset.freeapp){ const p=el.dataset.freeapp; if(A.isInstalled(p)) launch(p); else nat("openUri","market://details?id="+p); return true } return false });
@@ -131,3 +131,11 @@ activators.unshift(el=>{ if(!el.dataset) return false;
   if(el.dataset.fastsrc!=null){ fastSrc=+el.dataset.fastsrc; libCat="fast"; renderLib().then(()=>focus(document.querySelector(`[data-fastsrc="${fastSrc}"]`))); return true }
   if(el.dataset.fastch!=null){ const l=libCache["fast|"+FAST_SRC[fastSrc][1]]||[], c=l[+el.dataset.fastch]; if(c){ if(typeof playList!=="undefined") playList=l; play(c) } return true }
   return false });
+
+// Arabic titles only, no duplicates (same film uploaded many times), nothing blocked
+function libClean(items){ const seen={};
+  return items.filter(i=>/[\u0600-\u06ff]/.test(i.title)&&!libBlocked(i.title)).filter(i=>{
+    const k=i.title.replace(/[^\u0600-\u06ff]/g,"").replace(/^(فيلم|مسرحية|مسرحيه|مشاهدة|تحميل)/,"").slice(0,18); if(!k||seen[k]) return false; seen[k]=1; return true }) }
+// keep only the sections that are clean and Arabic
+(function(){ const keep={quran:1,radio:1,khutab:1,oldar:1,plays:1,search:1};
+  setTimeout(()=>{ for(let i=LIB_CATS.length-1;i>=0;i--) if(!keep[LIB_CATS[i][0]]) LIB_CATS.splice(i,1); if(!keep[libCat]) libCat="quran" },0) })();

@@ -85,7 +85,10 @@ function globalSearch(q, seq) {
     if (isKids()) return;
     try {
       const r = yield A.fetchJSON("https://archive.org/advancedsearch.php?q=" + encodeURIComponent(`title:(${q}) AND mediatype:(movies OR audio)`) + "&fl[]=identifier&fl[]=title&sort[]=downloads+desc&rows=24&output=json");
-      const d = ((r.response || {}).docs || []).filter((x) => !libBlocked(Array.isArray(x.title) ? x.title[0] : x.title));
+      const d = ((r.response || {}).docs || []).filter((x) => {
+        const t = Array.isArray(x.title) ? x.title[0] : x.title || "";
+        return /[\u0600-\u06ff]/.test(t) && !libBlocked(t);
+      });
       if (d.length) add(`<h2>${esc(L("sLib"))}</h2><div class="row">${d.map((x) => libCard({ attr: `data-arch="${esc(x.identifier)}"`, img: "https://archive.org/services/img/" + x.identifier, title: Array.isArray(x.title) ? x.title[0] : x.title })).join("")}</div>`);
     } catch (e) {
     }
@@ -264,7 +267,7 @@ setTimeout(() => {
 const _libCatsM = libCatsHtml;
 libCatsHtml = function() {
   if (!isKids()) return _libCatsM();
-  return LIB_CATS.filter((c) => c[0] === "quran" || c[0] === "cartoon").map((c) => `<div class="it f${c[0] === libCat ? " on" : ""}" tabindex="0" data-libcat="${c[0]}">${c[1]} ${esc(L(LIBN[c[0]]))}</div>`).join("");
+  return LIB_CATS.filter((c) => c[0] === "quran" || c[0] === "radio").map((c) => `<div class="it f${c[0] === libCat ? " on" : ""}" tabindex="0" data-libcat="${c[0]}">${c[1]} ${esc(L(LIBN[c[0]]))}</div>`).join("");
 };
 const _renderLibM = renderLib;
 renderLib = function() {
@@ -275,7 +278,7 @@ renderLib = function() {
         $("libCats").innerHTML = "";
         return libMsg("🔒 " + L("kidsLibOff") + ` (${S.kidsLibFrom}:00 – ${S.kidsLibTo}:00)`);
       }
-      if (libCat !== "quran" && libCat !== "cartoon" && libCat !== "kidsar") libCat = "cartoon";
+      if (libCat !== "quran" && libCat !== "radio") libCat = "quran";
     }
     return _renderLibM.apply(this, arguments);
   });

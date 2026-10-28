@@ -17,7 +17,7 @@ const _renderLibR=renderLib; renderLib=async function(){
 activators.unshift(el=>{ if(el.dataset&&el.dataset.qradio!=null){ const x=(qRadios||[])[+el.dataset.qradio]; if(x) play({name:"📻 "+x.name,url:x.url,logo:""}); return true } return false });
 // kids see the Arabic cartoons too
 const _libCatsK=libCatsHtml; libCatsHtml=function(){ const h=_libCatsK(); if(!isKids()) return h;
-  return h+`<div class="it f${libCat==="kidsar"?" on":""}" tabindex="0" data-libcat="kidsar">🧸 ${esc(L("libKidsAr"))}</div>` };
+  return h };
 
 // ---- 2) widget: countdown to the next Islamic occasions
 const EVENTS=[[9,1,"evRamadan"],[10,1,"evEidF"],[12,9,"evArafa"],[12,10,"evEidA"],[1,1,"evHijri"],[1,10,"evAshura"],[3,12,"evMawlid"]];
