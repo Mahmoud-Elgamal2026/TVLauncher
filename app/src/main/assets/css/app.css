@@ -698,3 +698,11 @@ html.nofg .lbgrid > *{margin-bottom:1.4vw}
 .lbs{font-size:1.3vh;opacity:.6;padding:0 .6vw .8vh}
 .lbc.f.focus{transform:scale(1.06);box-shadow:0 0 0 .4vh #fff;z-index:2}
 #lib .hint{padding:4vh 2vw;opacity:.7}
+.hwtools{display:inline-flex;gap:.8vw;vertical-align:middle}
+html[dir=ltr] .hwtools{margin-left:1.5vw}
+html[dir=rtl] .hwtools{margin-right:1.5vw}
+html[dir=ltr].nofg .hwtools > * + *{margin-left:.8vw}
+html[dir=rtl].nofg .hwtools > * + *{margin-right:.8vw}
+.hwtools .btn{font-size:1.6vh;padding:.6vh 1vw}
+body.hwedit .hw{outline:.3vh dashed rgba(255,255,255,.5);outline-offset:.4vh}
+.hw.grabbed{outline:.5vh solid #ffd54a!important;transform:scale(1.08) rotate(-1deg)!important;box-shadow:0 2vh 5vh rgba(0,0,0,.7)!important}

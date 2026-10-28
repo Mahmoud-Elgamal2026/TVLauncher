@@ -579,3 +579,7 @@ body[data-fx=zoom] .app.f.focus{transform:scale(1.1)!important}
 .lbs{font-size:1.3vh;opacity:.6;padding:0 .6vw .8vh}
 .lbc.f.focus{transform:scale(1.06);box-shadow:0 0 0 .4vh #fff;z-index:2}
 #lib .hint{padding:4vh 2vw;opacity:.7}
+.hwtools{display:inline-flex;gap:.8vw;margin-inline-start:1.5vw;vertical-align:middle}
+.hwtools .btn{font-size:1.6vh;padding:.6vh 1vw}
+body.hwedit .hw{outline:.3vh dashed rgba(255,255,255,.5);outline-offset:.4vh}
+.hw.grabbed{outline:.5vh solid #ffd54a!important;transform:scale(1.08) rotate(-1deg)!important;box-shadow:0 2vh 5vh rgba(0,0,0,.7)!important}

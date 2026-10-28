@@ -107,6 +107,9 @@ js "console.log('TVL|lib-archive|'+(document.querySelectorAll('#libMain [data-ar
 js "hwSave(hwList().concat([{id:'wird',t:'wird',sz:2,st:'glass'}]));showPage('home')" 10; shot 59-wird
 js "console.log('TVL|wird|'+(document.querySelector('#hwBoard [data-hw=wird] .hwzk')?'PASS':'FAIL')+'|'+(document.querySelector('#hwBoard [data-hw=wird]')||{}).textContent)" 1
 js "console.log('TVL|usb-api|'+(typeof NA.writeText==='function'&&typeof NA.readText==='function'?'PASS':'FAIL')+'|')" 1
+js "hwSave(HW_PRESETS.pIslam);showPage('home');renderHome();hwEditStart()" 4; key DPAD_CENTER; sleep 1; key DPAD_UP; sleep 1; shot 60-hw-edit
+js "console.log('TVL|hw-edit|'+(hwEdit.grab&&hwGet(hwEdit.grab).sz===3?'PASS':'FAIL')+'|grab='+hwEdit.grab+' '+JSON.stringify(hwList().map(function(w){return w.t+w.sz})))" 1
+key BACK; key BACK
 js "S.simple=false;applySimple()" 1
 key SEARCH; sleep 3; shot 51-voice; key BACK; sleep 1
 # volume keys show the on-screen bar

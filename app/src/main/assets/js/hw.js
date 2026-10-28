@@ -563,3 +563,140 @@ setTimeout(() => {
   applyIconLook();
   renderHW();
 }, 0);
+Object.assign(T.ar, {
+  hwPresets: "قوالب جاهزة",
+  hwEditMode: "✏️ ترتيب",
+  pIslam: "🕌 إسلامي",
+  pSport: "⚽ رياضة",
+  pFull: "✨ كامل",
+  pMin: "🪶 بسيط",
+  pFamily: "👨‍👩‍👧 العيلة",
+  edHint: "اختار ويدجت ودوس OK عشان تمسكها",
+  edHold: "⬅️➡️ حرّك · ⬆️ كبّر · ⬇️ صغّر · 5 غيّر الشكل · 0 امسح · OK سيب",
+  edDone: "Back للخروج من الترتيب"
+});
+Object.assign(T.en, {
+  hwPresets: "Ready layouts",
+  hwEditMode: "✏️ Arrange",
+  pIslam: "🕌 Islamic",
+  pSport: "⚽ Sports",
+  pFull: "✨ Full",
+  pMin: "🪶 Minimal",
+  pFamily: "👨‍👩‍👧 Family",
+  edHint: "Pick a widget and press OK to grab it",
+  edHold: "⬅️➡️ move · ⬆️ bigger · ⬇️ smaller · 5 style · 0 delete · OK drop",
+  edDone: "Back to finish"
+});
+const W_ = (t, sz, st) => ({ id: t, t, sz, st: st || "glass" });
+const HW_PRESETS = {
+  pIslam: [W_("prayer", 3, "grad"), W_("wird", 2), W_("clock", 1), W_("azkar", 2), W_("cal", 1)],
+  pSport: [W_("matches", 3, "accent"), W_("clock", 1), W_("weather", 2)],
+  pFull: [W_("clock", 2), W_("prayer", 2), W_("weather", 1), W_("matches", 2), W_("boost", 1, "accent"), W_("wird", 2), W_("yt", 1)],
+  pMin: [W_("clock", 2), W_("weather", 1)],
+  pFamily: [W_("clock", 2), W_("weather", 2), W_("prayer", 2), W_("cal", 1), W_("note", 2)]
+};
+function hwPresetMenu() {
+  dialog("🎛 " + L("hwPresets"), Object.keys(HW_PRESETS).map((k) => ({ label: L(k) + " — " + HW_PRESETS[k].map((w) => (HW_TYPES.find((t) => t[0] === w.t) || [0, ""])[1]).join(" "), fn: () => {
+    hwSave(HW_PRESETS[k]);
+    setTimeout(() => {
+      const e = document.querySelector("#hwBoard .hw");
+      if (e) focus(e);
+    }, 60);
+  } })));
+}
+function hwToolbar() {
+  const h = $("hwH");
+  if (!h) return;
+  h.innerHTML = `${esc(L("hwTitle"))} <span class="hwtools"><button class="btn sm f" id="hwEditBtn">${esc(L("hwEditMode"))}</button><button class="btn sm f" id="hwPresetBtn">🎛 ${esc(L("hwPresets"))}</button><button class="btn sm f" id="hwAddBtn2">＋ ${esc(L("hwAdd"))}</button></span>`;
+}
+const _renderHWE = renderHW;
+renderHW = function() {
+  _renderHWE.apply(this, arguments);
+  hwToolbar();
+  document.body.classList.toggle("hwedit", hwEdit.on);
+  if (hwEdit.grab) {
+    const e = document.querySelector(`#hwBoard [data-hw="${hwEdit.grab}"]`);
+    if (e) {
+      e.classList.add("grabbed");
+      focus(e);
+    }
+  }
+};
+const hwEdit = { on: false, grab: null };
+function hwEditStart() {
+  hwEdit.on = true;
+  hwEdit.grab = null;
+  renderHW();
+  const e = document.querySelector("#hwBoard .hw");
+  if (e) focus(e);
+  banner("✏️", L("edHint"), L("edDone"), 6e5);
+}
+function hwEditEnd() {
+  hwEdit.on = false;
+  hwEdit.grab = null;
+  $("banners").innerHTML = "";
+  renderHW();
+  const b = $("hwEditBtn");
+  if (b) focus(b);
+}
+activators.unshift((el) => {
+  if (el.id === "hwEditBtn") {
+    hwEditStart();
+    return true;
+  }
+  if (el.id === "hwPresetBtn") {
+    hwPresetMenu();
+    return true;
+  }
+  if (el.id === "hwAddBtn2") {
+    hwAddMenu();
+    return true;
+  }
+  return false;
+});
+layers.unshift({ test: () => hwEdit.on && !on("dlg"), ownsEnter: true, key: (e) => {
+  const k = e.key, l = hwList();
+  if (e.preventDefault) e.preventDefault();
+  if (isBack(k)) {
+    if (hwEdit.grab) {
+      hwEdit.grab = null;
+      renderHW();
+      banner("✏️", L("edHint"), L("edDone"), 6e5);
+    } else hwEditEnd();
+    return true;
+  }
+  const id = focused && focused.dataset && focused.dataset.hw;
+  if (k === "Enter" || e.keyCode === 13 || e.keyCode === 23) {
+    held = true;
+    if (!id) return true;
+    if (hwEdit.grab) {
+      hwEdit.grab = null;
+      banner("✏️", L("edHint"), L("edDone"), 6e5);
+    } else {
+      hwEdit.grab = id;
+      banner("✋", L("edHold"), "", 6e5);
+    }
+    renderHW();
+    return true;
+  }
+  if (!hwEdit.grab) return false;
+  const i = l.findIndex((w2) => w2.id === hwEdit.grab), w = l[i];
+  if (i < 0) return true;
+  const rtl = document.documentElement.dir === "rtl";
+  if (k === "ArrowLeft" || k === "ArrowRight") {
+    const d = k === "ArrowRight" !== rtl ? 1 : -1, j = i + d;
+    if (j >= 0 && j < l.length) {
+      const n = l.slice();
+      n[i] = n[j];
+      n[j] = w;
+      hwSave(n);
+    }
+  } else if (k === "ArrowUp") hwSet(w.id, { sz: Math.min(3, (w.sz || 1) + 1) });
+  else if (k === "ArrowDown") hwSet(w.id, { sz: Math.max(1, (w.sz || 1) - 1) });
+  else if (k === "5") hwSet(w.id, { st: HW_STYLES[(HW_STYLES.indexOf(w.st || "glass") + 1) % HW_STYLES.length] });
+  else if (k === "0") {
+    hwEdit.grab = null;
+    hwSave(l.filter((x) => x.id !== w.id));
+  }
+  return true;
+} });
