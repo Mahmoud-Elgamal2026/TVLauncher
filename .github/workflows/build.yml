@@ -42,7 +42,7 @@ jobs:
           echo "::error title=Gradle::${msg}"
       - run: |
           cp app/build/outputs/apk/release/app-release.apk TVLauncher-v${{ github.run_number }}.apk
-          cp phone/build/outputs/apk/release/phone-release.apk PhoneRemote-v${{ github.run_number }}.apk || true
+          mkdir -p phoneout; cp phone/build/outputs/apk/release/phone-release.apk phoneout/PhoneRemote.apk || true
       - uses: actions/upload-artifact@v4
         with: { name: TVLauncher-apk, path: TVLauncher-v*.apk }
       # Every build becomes a release, so the launcher can update itself from GitHub.
@@ -51,6 +51,13 @@ jobs:
           tag_name: v${{ github.run_number }}
           name: TV Launcher v${{ github.run_number }}
           body: ${{ github.event.head_commit.message }}
-          files: |
-            TVLauncher-v${{ github.run_number }}.apk
-            PhoneRemote-v${{ github.run_number }}.apk
+          files: TVLauncher-v${{ github.run_number }}.apk
+      # The phone remote lives in its own pre-release (fixed tag), so the TV updater never picks it up.
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: phone
+          name: Phone remote
+          prerelease: true
+          make_latest: false
+          body: Phone remote app for TV Launcher
+          files: phoneout/PhoneRemote.apk

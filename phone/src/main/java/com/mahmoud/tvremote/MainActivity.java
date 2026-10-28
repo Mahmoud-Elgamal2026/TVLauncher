@@ -55,16 +55,39 @@ public class MainActivity extends Activity {
     }
 
     void scan() {
-        WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        int ip = wm != null ? wm.getConnectionInfo().getIpAddress() : 0;
-        if (ip == 0) { msg.setText("وصّل الموبايل بنفس الواي فاي بتاع البوكس وافتح التطبيق تاني"); return; }
-        String base = (ip & 0xff) + "." + ((ip >> 8) & 0xff) + "." + ((ip >> 16) & 0xff) + ".";
+        String base = localBase();
+        if (base == null) { askAddress("مش لاقي الواي فاي. اكتب عنوان البوكس اللي ظاهر على التليفزيون في «التحكم من الموبايل» (زي 192.168.1.5):"); return; }
         ExecutorService ex = Executors.newFixedThreadPool(32); AtomicBoolean found = new AtomicBoolean(false);
         for (int i = 1; i < 255; i++) { final String h = base + i;
             ex.execute(() -> { if (found.get()) return; if (alive(h) && found.compareAndSet(false, true)) runOnUiThread(() -> { prefs.edit().putString("host", h).apply(); open(h); }); }); }
         ex.shutdown();
         new Thread(() -> { try { ex.awaitTermination(30, java.util.concurrent.TimeUnit.SECONDS); } catch (InterruptedException ignored) {}
-            if (!found.get()) runOnUiThread(() -> msg.setText("ملقتش البوكس.\nاتأكد إن البوكس شغال وإن «التحكم من الموبايل» شغال في الإعدادات، وإن الموبايل على نفس الواي فاي.")); }).start();
+            if (!found.get()) runOnUiThread(() -> askAddress("ملقتش البوكس لوحدي. اكتب العنوان اللي ظاهر على التليفزيون في الإعدادات ← «التحكم من الموبايل» (زي 192.168.1.5):")); }).start();
+    }
+
+    /** First private IPv4 of the phone (works on all Android versions, no location permission). */
+    static String localBase() {
+        try { for (java.net.NetworkInterface ni : java.util.Collections.list(java.net.NetworkInterface.getNetworkInterfaces())) {
+            if (!ni.isUp() || ni.isLoopback()) continue; String n = ni.getName();
+            for (java.net.InetAddress a : java.util.Collections.list(ni.getInetAddresses())) {
+                if (!(a instanceof java.net.Inet4Address)) continue; String h = a.getHostAddress();
+                if (h.startsWith("192.168.") || h.startsWith("10.") || h.matches("172\\.(1[6-9]|2\\d|3[01])\\..*")) {
+                    if (n.startsWith("rmnet") || n.startsWith("ccmni")) continue;
+                    return h.substring(0, h.lastIndexOf('.') + 1); } } } } catch (Exception ignored) {}
+        return null;
+    }
+
+    void askAddress(String text) {
+        android.widget.LinearLayout l = new android.widget.LinearLayout(this); l.setOrientation(android.widget.LinearLayout.VERTICAL); l.setPadding(50, 120, 50, 50); l.setBackgroundColor(0xFF0B0E1A);
+        TextView t = new TextView(this); t.setText(text); t.setTextColor(0xFFFFFFFF); t.setTextSize(18);
+        final android.widget.EditText e = new android.widget.EditText(this); e.setHint("192.168.1.5"); e.setTextColor(0xFFFFFFFF); e.setHintTextColor(0xFF777777);
+        e.setInputType(android.text.InputType.TYPE_CLASS_PHONE); String last = prefs.getString("host", null); if (last != null) e.setText(last);
+        android.widget.Button go = new android.widget.Button(this); go.setText("اتصل");
+        android.widget.Button again = new android.widget.Button(this); again.setText("دوّر تاني");
+        go.setOnClickListener(v -> { String h = e.getText().toString().trim().replaceAll("^https?://", "").replaceAll("[:/].*$", ""); if (h.isEmpty()) return;
+            msg.setText("بيتصل…"); setContentView(msg); check(h, ok -> { if (ok) { prefs.edit().putString("host", h).apply(); open(h); } else askAddress("العنوان ده مش بيرد. اتأكد منه ومن إن الموبايل على نفس الواي فاي:"); }); });
+        again.setOnClickListener(v -> { msg.setText("بيدوّر على البوكس في الواي فاي…"); setContentView(msg); scan(); });
+        l.addView(t); l.addView(e); l.addView(go); l.addView(again); setContentView(l);
     }
 
     void open(String host) {
