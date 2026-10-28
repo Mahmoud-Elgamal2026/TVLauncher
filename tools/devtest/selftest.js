@@ -26,6 +26,8 @@
   await t("net-radio-stream",async()=>{ const r=JSON.parse(await natAsync("resolveUrl",RADIO_FB[0].url)); return [!!r.url,r.url+" "+r.type] });
   await t("net-install-code",async()=>{ const r=JSON.parse(await natAsync("resolveUrl","https://aftv.news/")); return [!!r.url,r.url] });
   await t("net-github-api",async()=>{ const r=await A.fetchJSON("https://api.github.com/repos/RikkaApps/Shizuku/releases/latest"); return [!!r.tag_name,"public repo release "+r.tag_name] });
+  await t("wallpaper-cache",async()=>{ const r=await A.fetchJSON("https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US"); const u=await natAsync("cacheImage","https://www.bing.com"+r.images[0].urlbase+"_UHD.jpg",1920);
+    const img=new Image(); const ok=await new Promise(res=>{ img.onload=()=>res(true); img.onerror=()=>res(false); img.src=u }); return [ok&&img.naturalWidth<=1920,u.split("/").pop()+" "+img.naturalWidth+"x"+img.naturalHeight] },60000);
   // ---- prayer times (city → coordinates → times)
   await t("prayer",async()=>{ S.city="Cairo"; S.loc=null; if(window.weather) await weather(); await wait(3000); if(window.computePrayers) computePrayers(); updateTicker(); return [!!$("tPrayer").textContent.trim(),$("tPrayer").textContent] });
   // ---- IPTV: real public playlist → channels → check → play

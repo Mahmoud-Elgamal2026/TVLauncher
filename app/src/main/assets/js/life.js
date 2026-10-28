@@ -528,11 +528,7 @@ function wallBrowse(src, name, page) {
     }
     const items = list.map((w) => ({ fn: () => {
       S.wallAuto = "";
-      S.wallImg = w.full;
-      S.wall = "image";
-      applyLook();
-      if (window.renderSettings) renderSettings();
-      A.toast(L("saved"));
+      setWall(w.full, true);
     } }));
     const more = src !== "bing";
     if (more) items.push({ fn: () => setTimeout(() => wallBrowse(src, name, page + 1), 30) });
@@ -548,14 +544,8 @@ function bingToday(force) {
       const r = yield A.fetchJSON("https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US");
       const i = r.images && r.images[0];
       if (i) {
-        S.wallImg = "https://www.bing.com" + i.urlbase + "_UHD.jpg";
-        S.wall = "image";
         S.wallDay = d;
-        applyLook();
-        if (force) {
-          if (window.renderSettings) renderSettings();
-          A.toast(L("saved"));
-        }
+        yield setWall("https://www.bing.com" + i.urlbase + "_1920x1080.jpg", force);
       }
     } catch (e) {
       if (force) A.toast(L("loadErr"));
@@ -677,3 +667,22 @@ setTimeout(() => {
     setupWizard();
   }
 }, 6e3);
+function setWall(url, say) {
+  return __async(this, null, function* () {
+    if (say) banner("🖼", L("w4k"), "...", 2e3);
+    let src = url;
+    try {
+      if (NA && NA.cacheImage) src = yield natAsync("cacheImage", url, Math.min(1920, Math.max(1280, Math.round(screen.width * (window.devicePixelRatio || 1)))));
+    } catch (e) {
+    }
+    S.wallImg = src;
+    S.wall = "image";
+    applyLook();
+    if (window.renderSettings && $("settings").classList.contains("on")) renderSettings();
+    if (say) A.toast(L("saved"));
+  });
+}
+window.setWall = setWall;
+setTimeout(() => {
+  if (/^https?:/.test(S.wallImg || "") && S.wall === "image") setWall(S.wallImg, false);
+}, 5e3);

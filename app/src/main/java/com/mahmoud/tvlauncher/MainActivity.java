@@ -553,6 +553,37 @@ public class MainActivity extends Activity {
 
 
 
+
+        /** Downloads an image once, scales it to at most maxW pixels wide and saves it locally (fast wallpapers on weak boxes). */
+        @JavascriptInterface
+        public void cacheImage(final String url, final int maxW, final String id) {
+            new Thread(() -> {
+                try {
+                    File dir = new File(getFilesDir(), "wall"); dir.mkdirs();
+                    File out = new File(dir, Integer.toHexString(url.hashCode()) + "_" + maxW + ".jpg");
+                    if (!out.exists() || out.length() < 1000) {
+                        File tmp = new File(dir, "dl.tmp");
+                        try (InputStream in = open(url); OutputStream o = new java.io.FileOutputStream(tmp)) {
+                            byte[] buf = new byte[65536]; int n; while ((n = in.read(buf)) > 0) o.write(buf, 0, n);
+                        }
+                        BitmapFactory.Options b = new BitmapFactory.Options(); b.inJustDecodeBounds = true;
+                        BitmapFactory.decodeFile(tmp.getPath(), b);
+                        int sample = 1; while (b.outWidth / (sample * 2) >= maxW) sample *= 2;
+                        BitmapFactory.Options o2 = new BitmapFactory.Options(); o2.inSampleSize = sample; o2.inPreferredConfig = Bitmap.Config.RGB_565;
+                        Bitmap bm = BitmapFactory.decodeFile(tmp.getPath(), o2);
+                        if (bm == null) throw new Exception("not an image");
+                        if (bm.getWidth() > maxW) { Bitmap sc = Bitmap.createScaledBitmap(bm, maxW, Math.max(1, bm.getHeight() * maxW / bm.getWidth()), true); bm.recycle(); bm = sc; }
+                        try (OutputStream o = new java.io.FileOutputStream(out)) { bm.compress(Bitmap.CompressFormat.JPEG, 86, o); }
+                        bm.recycle(); tmp.delete();
+                        // keep the folder small: only the 12 newest wallpapers
+                        File[] all = dir.listFiles();
+                        if (all != null && all.length > 12) { java.util.Arrays.sort(all, (x, y) -> Long.compare(y.lastModified(), x.lastModified())); for (int k = 12; k < all.length; k++) all[k].delete(); }
+                    }
+                    callback(id, true, Uri.fromFile(out).toString());
+                } catch (Throwable t) { callback(id, false, String.valueOf(t.getMessage())); }
+            }).start();
+        }
+
         // ---------- start-up: resume last channel ----------
         /** True once per boot, for the first launcher start within 10 minutes of the box turning on. */
         @JavascriptInterface

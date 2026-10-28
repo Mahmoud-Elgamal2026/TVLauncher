@@ -132,15 +132,15 @@ activators.push((el) => {
     case "wallUrlSave": {
       const u = v("wallUrl");
       if (u) {
-        S.wallImg = u;
-        S.wall = "image";
+        S.wallAuto = "";
+        setWall(u, true);
       } else {
         S.wallImg = "";
         S.wall = "dynamic";
+        applyLook();
+        renderSettings();
+        A.toast(L("saved"));
       }
-      applyLook();
-      renderSettings();
-      A.toast(L("saved"));
       return true;
     }
     case "framePrev":

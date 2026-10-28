@@ -87,7 +87,7 @@ activators.push(el=>{
   const v=id=>($(id)||{}).value?$(id).value.trim():"";
   switch(el.id){
     case "wallPick": A.pickImage("wall"); return true;
-    case "wallUrlSave": { const u=v("wallUrl"); if(u){S.wallImg=u;S.wall="image"} else {S.wallImg="";S.wall="dynamic"} applyLook(); renderSettings(); A.toast(L("saved")); return true }
+    case "wallUrlSave": { const u=v("wallUrl"); if(u){ S.wallAuto=""; setWall(u,true) } else {S.wallImg="";S.wall="dynamic"; applyLook(); renderSettings(); A.toast(L("saved"))} return true }
     case "framePrev": startFrame(); return true;
     case "addPhotos": NA?A.pickFrames():window.onFramesAdded(JSON.stringify(["https://picsum.photos/seed/demo1/1920/1080","https://picsum.photos/seed/demo2/1920/1080"])); return true;
     case "clearPhotos": guard(!!S.pin,()=>{ S.frames.forEach(A.deleteFrame); S.frames=[]; if(S.frameSrc==="mine") S.frameSrc="online"; renderSettings() }); return true;

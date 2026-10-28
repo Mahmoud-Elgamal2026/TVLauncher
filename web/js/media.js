@@ -210,3 +210,27 @@ activators.push(el=>{
   if(el.id==="xAllApps"){ showPage("apps"); focus(document.querySelector("#appGrid .f")||document.querySelector(".tab.on")); return true }
   if(el.id==="xSources"){ const p=SRC_PKGS.find(x=>A.isInstalled(x)); if(p) launch(p); else A.toast(L("noSrc")); return true }
   return false });
+
+// ---------- IPTV without a subscription: free public channel packs (iptv-org) ----------
+const FREE_PACKS=[["eg","🇪🇬",{ar:"قنوات مصر",en:"Egypt"},"countries/eg.m3u"],["ara","🌍",{ar:"قنوات عربية",en:"Arabic channels"},"languages/ara.m3u"],
+  ["sa","🇸🇦",{ar:"السعودية",en:"Saudi Arabia"},"countries/sa.m3u"],["ae","🇦🇪",{ar:"الإمارات",en:"UAE"},"countries/ae.m3u"],
+  ["rel","🕌",{ar:"قنوات دينية",en:"Religious"},"categories/religious.m3u"],["kids","🧸",{ar:"أطفال",en:"Kids"},"categories/kids.m3u"]];
+MT.ar.freeTitle="مفيش اشتراك IPTV؟ ضيف قنوات مجانية بضغطة";MT.en.freeTitle="No IPTV subscription? Add free channels in one press";
+MT.ar.freeNote="قنوات مجانية متاحة للعامة من مشروع iptv-org — مش كلها شغالة طول الوقت، واللانشر بيعلّم على الواقفة";MT.en.freeNote="Free public channels from the iptv-org project — not all are always up; the launcher marks dead ones";
+MT.ar.freeAdded="اتضافت";MT.en.freeAdded="Added";MT.ar.ownList="أو ضيف اشتراكك من الإعدادات";MT.en.ownList="or add your own subscription in Settings";
+Object.keys(MT).forEach(l=>Object.assign(T[l],MT[l]));
+function freePackHtml(){ return `<div class="freebox"><div class="sec"><h3>📺 ${esc(L("freeTitle"))}</h3><div class="inline">${FREE_PACKS.map(p=>{ const on=S.lists.some(l=>l.url&&l.url.indexOf(p[3])>=0);
+  return `<button class="btn f${on?" pri":""}" data-freepack="${p[0]}">${p[1]} ${esc(p[2][S.lang]||p[2].en)}${on?" ✓":""}</button>` }).join("")}</div><div class="sub" style="margin-top:1.2vh">${esc(L("freeNote"))}</div>
+  <div class="inline" style="margin-top:1.2vh"><button class="btn f" id="ownList">⚙️ ${esc(L("ownList"))}</button></div></div></div>` }
+const _renderGroupsF=renderGroups; renderGroups=function(){ _renderGroupsF.apply(this,arguments);
+  if(!channels.length&&!S.favCh.length){ $("channels").innerHTML=freePackHtml() } };
+activators.push(el=>{
+  if(el.dataset.freepack){ const p=FREE_PACKS.find(x=>x[0]===el.dataset.freepack); if(!p) return true; const url="https://iptv-org.github.io/iptv/"+p[3];
+    const l=S.lists; if(!l.some(x=>x.url===url)){ l.push({name:p[1]+" "+(p[2][S.lang]||p[2].en),url}); S.lists=l }
+    banner("📺",L("freeAdded"),p[2][S.lang]||p[2].en,2500); loadLists().then(()=>{ if(window.loadEpg) loadEpg(); renderGroups(); if(window.runCheck) runCheck(true) }); return true }
+  if(el.id==="ownList"){ showPage("settings"); renderSettings(); return true }
+  return false });
+// Movies & Series tab only shows when there is something to show
+function updVodTab(){ const t=document.querySelector('.tab[data-page="vod"]'); if(!t) return; const has=(typeof vodCats!=="undefined"&&vodCats.length)||S.watch.some(w=>w.kind)||S.lists.some(l=>l.type==="xtream");
+  t.style.display=has?"":"none"; if(!has&&document.querySelector("#vod.on")) showPage("home") }
+setInterval(updVodTab,4000); setTimeout(updVodTab,1500);

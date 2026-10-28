@@ -203,7 +203,7 @@ async function wallBrowse(src,name,page){
   banner("🖼",L("w4k"),"...",2500);
   let list=[]; try{ list=await wallList(src,page) }catch(e){}
   if(!list.length){ A.toast(L("loadErr")); return }
-  const items=list.map(w=>({fn:()=>{ S.wallAuto=""; S.wallImg=w.full; S.wall="image"; applyLook(); if(window.renderSettings) renderSettings(); A.toast(L("saved")) }}));
+  const items=list.map(w=>({fn:()=>{ S.wallAuto=""; setWall(w.full,true) }}));
   const more=src!=="bing"; if(more) items.push({fn:()=>setTimeout(()=>wallBrowse(src,name,page+1),30)});
   dialog("🖼 "+name+" · 4K",items,{html:`<div class="wgrid">${list.map((w,i)=>`<button class="btn f wthumb" data-di="${i}"><img src="${esc(w.thumb)}" alt=""></button>`).join("")}${more?`<button class="btn f wthumb wmore" data-di="${list.length}">${esc(L("more"))} ›</button>`:""}</div>`});
 }
@@ -211,7 +211,7 @@ async function bingToday(force){
   if(S.wallAuto!=="bing") return;
   const d=new Date().toDateString(); if(!force&&S.wallDay===d) return;
   try{ const r=await A.fetchJSON("https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US"); const i=r.images&&r.images[0];
-    if(i){ S.wallImg="https://www.bing.com"+i.urlbase+"_UHD.jpg"; S.wall="image"; S.wallDay=d; applyLook(); if(force){ if(window.renderSettings) renderSettings(); A.toast(L("saved")) } } }catch(e){ if(force) A.toast(L("loadErr")) }
+    if(i){ S.wallDay=d; await setWall("https://www.bing.com"+i.urlbase+"_1920x1080.jpg",force) } }catch(e){ if(force) A.toast(L("loadErr")) }
 }
 setTimeout(()=>bingToday(false),4000); setInterval(()=>bingToday(false),3600000);
 activators.push(el=>{ if(el.id==="wall4k"){ wallMenu(); return true } return false });
@@ -257,3 +257,13 @@ async function selfTest(){
 }
 activators.push(el=>{ if(el.id==="setupBtn"){ setupWizard(); return true } return false });
 setTimeout(()=>{ if(!S.setupSeen&&NA&&NA.isDefaultHome&&!nat("isDefaultHome")){ S.setupSeen=true; setupWizard() } },6000);
+
+// online wallpapers are downloaded once, scaled to screen size and shown from the box (much lighter than 4K over the network)
+async function setWall(url,say){
+  if(say) banner("🖼",L("w4k"),"...",2000);
+  let src=url; try{ if(NA&&NA.cacheImage) src=await natAsync("cacheImage",url,Math.min(1920,Math.max(1280,Math.round(screen.width*(window.devicePixelRatio||1))))) }catch(e){}
+  S.wallImg=src; S.wall="image"; applyLook(); if(window.renderSettings&&$("settings").classList.contains("on")) renderSettings(); if(say) A.toast(L("saved"));
+}
+window.setWall=setWall;
+// wallpapers saved before (straight from the internet, often 4K) get converted once to the light local copy
+setTimeout(()=>{ if(/^https?:/.test(S.wallImg||"")&&S.wall==="image") setWall(S.wallImg,false) },5000);

@@ -407,3 +407,12 @@ body.lite.lighttheme .btn.pri,body.lite.lighttheme .it.sel,body.lite.lighttheme 
 /* mixed Arabic/English names (e.g. "[Not 24/7]") keep their own direction */
 #shelfTitle,#shelfSub,.app .nm,.app .lbl,.chrow .cn,#pName,#pNow,.it,.bt,.bx{unicode-bidi:plaintext}
 html[dir=rtl] #shelfTitle,html[dir=rtl] #shelfSub,html[dir=rtl] .it,html[dir=rtl] .bt,html[dir=rtl] .bx,html[dir=rtl] #pName,html[dir=rtl] #pNow{text-align:right}html[dir=ltr] #shelfTitle,html[dir=ltr] #shelfSub,html[dir=ltr] .it,html[dir=ltr] .bt,html[dir=ltr] .bx,html[dir=ltr] #pName,html[dir=ltr] #pNow{text-align:left}
+.freebox{padding:1vh .5vw}.freebox .inline{flex-wrap:wrap}
+html.nofg .freebox .btn{margin:0 .6vw 1vh 0}
+/* clear focus frame in every theme and in fast mode: white on dark themes, near-black on light themes */
+.f.focus{outline:.42vh solid #fff;outline-offset:.32vh}
+body.lighttheme .f.focus{outline-color:#111}
+.tab.f.focus{outline-offset:.15vh}
+.inp.f.focus{outline-offset:0}
+body.lite .app.f.focus,body.lite .it.f.focus,body.lite .poster.f.focus{transform:scale(1.06)}
+.app.focus .nm{opacity:1!important}
