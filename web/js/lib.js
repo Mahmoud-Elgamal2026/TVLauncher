@@ -1,19 +1,25 @@
 // ================= Free libraries: Quran, lectures, classic films, documentaries, audiobooks =================
 // Sources are free and legal: mp3quran.net (Quran recitations) and the Internet Archive (public-domain films, lectures, books).
-Object.assign(T.ar,{libTab:"📚 المكتبة",libQuran:"القرآن الكريم",libKhutab:"خطب ودروس",libOldAr:"أفلام عربي قديمة",libClassic:"أفلام كلاسيك",libDocs:"وثائقي",libCartoon:"كرتون قديم",libBooks:"كتب مسموعة",libPlays:"مسرحيات قديمة",
+Object.assign(T.ar,{libTab:"📚 المكتبة",libQuran:"القرآن الكريم",libKhutab:"خطب ودروس",libOldAr:"أفلام عربي قديمة",libClassic:"أفلام كلاسيك",libDocs:"وثائقي",libCartoon:"كرتون قديم",libBooks:"كتب مسموعة",libPlays:"مسرحيات",libArabic:"أفلام عربي",libHorror:"رعب",libRomance:"رومانسي",libAction:"أكشن",libComedy:"كوميدي",libForeign:"أفلام أجنبي",
   libSearch:"بحث في المكتبة",libLoading:"بيحمّل…",libEmpty:"مفيش نتايج",libReciter:"اختار القارئ",libSurah:"اختار السورة",libFiles:"اختار الحلقة/الجزء",libAll:"شغّل الكل"});
-Object.assign(T.en,{libTab:"📚 Library",libQuran:"Holy Quran",libKhutab:"Sermons & lessons",libOldAr:"Classic Arabic films",libClassic:"Classic films",libDocs:"Documentaries",libCartoon:"Old cartoons",libBooks:"Audiobooks",libPlays:"Classic plays",
+Object.assign(T.en,{libTab:"📚 Library",libQuran:"Holy Quran",libKhutab:"Sermons & lessons",libOldAr:"Classic Arabic films",libClassic:"Classic films",libDocs:"Documentaries",libCartoon:"Old cartoons",libBooks:"Audiobooks",libPlays:"Plays",libArabic:"Arabic films",libHorror:"Horror",libRomance:"Romance",libAction:"Action",libComedy:"Comedy",libForeign:"Foreign films",
   libSearch:"Search the library",libLoading:"Loading…",libEmpty:"No results",libReciter:"Pick a reciter",libSurah:"Pick a surah",libFiles:"Pick a part",libAll:"Play all"});
 // [key, icon, archive.org query]
 const LIB_CATS=[["quran","📖",null],
   ["khutab","🕌",'subject:("خطب الجمعة" OR "خطبة الجمعة" OR "دروس دينية" OR محاضرات OR "تفسير القرآن" OR "السيرة النبوية") AND mediatype:audio'],
   ["oldar","🎞",'mediatype:movies AND title:(فيلم) AND (subject:("ابيض واسود" OR "أبيض وأسود" OR "الزمن الجميل" OR "افلام قديمة" OR "أفلام قديمة" OR "افلام مصرية" OR "سينما مصرية" OR "egyptian cinema" OR "egyptian movie" OR "classic arabic" OR "افلام زمان" OR "فيلم مصري" OR "افلام مصرية قديمة" OR "افلام عربي قديمة" OR "السينما المصرية" OR "افلام عربية قديمة" OR "egyptian films" OR "arabic cinema") OR title:(19*))'],
   ["plays","🎭",'mediatype:movies AND title:(مسرحية OR مسرحيه) AND NOT title:(تريلر OR اعلان OR مقطع OR مشهد)'],
+  ["arabic","🇪🇬",'mediatype:movies AND title:(فيلم OR افلام) AND NOT title:(تريلر OR اعلان OR مقطع)'],
+  ["horror","👻",'mediatype:movies AND (subject:(horror OR رعب) OR title:(رعب)) AND (collection:feature_films OR collection:moviesandfilms OR title:(فيلم))'],
+  ["romance","💕",'mediatype:movies AND (subject:(romance OR رومانسي OR رومانسية) OR title:(رومانسي)) AND (collection:feature_films OR collection:moviesandfilms OR title:(فيلم))'],
+  ["action","💥",'mediatype:movies AND (subject:(action OR اكشن OR أكشن OR western) OR title:(اكشن)) AND (collection:feature_films OR collection:moviesandfilms OR title:(فيلم))'],
+  ["comedy","😂",'mediatype:movies AND (subject:(comedy OR كوميدي OR كوميديا) OR title:(كوميدي)) AND (collection:feature_films OR collection:moviesandfilms OR title:(فيلم))'],
+  ["foreign","🌐",'mediatype:movies AND collection:(feature_films OR moviesandfilms OR film_noir OR scifi_horror)'],
   ["classic","🎬",'collection:feature_films AND mediatype:movies'],
   ["docs","🌍",'collection:(documentaries OR ephemera) AND mediatype:movies'],
   ["cartoon","🐭",'collection:classic_cartoons AND mediatype:movies'],
   ["books","🎧",'collection:librivoxaudio AND mediatype:audio']];
-const LIBN={plays:"libPlays",quran:"libQuran",khutab:"libKhutab",oldar:"libOldAr",classic:"libClassic",docs:"libDocs",cartoon:"libCartoon",books:"libBooks"};
+const LIBN={arabic:"libArabic",horror:"libHorror",romance:"libRomance",action:"libAction",comedy:"libComedy",foreign:"libForeign",plays:"libPlays",quran:"libQuran",khutab:"libKhutab",oldar:"libOldAr",classic:"libClassic",docs:"libDocs",cartoon:"libCartoon",books:"libBooks"};
 let libCat="quran", libCache={}, libQ="";
 
 (function(){ // tab + page (shown in the simple interface too)
@@ -31,7 +37,7 @@ async function renderLib(){
   const key=libCat+"|"+libQ; let items=libCache[key];
   if(!items){ libMsg(L("libLoading"));
     const cat=LIB_CATS.find(c=>c[0]===libCat), q=libQ?`(${libQ}) AND mediatype:(movies OR audio)`:cat[2];
-    try{ const r=await A.fetchJSON("https://archive.org/advancedsearch.php?q="+encodeURIComponent(q)+"&fl[]=identifier&fl[]=title&fl[]=mediatype&fl[]=year&sort[]=downloads+desc&rows=60&output=json");
+    try{ const r=await A.fetchJSON("https://archive.org/advancedsearch.php?q="+encodeURIComponent(q)+"&fl[]=identifier&fl[]=title&fl[]=mediatype&fl[]=year&sort[]=downloads+desc&rows=200&output=json");
       items=((r.response||{}).docs||[]).filter(d=>!libBlocked(Array.isArray(d.title)?d.title[0]:d.title||"")).map(d=>({id:d.identifier,title:Array.isArray(d.title)?d.title[0]:d.title||d.identifier,mt:d.mediatype,year:d.year})); libCache[key]=items }catch(e){ items=[] } }
   if(!items.length) return libMsg(L("libEmpty"));
   $("libMain").innerHTML=`<div class="lbgrid">${items.map(i=>libCard({attr:`data-arch="${esc(i.id)}"`,img:"https://archive.org/services/img/"+i.id,title:i.title,sub:i.year?String(i.year):""})).join("")}</div>`;
