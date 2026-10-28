@@ -54,8 +54,8 @@ Object.assign(T.en, {
 });
 const LIB_CATS = [
   ["quran", "📖", null],
-  ["khutab", "🕌", "(title:(خطبة OR خطب OR محاضرة OR درس OR دروس) OR subject:(خطب OR محاضرات OR دروس)) AND mediatype:(audio OR movies)"],
-  ["oldar", "🎞", '(subject:(افلام عربية OR فيلم عربي OR "arabic film" OR "egyptian film") OR title:(فيلم)) AND mediatype:movies'],
+  ["khutab", "🕌", 'subject:("خطب الجمعة" OR "خطبة الجمعة" OR "دروس دينية" OR محاضرات OR "تفسير القرآن" OR "السيرة النبوية") AND mediatype:audio'],
+  ["oldar", "🎞", 'title:(فيلم) AND subject:("ابيض واسود" OR "أبيض وأسود" OR "الزمن الجميل" OR "افلام قديمة" OR "أفلام قديمة" OR "افلام مصرية" OR "سينما مصرية" OR "egyptian cinema" OR "egyptian movie" OR "classic arabic") AND mediatype:movies'],
   ["classic", "🎬", "collection:feature_films AND mediatype:movies"],
   ["docs", "🌍", "collection:(documentaries OR ephemera) AND mediatype:movies"],
   ["cartoon", "🐭", "collection:classic_cartoons AND mediatype:movies"],
@@ -96,7 +96,7 @@ function renderLib() {
       const cat = LIB_CATS.find((c) => c[0] === libCat), q = libQ ? `(${libQ}) AND mediatype:(movies OR audio)` : cat[2];
       try {
         const r = yield A.fetchJSON("https://archive.org/advancedsearch.php?q=" + encodeURIComponent(q) + "&fl[]=identifier&fl[]=title&fl[]=mediatype&fl[]=year&sort[]=downloads+desc&rows=60&output=json");
-        items = ((r.response || {}).docs || []).map((d) => ({ id: d.identifier, title: Array.isArray(d.title) ? d.title[0] : d.title || d.identifier, mt: d.mediatype, year: d.year }));
+        items = ((r.response || {}).docs || []).filter((d) => !libBlocked(Array.isArray(d.title) ? d.title[0] : d.title || "")).map((d) => ({ id: d.identifier, title: Array.isArray(d.title) ? d.title[0] : d.title || d.identifier, mt: d.mediatype, year: d.year }));
         libCache[key] = items;
       } catch (e) {
         items = [];
@@ -197,3 +197,7 @@ pageHooks["lib:enter"] = () => {
 };
 LIB_CATS.push(["search", "🔍", ""]);
 LIBN.search = "libSearch";
+const LIB_BLOCK = /جيش|إصدار|اصدار|مؤسسة|تحرير|معركة|غزو|مجاهد|جهاد|انغماس|الدولة الإسلامية|الدولة الاسلامية|ولاية|استشهاد|عملية|قصف|سرايا|كتائب|فصائل|كتيبة|طلائع|أحرار|احرار|isis|daesh|jihad|mujahid|militant|\+18|sex|xxx/i;
+function libBlocked(t) {
+  return LIB_BLOCK.test(String(t || ""));
+}

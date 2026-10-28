@@ -101,6 +101,8 @@ js "console.log('TVL|hw-board|'+(document.querySelectorAll('#hwBoard .hw').lengt
 js "showPage('lib');renderLib()" 15; shot 56-lib-quran
 js "console.log('TVL|lib-quran|'+(document.querySelectorAll('#libMain [data-reciter]').length>10?'PASS':'FAIL')+'|'+document.querySelectorAll('#libMain [data-reciter]').length+' reciters')" 1
 js "libCat='oldar';renderLib()" 15; shot 57-lib-films
+js "console.log('TVL|lib-clean|'+([].slice.call(document.querySelectorAll('#libMain .lbt')).some(function(e){return libBlocked(e.textContent)})?'FAIL':'PASS')+'|')" 1
+js "libCat='khutab';renderLib()" 15; shot 58-lib-khutab
 js "console.log('TVL|lib-archive|'+(document.querySelectorAll('#libMain [data-arch]').length>5?'PASS':'FAIL')+'|'+document.querySelectorAll('#libMain [data-arch]').length+' items')" 1
 js "S.simple=false;applySimple()" 1
 key SEARCH; sleep 3; shot 51-voice; key BACK; sleep 1
