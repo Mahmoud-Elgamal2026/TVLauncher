@@ -55,7 +55,7 @@ Object.assign(T.en, {
 const LIB_CATS = [
   ["quran", "📖", null],
   ["khutab", "🕌", 'subject:("خطب الجمعة" OR "خطبة الجمعة" OR "دروس دينية" OR محاضرات OR "تفسير القرآن" OR "السيرة النبوية") AND mediatype:audio'],
-  ["oldar", "🎞", 'title:(فيلم) AND subject:("ابيض واسود" OR "أبيض وأسود" OR "الزمن الجميل" OR "افلام قديمة" OR "أفلام قديمة" OR "افلام مصرية" OR "سينما مصرية" OR "egyptian cinema" OR "egyptian movie" OR "classic arabic" OR "افلام زمان" OR "فيلم مصري" OR "افلام مصرية قديمة" OR "افلام عربي قديمة" OR "السينما المصرية" OR "افلام عربية قديمة" OR "egyptian films" OR "old egyptian" OR "arabic cinema" OR "abyad wa aswad")) OR (title:(فيلم) AND title:(19*) AND mediatype:movies'],
+  ["oldar", "🎞", 'mediatype:movies AND title:(فيلم) AND (subject:("ابيض واسود" OR "أبيض وأسود" OR "الزمن الجميل" OR "افلام قديمة" OR "أفلام قديمة" OR "افلام مصرية" OR "سينما مصرية" OR "egyptian cinema" OR "egyptian movie" OR "classic arabic" OR "افلام زمان" OR "فيلم مصري" OR "افلام مصرية قديمة" OR "افلام عربي قديمة" OR "السينما المصرية" OR "افلام عربية قديمة" OR "egyptian films" OR "arabic cinema") OR title:(19*))'],
   ["classic", "🎬", "collection:feature_films AND mediatype:movies"],
   ["docs", "🌍", "collection:(documentaries OR ephemera) AND mediatype:movies"],
   ["cartoon", "🐭", "collection:classic_cartoons AND mediatype:movies"],
