@@ -238,7 +238,7 @@ function activate(el){
   for(const a of activators) if(a(el)) return;
 }
 function openOptions(el){ if(!el||el.closest("#dbox")) return; for(const h of optionHandlers) if(h(el)) return }
-const hasOptions=el=>el&&!el.closest("#dbox")&&(el.dataset.pkg||el.dataset.chu||el.dataset.group!==undefined||el.dataset.wk||el.dataset.vcat||el.dataset.folder);
+const hasOptions=el=>el&&!el.closest("#dbox")&&(el.dataset.pkg||el.dataset.chu||el.dataset.group!==undefined||el.dataset.wk||el.dataset.vcat||el.dataset.folder||el.dataset.hw||el.id==="hwAddBtn"||el.classList.contains("lbc"));
 
 // ================= key routing =================
 let idleAt=Date.now();
