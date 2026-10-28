@@ -250,6 +250,14 @@ tickers.push(() => {
   if (hwTickN % 2) return;
   hwList().forEach((w) => {
     if (w.t === "yt" || w.t === "note") return;
+    if (w.t === "hero") {
+      const hb = document.querySelector("#hwBoard .hw-hero .hbig");
+      if (hb) {
+        const t = fmtTime(/* @__PURE__ */ new Date());
+        if (hb.textContent !== t) hb.textContent = t;
+      }
+      if (hwTickN % 30) return;
+    }
     if (w.t === "weather" && hwTickN % 6) return;
     if (w.t === "matches" && hwTickN % 12) return;
     const e = document.querySelector(`#hwBoard [data-hw="${w.id}"] .hwb`);

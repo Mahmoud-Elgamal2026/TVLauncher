@@ -640,3 +640,7 @@ body.simple #home .scroll{padding-inline-start:9vh}
 body[data-hpage="0"] #favRow,body[data-hpage="0"] #favRow + .x,body[data-hpage="0"] #folderRow,body[data-hpage="0"] h2[data-row=folderRow]{display:none!important}
 body[data-hpage="1"] #home .scroll > #favRow,body[data-hpage="1"] #home .scroll > #folderRow{display:flex!important}
 body[data-hpage="0"] h2.favh{display:none!important}
+#npMini{font-size:1.7vh;opacity:.8;margin-top:.3vh;white-space:nowrap}
+.herobox .hlive{font-size:2.3vh;margin-top:1vh;background:rgba(220,30,30,.55);padding:.5vh 1vw;border-radius:1vh;align-self:flex-start}
+.herobox .hlive span{color:#fff;opacity:.9;margin-inline-start:.6vw}
+.herobox .hwird{margin-top:1.2vh;font-size:1.9vh;opacity:.92;max-width:70%;line-height:1.5;max-height:5.8vh;overflow:hidden;text-shadow:0 .2vh .8vh rgba(0,0,0,.7)}

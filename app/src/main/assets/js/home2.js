@@ -366,3 +366,39 @@ setTimeout(() => {
   const fr = $("favRow"), h = fr && fr.previousElementSibling;
   if (h && h.tagName === "H2") h.classList.add("favh");
 }, 0);
+if (!S.slimSeeded) {
+  S.slimSeeded = true;
+  S.hw = hwList().filter((w) => !(w.t === "clock" || w.t === "boost" || w.t === "weather" && (w.sz || 1) < 2 || w.t === "wird"));
+  if (!hwList().some((w) => w.t === "hero")) S.hw = [{ id: "hero", t: "hero", sz: 4, st: "clear" }].concat(hwList());
+}
+(function() {
+  const d = $("date");
+  if (!d) return;
+  const m = document.createElement("div");
+  m.id = "npMini";
+  d.parentNode.insertBefore(m, d.nextSibling);
+})();
+tickers.push(() => {
+  const m = $("npMini");
+  if (!m) return;
+  const np = S.prayerOn && window.nextPrayer && typeof prayers !== "undefined" && prayers.length ? nextPrayer() : null;
+  const t = np ? `🕌 ${L("prayers")[np.i]} ${fmtTime(np.t)} · ${fmtLeft(np.t - Date.now())}` : "";
+  if (m.textContent !== t) m.textContent = t;
+});
+const _hwBodyS2 = hwBody;
+hwBody = function(w) {
+  let h = _hwBodyS2(w);
+  if (w.t !== "hero") return h;
+  const live = typeof matches !== "undefined" ? matches.find((e) => evState(e) === "live") : null;
+  if (live) h = h.replace('<div class="hrow">', `<div class="hlive">⚽ <b>${esc(live.strHomeTeam)} ${esc(String(live.intHomeScore || 0))} - ${esc(String(live.intAwayScore || 0))} ${esc(live.strAwayTeam)}</b> <span>● ${esc(L("live"))}</span></div><div class="hrow">`);
+  const wd = typeof wird !== "undefined" && wird || S.wird;
+  if (!wd && typeof loadWird === "function") loadWird();
+  if (wd) h = h.replace(/<\/div>$/, `<div class="hwird"><span>📖 ${esc(wd.text)} — ${esc(wd.ref)}</span></div></div>`);
+  return h;
+};
+setTimeout(() => {
+  if (!sportsTried && S.sportsOn !== false) {
+    sportsTried = true;
+    loadSports();
+  }
+}, 8e3);
