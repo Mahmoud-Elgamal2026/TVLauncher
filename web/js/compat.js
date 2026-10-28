@@ -33,21 +33,23 @@
     d.documentElement.className+=" noar";
     var RATIOS=[[".app.match",16/7],["#apps .app",1/0.9],[".app",16/9.6],[".chgrid .it",16/10],[".pv",16/9],[".poster",2/3],["#dPoster",2/3],[".fgrid",1.6],[".ep img",16/9],[".ep .epn",16/9],[".sico",1]];
     var busy=false;
+    var roots=function(){ var r=[], q=d.querySelectorAll(".page.on,#dlg,#frame,#dock,#allAppsW"); for(var i=0;i<q.length;i++) r.push(q[i]); return r };
+    var qa=function(sel){ var out=[], rs=roots(); for(var i=0;i<rs.length;i++){ var l=rs[i].querySelectorAll(sel); for(var j=0;j<l.length;j++) out.push(l[j]) } return out };
     var fix=function(){ busy=false;
-      for(var i=0;i<RATIOS.length;i++){ var els=d.querySelectorAll(RATIOS[i][0]);
+      for(var i=0;i<RATIOS.length;i++){ var els=qa(RATIOS[i][0]);
         for(var j=0;j<els.length;j++){ var el=els[j]; if(el.__ar) continue; var wd=el.offsetWidth; if(wd&&el.__w!==wd+"/"+RATIOS[i][1]){ el.__w=wd+"/"+RATIOS[i][1]; el.style.height=(wd/RATIOS[i][1])+"px" } } }
       // .app.match must not be overwritten by the generic .app rule
-      var ms=d.querySelectorAll(".app.match"); for(var k=0;k<ms.length;k++){ ms[k].style.height=(ms[k].offsetWidth/(16/7))+"px" }
+      var ms=qa(".app.match"); for(var k=0;k<ms.length;k++){ ms[k].style.height=(ms[k].offsetWidth/(16/7))+"px" }
       // theme layouts with their own tile shapes (applied last so they win)
       var SPEC=[['#home .row[data-wshape=square] .app',1],['#home .row[data-wshape=circle] .app',1],['#home .row[data-wshape=icon] .app',1],['#home .row[data-wshape=poster] .app',2/3],['body[data-lay=poster][data-page=home] #favRow .app',2/3],['body[data-lay=grid][data-page=home] #favRow .app',16/9.6],['body[data-lay=bar][data-page=home] #favRow .app',16/9.6]];
-      for(var q=0;q<SPEC.length;q++){ var se=d.querySelectorAll(SPEC[q][0]); for(var z=0;z<se.length;z++){ if(se[z].offsetWidth) se[z].style.height=(se[z].offsetWidth/SPEC[q][1])+"px" } }
+      for(var q=0;q<SPEC.length;q++){ var se=qa(SPEC[q][0]); for(var z=0;z<se.length;z++){ if(se[z].offsetWidth) se[z].style.height=(se[z].offsetWidth/SPEC[q][1])+"px" } }
       var xb=d.querySelector('body[data-lay=xbox][data-page=home] #favRow .app:first-child'); if(xb) xb.style.height="";
     };
     var later=function(){ if(!busy){ busy=true; setTimeout(fix,30) } };
     w.__fixAspect=later;
     d.addEventListener("DOMContentLoaded",function(){
       // only re-measure when cards are added/removed or the look changes — not on every focus move
-      new MutationObserver(later).observe(d.body,{childList:true,subtree:true});
+      new MutationObserver(function(ms){ for(var i=0;i<ms.length;i++){ var a=ms[i].addedNodes; for(var j=0;j<a.length;j++) if(a[j].nodeType===1&&a[j].tagName!=="IMG"&&a[j].tagName!=="SPAN"&&a[j].tagName!=="B"){ later(); return } } }).observe(d.body,{childList:true,subtree:true});
       new MutationObserver(later).observe(d.body,{attributes:true,attributeFilter:["data-theme","data-size","data-page","data-lay","data-wshape","data-wsize","data-wview"]});
       w.addEventListener("resize",later); later();
     });

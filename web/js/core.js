@@ -177,8 +177,10 @@ function focus(el){
   if(el.tagName==="INPUT"){ if(document.activeElement&&document.activeElement!==el&&document.activeElement.blur) document.activeElement.blur() } else el.focus({preventScroll:true});
   keepVisible(el);
   if(el.classList.contains("tab")){ if(el.dataset.page) showPage(el.dataset.page); return }
-  focusHooks.forEach(h=>h(el));
+  // heavy updates (shelf picture, preview, EPG) run once the remote settles, not on every single step
+  clearTimeout(focusHookT); focusHookT=setTimeout(()=>{ if(focused===el) focusHooks.forEach(h=>{ try{h(el)}catch(e){} }) },90);
 }
+let focusHookT=0;
 // Scroll every scrollable parent so the focused item is fully on screen, with breathing room.
 // Written by hand because old TV WebViews ignore scrollIntoView options.
 function keepVisible(el){

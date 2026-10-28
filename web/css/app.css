@@ -518,3 +518,7 @@ body[data-anim=lanterns] #animBg i:nth-child(3){left:63vw;animation-delay:3s!imp
 @keyframes anSway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
 @keyframes kenBurns{from{transform:scale(1) translate(0,0)}to{transform:scale(1.08) translate(-1.5%,-1%)}}
 body.livewall[data-page=home] #wall{animation:kenBurns 45s ease-in-out infinite alternate!important;will-change:transform}
+
+/* fast mode: no full-screen blurred picture behind the focus (very heavy on old GPUs), no wallpaper motion */
+body.lite #shelfImg{display:none!important}
+body.lite.livewall #wall{animation:none!important}

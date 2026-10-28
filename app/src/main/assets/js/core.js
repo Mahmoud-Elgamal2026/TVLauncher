@@ -451,8 +451,17 @@ function focus(el) {
     if (el.dataset.page) showPage(el.dataset.page);
     return;
   }
-  focusHooks.forEach((h) => h(el));
+  clearTimeout(focusHookT);
+  focusHookT = setTimeout(() => {
+    if (focused === el) focusHooks.forEach((h) => {
+      try {
+        h(el);
+      } catch (e) {
+      }
+    });
+  }, 90);
 }
+let focusHookT = 0;
 function keepVisible(el) {
   const pad2 = Math.round(innerHeight * 0.06), padX = Math.round(innerWidth * 0.04);
   let p = el.parentElement;
