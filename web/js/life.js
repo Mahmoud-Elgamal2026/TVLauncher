@@ -256,4 +256,4 @@ async function selfTest(){
   show(true);
 }
 activators.push(el=>{ if(el.id==="setupBtn"){ setupWizard(); return true } return false });
-setTimeout(()=>{ if(!S.setupSeen&&NA&&NA.isDefaultHome&&!nat("isDefaultHome")) setupWizard() },6000);
+setTimeout(()=>{ if(!S.setupSeen&&NA&&NA.isDefaultHome&&!nat("isDefaultHome")){ S.setupSeen=true; setupWizard() } },6000);

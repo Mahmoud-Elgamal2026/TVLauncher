@@ -11,26 +11,28 @@ adb shell dumpsys package com.google.android.webview | grep -m1 versionName > $O
 adb logcat -c
 adb shell am start -n $PKG/.MainActivity
 sleep 25
+adb exec-out screencap -p > $OUT/shots/00-first-start.png
 shot(){ adb exec-out screencap -p > $OUT/shots/$1.png; }
 js(){ adb shell am start -n $PKG/.MainActivity --es js64 "$(printf '%s' "$1" | base64 -w0)" >/dev/null; sleep ${2:-2}; }
+chk(){ js "(function(){var r=focused&&focused.getBoundingClientRect();var pg=document.querySelector('.page.on').id;var vis=!!r&&r.top>=0&&r.bottom<=innerHeight+1&&r.left>=-1&&r.right<=innerWidth+1;console.log('TVL|nav-$1|'+((pg==='$2'&&vis)?'PASS':'FAIL')+'|page='+pg+' visible='+vis+' on='+(focused&&(focused.dataset.page||focused.dataset.pkg||focused.id||focused.className)))})()" 1; }
 key(){ for k in "$@"; do adb shell input keyevent $k; sleep 0.5; done; }
 shot 00-boot
 # real remote: walk the tabs, enter pages, move left/right/down
-js "S.lite=true;S.perfChosen=true;S.favs=apps.slice(0,6).map(a=>a.pkg);S.recent=apps.slice(6,10).map(a=>a.pkg);applyLook();renderHome();showPage('home');focus(document.querySelector('.tab[data-page=home]'))" 3
+js "closeDialog();S.setupSeen=true;S.lite=true;S.perfChosen=true;S.favs=apps.slice(0,6).map(a=>a.pkg);S.recent=apps.slice(6,10).map(a=>a.pkg);applyLook();renderHome();showPage('home');focus(document.querySelector('.tab[data-page=home]'))" 3
 shot 01-home-tab
 key DPAD_DOWN; shot 02-home-down
-key DPAD_RIGHT DPAD_RIGHT DPAD_LEFT; shot 03-home-right
-key DPAD_DOWN DPAD_DOWN DPAD_DOWN; shot 04-home-down3
-key DPAD_UP DPAD_UP DPAD_UP DPAD_UP DPAD_UP; shot 05-back-to-tabs
-key DPAD_LEFT; shot 06-tab-apps
-key DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN; shot 07-apps-scroll
-key DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT; shot 08-apps-right-edge
+key DPAD_RIGHT DPAD_RIGHT DPAD_LEFT; shot 03-home-right; chk 03 home
+key DPAD_DOWN DPAD_DOWN DPAD_DOWN; shot 04-home-down3; chk 04 home
+key DPAD_UP DPAD_UP DPAD_UP DPAD_UP DPAD_UP; shot 05-back-to-tabs; chk 05 home
+key DPAD_LEFT; shot 06-tab-apps; chk 06 apps
+key DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN; shot 07-apps-scroll; chk 07 apps
+key DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT; shot 08-apps-right-edge; chk 08 apps
 key BACK; sleep 1; shot 09-after-back
 # every page
 for p in tv vod files store settings; do js "showPage('$p');if('$p'==='settings')renderSettings();focus(document.querySelector('.tab[data-page=$p]'))" 2; key DPAD_DOWN; shot "10-page-$p"; done
 js "showPage('settings');renderSettings();focus(document.querySelector('#setScroll .f'))" 2
-key DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN; shot 11-settings-scrolled
-key DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT; shot 12-settings-right
+key DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN DPAD_DOWN; shot 11-settings-scrolled; chk 11 settings
+key DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT DPAD_RIGHT; shot 12-settings-right; chk 12 settings
 # every theme on home (fast mode, like the box)
 for t in $(cat themes.txt); do js "S.theme='$t';applyLook();renderHome();showPage('home');focus(document.querySelector('#favRow .app')||document.querySelector('.tab.on'))" 2; shot "20-theme-$t"; done
 js "S.theme='apple';applyLook();renderHome()" 1

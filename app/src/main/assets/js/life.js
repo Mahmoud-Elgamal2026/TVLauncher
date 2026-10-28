@@ -672,5 +672,8 @@ activators.push((el) => {
   return false;
 });
 setTimeout(() => {
-  if (!S.setupSeen && NA && NA.isDefaultHome && !nat("isDefaultHome")) setupWizard();
+  if (!S.setupSeen && NA && NA.isDefaultHome && !nat("isDefaultHome")) {
+    S.setupSeen = true;
+    setupWizard();
+  }
 }, 6e3);

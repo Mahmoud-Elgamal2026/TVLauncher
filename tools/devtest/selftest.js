@@ -12,7 +12,7 @@
   for(const p of ["home","apps","tv","vod","files","store","settings"]){
     await t("page-"+p,async()=>{ showPage(p); if(p==="settings") renderSettings(); await wait(600); const f=document.querySelector(".page.on .f"); return [!!f||p==="vod",(document.querySelectorAll(".page.on .f").length)+" focusable"] });
   }
-  for(const c of ["featured","browser","player","iptv","stream","sports","tools","boost","clean","sys","ram","code","link","custom"]){
+  for(const c of ["all","browser","player","iptv","stream","sports","tools","boost","clean","sys","ram","code","link","custom"]){
     await t("store-"+c,async()=>{ showPage("store"); storeCat=c; renderStore(); await wait(300); return [$("storeMain").innerHTML.length>50,$("storeMain").innerText.slice(0,60)] });
   }
   // ---- internet & data sources
@@ -25,7 +25,7 @@
   await t("net-radio-list",async()=>{ const r=await A.fetchJSON("https://mp3quran.net/api/v3/radios?language=ar"); return [!!(r.radios&&r.radios.length),(r.radios||[]).length+" radios"] });
   await t("net-radio-stream",async()=>{ const r=JSON.parse(await natAsync("resolveUrl",RADIO_FB[0].url)); return [!!r.url,r.url+" "+r.type] });
   await t("net-install-code",async()=>{ const r=JSON.parse(await natAsync("resolveUrl","https://aftv.news/")); return [!!r.url,r.url] });
-  await t("net-github-update",async()=>{ const r=JSON.parse(await natAsync("checkUpdate","Mahmoud-Elgamal2026/TVLauncher")); return [true,JSON.stringify(r).slice(0,120)] });
+  await t("net-github-api",async()=>{ const r=await A.fetchJSON("https://api.github.com/repos/RikkaApps/Shizuku/releases/latest"); return [!!r.tag_name,"public repo release "+r.tag_name] });
   // ---- prayer times (city → coordinates → times)
   await t("prayer",async()=>{ S.city="Cairo"; S.loc=null; if(window.weather) await weather(); await wait(3000); if(window.computePrayers) computePrayers(); updateTicker(); return [!!$("tPrayer").textContent.trim(),$("tPrayer").textContent] });
   // ---- IPTV: real public playlist → channels → check → play

@@ -498,3 +498,6 @@ body.lite.lighttheme .mbox{background:#f4f4f6}body.lite.lighttheme #search{backg
 body.lite.lighttheme .btn.pri,body.lite.lighttheme .it.sel,body.lite.lighttheme .tab.on{background:var(--sel)}
 
 .wmoving{outline:.4vh dashed #fff;outline-offset:.6vh;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)!important}
+
+/* mixed Arabic/English names (e.g. "[Not 24/7]") keep their own direction */
+#shelfTitle,#shelfSub,.app .nm,.app .lbl,.chrow .cn,#pName,#pNow,.it,.bt,.bx{unicode-bidi:plaintext}
