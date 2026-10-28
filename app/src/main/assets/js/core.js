@@ -476,7 +476,7 @@ function move(dir) {
   let best = null, bs = 1e9;
   const onTab = focused.classList.contains("tab");
   let pool = visibleFocusables();
-  if (onTab && (dir === "left" || dir === "right")) pool = pool.filter((e) => e.classList.contains("tab"));
+  if (onTab && (dir === "left" || dir === "right")) pool = pool.filter((e) => !!e.closest(".top"));
   if (!onTab && (dir === "left" || dir === "right")) {
     const pg = focused.closest(".page");
     if (pg) pool = pool.filter((e) => pg.contains(e));
@@ -525,7 +525,7 @@ function move(dir) {
     }
   }
   if (onTab && dir === "up" && best && best.closest(".page") && document.querySelector(".tabs").getBoundingClientRect().top < innerHeight / 2) best = null;
-  if (best && !onTab && best.classList.contains("tab") && !best.classList.contains("on")) best = document.querySelector(".tab.on") || best;
+  if (best && !onTab && focused.closest(".page") && best.closest(".top") && !(best.classList.contains("tab") && best.classList.contains("on"))) best = document.querySelector(".tab.on") || best;
   if (best) focus(best);
 }
 const activators = [], optionHandlers = [];
