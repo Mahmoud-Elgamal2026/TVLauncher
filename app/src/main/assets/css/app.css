@@ -798,3 +798,5 @@ html[dir=rtl].nofg .ticker.intabs > * + *{margin-right:1vw}
 .hw.sz2 .hwpt{gap:.4vw}.hw.sz2 .hwpt span{padding:.3vh .35vw;font-size:1.25vh}.hw.sz2 .hwpt b{font-size:1.5vh}
 .hw.sz2 .hwbig{font-size:4.6vh}
 body:not(.showadv) #setScroll .sec.advsec{display:none!important}
+html[lang=en] #time,html[lang=en] .hbig,html[lang=en] .hwbig,html[lang=en] #date,html[lang=en] .hsub,html[lang=en] .hwsub{direction:ltr;unicode-bidi:-webkit-isolate;unicode-bidi:isolate;display:block}
+html[lang=en] .hbig,html[lang=en] .hwbig,html[lang=en] .hsub,html[lang=en] .hwsub{text-align:right}html[lang=en] #time,html[lang=en] #date{text-align:left}

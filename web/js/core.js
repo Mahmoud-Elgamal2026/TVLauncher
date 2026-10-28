@@ -75,7 +75,7 @@ function applyLook(){
   const p=profile(); $("profBtn").textContent=p?p.emoji:"🙂";
 }
 function applyLang(){
-  document.documentElement.lang=S.lang; document.documentElement.dir=S.lang==="ar"?"rtl":"ltr";
+  document.documentElement.lang=S.lang; document.documentElement.dir="rtl"; // layout stays the same in every language; only the words change
   document.querySelectorAll("[data-i18n]").forEach(e=>e.textContent=L(e.dataset.i18n));
   document.querySelectorAll("[data-i18n-ph]").forEach(e=>e.placeholder=L(e.dataset.i18nPh));
 }
