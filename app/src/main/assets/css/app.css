@@ -784,3 +784,5 @@ html[dir=ltr] .herobox .hlive span{margin-left:.6vw}
 html[dir=rtl] .herobox .hlive span{margin-right:.6vw}
 .herobox .hwird{margin-top:1.2vh;font-size:1.9vh;opacity:.92;max-width:70%;line-height:1.5;max-height:5.8vh;overflow:hidden;text-shadow:0 .2vh .8vh rgba(0,0,0,.7)}
 .hrail .rb.boostrb{background:linear-gradient(135deg,#3b6cff,#7a3bff);margin-top:2vh}
+#creator{font-size:2.2vh!important;opacity:.9!important;gap:1vw!important;bottom:2vh!important}
+#creator img{width:5.2vh!important;height:5.2vh!important;border-width:2px!important}

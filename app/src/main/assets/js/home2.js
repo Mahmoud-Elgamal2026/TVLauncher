@@ -441,3 +441,21 @@ window.ytAddFromPhone = (v) => __async(this, null, function* () {
     A.toast(L("ytBad"));
   }
 });
+const _renderPagerV = renderPager;
+renderPager = function() {
+  _renderPagerV();
+  const d = $("homePager");
+  if (!d || $("railMic")) return;
+  const b = $("railBoost");
+  const h = `<button class="rb f" id="railMic"><b>🎤</b><span>${esc(S.lang === "ar" ? "بحث بالصوت" : "Voice search")}</span></button>`;
+  if (b) b.insertAdjacentHTML("beforebegin", h);
+  else d.insertAdjacentHTML("beforeend", h);
+};
+activators.unshift((el) => {
+  if (el.id === "railMic") {
+    if (typeof A.voice === "function") A.voice();
+    else openSearch("");
+    return true;
+  }
+  return false;
+});

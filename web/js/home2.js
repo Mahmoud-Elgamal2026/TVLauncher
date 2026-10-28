@@ -148,3 +148,9 @@ window.ytAddFromPhone=async v=>{ if(!v) return; try{ const r=await ytResolve(v);
   const chs=(S.ytCh||[]).filter(c=>c.id!==r.id); chs.push({id:r.id,name:r.name}); S.ytCh=chs;
   if(!hwList().some(w=>w.t==="yt")) hwSave(hwList().concat([{id:"yt",t:"yt",sz:1,st:"glass"}]));
   ytAt=0; ytLoad(true); banner("▶️",r.name,S.lang==="ar"?"اتضافت لويدجت يوتيوب":"Added to YouTube widget",5000) }catch(e){ A.toast(L("ytBad")) } };
+
+// ================= Voice search: a mic on the side rail (same as the remote's mic key) =================
+const _renderPagerV=renderPager; renderPager=function(){ _renderPagerV(); const d=$("homePager"); if(!d||$("railMic")) return;
+  const b=$("railBoost"); const h=`<button class="rb f" id="railMic"><b>🎤</b><span>${esc(S.lang==="ar"?"بحث بالصوت":"Voice search")}</span></button>`;
+  if(b) b.insertAdjacentHTML("beforebegin",h); else d.insertAdjacentHTML("beforeend",h) };
+activators.unshift(el=>{ if(el.id==="railMic"){ if(typeof A.voice==="function") A.voice(); else openSearch(""); return true } return false });
