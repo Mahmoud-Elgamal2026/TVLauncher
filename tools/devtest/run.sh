@@ -103,6 +103,8 @@ js "console.log('TVL|lib-quran|'+(document.querySelectorAll('#libMain [data-reci
 js "libCat='oldar';renderLib()" 15; shot 57-lib-films
 js "console.log('TVL|lib-clean|'+([].slice.call(document.querySelectorAll('#libMain .lbt')).some(function(e){return libBlocked(e.textContent)})?'FAIL':'PASS')+'|')" 1
 js "libCat='khutab';renderLib()" 15; shot 58-lib-khutab
+js "libCat='plays';libQ='';renderLib()" 20; shot 61-lib-plays
+js "console.log('TVL|lib-plays|'+(document.querySelectorAll('#libMain [data-arch]').length>20?'PASS':'FAIL')+'|'+document.querySelectorAll('#libMain [data-arch]').length+' plays')" 1
 js "console.log('TVL|lib-archive|'+(document.querySelectorAll('#libMain [data-arch]').length>5?'PASS':'FAIL')+'|'+document.querySelectorAll('#libMain [data-arch]').length+' items')" 1
 js "hwSave(hwList().concat([{id:'wird',t:'wird',sz:2,st:'glass'}]));showPage('home')" 10; shot 59-wird
 js "console.log('TVL|wird|'+(document.querySelector('#hwBoard [data-hw=wird] .hwzk')?'PASS':'FAIL')+'|'+(document.querySelector('#hwBoard [data-hw=wird]')||{}).textContent)" 1

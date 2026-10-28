@@ -27,6 +27,7 @@ Object.assign(T.ar, {
   libDocs: "وثائقي",
   libCartoon: "كرتون قديم",
   libBooks: "كتب مسموعة",
+  libPlays: "مسرحيات قديمة",
   libSearch: "بحث في المكتبة",
   libLoading: "بيحمّل…",
   libEmpty: "مفيش نتايج",
@@ -44,6 +45,7 @@ Object.assign(T.en, {
   libDocs: "Documentaries",
   libCartoon: "Old cartoons",
   libBooks: "Audiobooks",
+  libPlays: "Classic plays",
   libSearch: "Search the library",
   libLoading: "Loading…",
   libEmpty: "No results",
@@ -56,12 +58,13 @@ const LIB_CATS = [
   ["quran", "📖", null],
   ["khutab", "🕌", 'subject:("خطب الجمعة" OR "خطبة الجمعة" OR "دروس دينية" OR محاضرات OR "تفسير القرآن" OR "السيرة النبوية") AND mediatype:audio'],
   ["oldar", "🎞", 'mediatype:movies AND title:(فيلم) AND (subject:("ابيض واسود" OR "أبيض وأسود" OR "الزمن الجميل" OR "افلام قديمة" OR "أفلام قديمة" OR "افلام مصرية" OR "سينما مصرية" OR "egyptian cinema" OR "egyptian movie" OR "classic arabic" OR "افلام زمان" OR "فيلم مصري" OR "افلام مصرية قديمة" OR "افلام عربي قديمة" OR "السينما المصرية" OR "افلام عربية قديمة" OR "egyptian films" OR "arabic cinema") OR title:(19*))'],
+  ["plays", "🎭", "mediatype:movies AND title:(مسرحية OR مسرحيه) AND NOT title:(تريلر OR اعلان OR مقطع OR مشهد)"],
   ["classic", "🎬", "collection:feature_films AND mediatype:movies"],
   ["docs", "🌍", "collection:(documentaries OR ephemera) AND mediatype:movies"],
   ["cartoon", "🐭", "collection:classic_cartoons AND mediatype:movies"],
   ["books", "🎧", "collection:librivoxaudio AND mediatype:audio"]
 ];
-const LIBN = { quran: "libQuran", khutab: "libKhutab", oldar: "libOldAr", classic: "libClassic", docs: "libDocs", cartoon: "libCartoon", books: "libBooks" };
+const LIBN = { plays: "libPlays", quran: "libQuran", khutab: "libKhutab", oldar: "libOldAr", classic: "libClassic", docs: "libDocs", cartoon: "libCartoon", books: "libBooks" };
 let libCat = "quran", libCache = {}, libQ = "";
 (function() {
   const st = document.querySelector('.tab[data-page="settings"]');
@@ -201,3 +204,41 @@ const LIB_BLOCK = /جيش|إصدار|اصدار|مؤسسة|تحرير|معركة
 function libBlocked(t) {
   return LIB_BLOCK.test(String(t || ""));
 }
+const PLAY_STARS = ["سمير غانم", "عادل إمام", "إسماعيل ياسين", "فؤاد المهندس", "محمد صبحي", "ريا وسكينة", "شادية", "سعيد صالح", "يونس شلبي", "محمد نجم", "نجيب الريحاني"];
+const _renderLibP = renderLib;
+renderLib = function() {
+  return __async(this, arguments, function* () {
+    if (libCat !== "plays") return _renderLibP.apply(this, arguments);
+    $("libCats").innerHTML = libCatsHtml();
+    const key = "plays|" + libQ;
+    let items = libCache[key];
+    if (!items) {
+      libMsg(L("libLoading"));
+      const q = LIB_CATS.find((c) => c[0] === "plays")[2] + (libQ ? ` AND (title:("${libQ}") OR subject:("${libQ}") OR description:("${libQ}"))` : "");
+      try {
+        const r = yield A.fetchJSON("https://archive.org/advancedsearch.php?q=" + encodeURIComponent(q) + "&fl[]=identifier&fl[]=title&fl[]=year&sort[]=downloads+desc&rows=300&output=json");
+        const seen = {};
+        items = ((r.response || {}).docs || []).map((d) => ({ id: d.identifier, title: Array.isArray(d.title) ? d.title[0] : d.title || d.identifier, year: d.year })).filter((i) => !libBlocked(i.title)).filter((i) => {
+          const k = i.title.replace(/[^\u0600-\u06ff]/g, "").slice(0, 25);
+          if (seen[k]) return false;
+          seen[k] = 1;
+          return true;
+        });
+        libCache[key] = items;
+      } catch (e) {
+        items = [];
+      }
+    }
+    const chips = `<div class="inline lbchips"><button class="btn f${!libQ ? " on" : ""}" data-playstar="">${S.lang === "ar" ? "الكل" : "All"}</button>${PLAY_STARS.map((n) => `<button class="btn f${libQ === n ? " on" : ""}" data-playstar="${esc(n)}">${esc(n)}</button>`).join("")}</div>`;
+    $("libMain").innerHTML = chips + (items.length ? `<div class="lbgrid">${items.map((i) => libCard({ attr: `data-arch="${esc(i.id)}"`, img: "https://archive.org/services/img/" + i.id, title: i.title, sub: i.year ? String(i.year) : "" })).join("")}</div>` : `<p class="hint">${esc(L("libEmpty"))}</p>`);
+  });
+};
+activators.unshift((el) => {
+  if (el.dataset && el.dataset.playstar != null) {
+    libQ = el.dataset.playstar;
+    libCat = "plays";
+    renderLib().then(() => focus(document.querySelector(`[data-playstar="${libQ}"]`)));
+    return true;
+  }
+  return false;
+});

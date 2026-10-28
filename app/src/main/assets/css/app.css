@@ -706,3 +706,4 @@ html[dir=rtl].nofg .hwtools > * + *{margin-right:.8vw}
 .hwtools .btn{font-size:1.6vh;padding:.6vh 1vw}
 body.hwedit .hw{outline:.3vh dashed rgba(255,255,255,.5);outline-offset:.4vh}
 .hw.grabbed{outline:.5vh solid #ffd54a!important;transform:scale(1.08) rotate(-1deg)!important;box-shadow:0 2vh 5vh rgba(0,0,0,.7)!important}
+.lbchips{flex-wrap:wrap;gap:.8vw;padding:1vh 1vw}
