@@ -602,7 +602,7 @@ body[data-favsz] #favRow{gap:1.4vw}
 /* home pages */
 .hpager{gap:1vw;padding:.4vh 1vw 1vh;justify-content:flex-start}
 .hpager .btn{font-size:1.7vh;padding:.7vh 1.2vw}
-body[data-hpage="1"] #home .scroll > *:not(#homePager):not(#homeApps){display:none!important}
+body[data-hpage="1"] #home .scroll > *:not(#homeApps):not(#favRow):not(#folderRow):not(.favh){display:none!important}
 body[data-hpage="2"] #home .scroll > *:not(#homePager):not(#libFavH):not(#libFavRow):not(#ytH):not(#ytRow):not(#homeMineEmpty){display:none!important}
 body:not([data-hpage="1"]) #homeApps{display:none}
 .hpapps{padding:1vh 1vw}
@@ -626,3 +626,17 @@ body:not([data-page=home]) #creator{display:none}
 #splashSig .t1{font-size:5vh;font-weight:800;letter-spacing:.2vw}
 #splashSig .t2{font-size:2vh;opacity:.7}
 #splashSig .t3{font-size:3.6vh;font-weight:700;color:#ffd54a}
+/* side rail */
+.hrail{position:fixed;top:50%;transform:translateY(-50%);inset-inline-start:1vw;display:flex;flex-direction:column;gap:2vh;z-index:6}
+body:not([data-page=home]) .hrail{display:none}
+.hrail .rb{width:7vh;height:7vh;border-radius:50%;border:0;background:rgba(255,255,255,.1);color:inherit;display:flex;align-items:center;justify-content:center;position:relative;padding:0}
+.hrail .rb b{font-size:3.2vh}
+.hrail .rb span{position:absolute;inset-inline-start:110%;white-space:nowrap;font-size:1.7vh;background:rgba(0,0,0,.7);padding:.4vh .8vw;border-radius:1vh;opacity:0;transition:opacity .2s}
+.hrail .rb.on{background:#ffd54a;color:#000}
+.hrail .rb.focus{transform:scale(1.15);box-shadow:0 0 0 .4vh #fff}
+.hrail .rb.focus span{opacity:1}
+body.simple #home .scroll{padding-inline-start:9vh}
+/* page 0 = widgets only; page 1 = favorites + folders + all apps */
+body[data-hpage="0"] #favRow,body[data-hpage="0"] #favRow + .x,body[data-hpage="0"] #folderRow,body[data-hpage="0"] h2[data-row=folderRow]{display:none!important}
+body[data-hpage="1"] #home .scroll > #favRow,body[data-hpage="1"] #home .scroll > #folderRow{display:flex!important}
+body[data-hpage="0"] h2.favh{display:none!important}

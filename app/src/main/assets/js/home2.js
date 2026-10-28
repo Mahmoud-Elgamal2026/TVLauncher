@@ -343,3 +343,26 @@ boostNow = function() {
   });
 };
 window.boostNow = boostNow;
+(function() {
+  const p = $("homePager");
+  if (!p) return;
+  p.id = "homePagerOld";
+  p.style.display = "none";
+  const r = document.createElement("div");
+  r.id = "homePager";
+  r.className = "hrail";
+  $("home").appendChild(r);
+})();
+const RAIL_ICON = ["🏠", "📱", "⭐"];
+renderPager = function() {
+  const d = $("homePager");
+  if (!d) return;
+  const cur = +S.homePage || 0;
+  d.innerHTML = HP.map((k, i) => `<button class="rb f${i === cur ? " on" : ""}" data-hpage="${i}"><b>${RAIL_ICON[i]}</b><span>${esc(L(k).replace(/^\S+\s/, ""))}</span></button>`).join("");
+};
+const _fhIdx = focusHooks.findIndex((f) => String(f).indexOf("hpage") >= 0);
+if (_fhIdx >= 0) focusHooks.splice(_fhIdx, 1);
+setTimeout(() => {
+  const fr = $("favRow"), h = fr && fr.previousElementSibling;
+  if (h && h.tagName === "H2") h.classList.add("favh");
+}, 0);
