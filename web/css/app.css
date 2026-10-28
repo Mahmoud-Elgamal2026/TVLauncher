@@ -616,3 +616,13 @@ body:not([data-hpage="1"]) #homeApps{display:none}
 .herobox .hsub{font-size:2.1vh;opacity:.9;margin-top:.4vh}
 .herobox .hrow{display:flex;gap:2vw;font-size:2.1vh;margin-top:1vh}
 body.simple .tab[data-page="apps"]{display:none!important}
+#creator{position:fixed;bottom:1.6vh;inset-inline-end:3vw;display:flex;align-items:center;gap:.7vw;font-size:1.6vh;opacity:.75;z-index:5;pointer-events:none}
+#creator img{width:3.2vh;height:3.2vh;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.4)}
+#creator b{font-weight:700;color:#ffd54a}
+body:not([data-page=home]) #creator{display:none}
+#splashSig{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 50% 40%,#1d2448,#05060c 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2vh;transition:opacity .6s}
+#splashSig.out{opacity:0}
+#splashSig img{width:16vh;height:16vh;border-radius:50%;object-fit:cover;border:.4vh solid #ffd54a;box-shadow:0 0 4vh rgba(255,213,74,.4)}
+#splashSig .t1{font-size:5vh;font-weight:800;letter-spacing:.2vw}
+#splashSig .t2{font-size:2vh;opacity:.7}
+#splashSig .t3{font-size:3.6vh;font-weight:700;color:#ffd54a}

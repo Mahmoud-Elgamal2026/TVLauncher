@@ -65,3 +65,14 @@ optionHandlers.unshift(el=>{ if(S.homeLock&&el.closest&&el.closest("#favRow")&&e
 if(!S.heroSeeded){ S.heroSeeded=true; if(!hwList().some(w=>w.t==="hero")) S.hw=[{id:"hero",t:"hero",sz:4,st:"clear"}].concat(hwList().filter(w=>w.t!=="clock")) }
 const _renderHomeP=renderHome; renderHome=function(){ _renderHomeP.apply(this,arguments); renderPager(); applyPage() }; window.renderHome=renderHome;
 setTimeout(()=>{ renderPager(); applyPage() },0);
+
+// ================= Creator signature =================
+const CREATOR={ar:"محمود الجمل",en:"Mahmoud Elgamal",img:"img/creator.jpg"};
+(function(){ const b=document.createElement("div"); b.id="creator"; document.body.appendChild(b) })();
+function renderCreator(){ const e=$("creator"); if(!e) return; const ar=S.lang==="ar";
+  e.innerHTML=`<img src="${CREATOR.img}" onerror="this.remove()" alt=""><span>${ar?"صُنع بواسطة":"Made by"} <b>${esc(ar?CREATOR.ar:CREATOR.en)}</b></span>` }
+renderCreator(); const _applyLangC=applyLang; applyLang=function(){ _applyLangC.apply(this,arguments); renderCreator() };
+// a short signed splash on start
+(function(){ const s=document.createElement("div"); s.id="splashSig"; const ar=S.lang==="ar";
+  s.innerHTML=`<img src="${CREATOR.img}" onerror="this.remove()" alt=""><div class="t1">TV Launcher</div><div class="t2">${ar?"من تصميم وتطوير":"Designed & built by"}</div><div class="t3">${esc(ar?CREATOR.ar:CREATOR.en)}</div>`;
+  document.body.appendChild(s); setTimeout(()=>s.classList.add("out"),1600); setTimeout(()=>s.remove(),2300) })();

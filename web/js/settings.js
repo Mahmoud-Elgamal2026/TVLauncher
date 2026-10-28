@@ -40,7 +40,6 @@ function renderSettings(){
     field(L("adhanSound"),`<div class="inline"><button class="btn f" id="testAdhan">🔔 ${L("adhanChime")} / ${L("preview")}</button></div><div style="margin-top:1.2vh">${inputRow("adhanUrl",S.adhanUrl,L("adhanUrlPh"),"adhanSave")}</div>`))+
   sec(L("sSports"),
     field(L("sportsOn"),onoff("sportsOn"))+
-    field(L("leagues"),`<div class="inline">${LEAGUES.map(([id,ar,en])=>`<button class="btn f${S.leagues.includes(id)?" pri":""}" data-tog="leagues:${id}">${esc(S.lang==="ar"?ar:en)}</button>`).join("")}</div>`)+
     field(L("favTeams"),inputRow("teamsInp",S.favTeams,L("favTeamsPh"),"teamsSave"))+`<div class="field"><label>${esc(L("sportsNote"))}</label></div>`)+
   sec(L("sNotif"),
     field(L("notifSys"),onoff("notifSys").replace(/<\/div>$/,`<button class="btn f" id="grantNotif">${A.notifAccess()?"✅ "+L("granted"):"🔓 "+L("grant")}</button></div>`))+
@@ -81,7 +80,7 @@ activators.push(el=>{
     S[k]=t==="boolean"?v==="1":t==="number"?+v:v; if(AFTER[k]) AFTER[k]();
     renderSettings(); focus(document.querySelector(`#setScroll [data-set^="${k}:"].pri`)||document.querySelector(`#setScroll [data-set="${el.dataset.set}"]`)); return true }
   if(el.dataset.tog){ const [k,v]=el.dataset.tog.split(":");
-    if(k==="fw"){ const f=S.fw; f[v]=!f[v]; S.fw=f } else { toggleList(k,v); if(k==="leagues") loadSports() }
+    if(k==="fw"){ const f=S.fw; f[v]=!f[v]; S.fw=f } else { toggleList(k,v); if(k==="leagues"||k==="comps") loadSports() }
     renderSettings(); return true }
   if(el.dataset.dellist!==undefined){ const l=S.lists; l.splice(+el.dataset.dellist,1); S.lists=l; renderSettings(); loadLists(); return true }
   if(el.dataset.delkey!==undefined){ const m=S.keymap; delete m[el.dataset.delkey]; S.keymap=m; syncKeyMap(); renderSettings(); return true }

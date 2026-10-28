@@ -230,3 +230,30 @@ setTimeout(() => {
   renderPager();
   applyPage();
 }, 0);
+const CREATOR = { ar: "محمود الجمل", en: "Mahmoud Elgamal", img: "img/creator.jpg" };
+(function() {
+  const b = document.createElement("div");
+  b.id = "creator";
+  document.body.appendChild(b);
+})();
+function renderCreator() {
+  const e = $("creator");
+  if (!e) return;
+  const ar = S.lang === "ar";
+  e.innerHTML = `<img src="${CREATOR.img}" onerror="this.remove()" alt=""><span>${ar ? "صُنع بواسطة" : "Made by"} <b>${esc(ar ? CREATOR.ar : CREATOR.en)}</b></span>`;
+}
+renderCreator();
+const _applyLangC = applyLang;
+applyLang = function() {
+  _applyLangC.apply(this, arguments);
+  renderCreator();
+};
+(function() {
+  const s = document.createElement("div");
+  s.id = "splashSig";
+  const ar = S.lang === "ar";
+  s.innerHTML = `<img src="${CREATOR.img}" onerror="this.remove()" alt=""><div class="t1">TV Launcher</div><div class="t2">${ar ? "من تصميم وتطوير" : "Designed & built by"}</div><div class="t3">${esc(ar ? CREATOR.ar : CREATOR.en)}</div>`;
+  document.body.appendChild(s);
+  setTimeout(() => s.classList.add("out"), 1600);
+  setTimeout(() => s.remove(), 2300);
+})();

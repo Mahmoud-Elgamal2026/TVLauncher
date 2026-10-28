@@ -25,7 +25,7 @@ function renderSettings() {
     field(L("prayerOn"), onoff("prayerOn")) + (pr ? field("", `<div class="inline">${pr}</div>`) : "") + field(L("method"), seg("method", [["egypt", L("mEgypt")], ["makkah", L("mMakkah")], ["mwl", L("mMWL")], ["karachi", L("mKarachi")]])) + field(L("asr"), seg("asrHanafi", [[0, L("asrStd")], [1, L("asrHanafi")]])) + field(L("adhanOn"), onoff("adhanOn")) + field(L("beforeAlert"), seg("adhanBefore", [[0, L("off")], [5, "5 " + L("min")], [10, "10 " + L("min")], [15, "15 " + L("min")]])) + field(L("adhanSound"), `<div class="inline"><button class="btn f" id="testAdhan">🔔 ${L("adhanChime")} / ${L("preview")}</button></div><div style="margin-top:1.2vh">${inputRow("adhanUrl", S.adhanUrl, L("adhanUrlPh"), "adhanSave")}</div>`)
   ) + sec(
     L("sSports"),
-    field(L("sportsOn"), onoff("sportsOn")) + field(L("leagues"), `<div class="inline">${LEAGUES.map(([id, ar, en]) => `<button class="btn f${S.leagues.includes(id) ? " pri" : ""}" data-tog="leagues:${id}">${esc(S.lang === "ar" ? ar : en)}</button>`).join("")}</div>`) + field(L("favTeams"), inputRow("teamsInp", S.favTeams, L("favTeamsPh"), "teamsSave")) + `<div class="field"><label>${esc(L("sportsNote"))}</label></div>`
+    field(L("sportsOn"), onoff("sportsOn")) + field(L("favTeams"), inputRow("teamsInp", S.favTeams, L("favTeamsPh"), "teamsSave")) + `<div class="field"><label>${esc(L("sportsNote"))}</label></div>`
   ) + sec(
     L("sNotif"),
     field(L("notifSys"), onoff("notifSys").replace(/<\/div>$/, `<button class="btn f" id="grantNotif">${A.notifAccess() ? "✅ " + L("granted") : "🔓 " + L("grant")}</button></div>`)) + field(L("tickerShow"), onoff("tickerOn"))
@@ -99,7 +99,7 @@ activators.push((el) => {
       S.fw = f;
     } else {
       toggleList(k, v2);
-      if (k === "leagues") loadSports();
+      if (k === "leagues" || k === "comps") loadSports();
     }
     renderSettings();
     return true;
