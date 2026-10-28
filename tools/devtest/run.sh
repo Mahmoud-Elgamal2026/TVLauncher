@@ -20,7 +20,7 @@ chk(){ js "(function(){var r=focused&&focused.getBoundingClientRect();var pg=doc
 key(){ for k in "$@"; do adb shell input keyevent $k; sleep 0.5; done; }
 shot 00-boot
 # real remote: walk the tabs, enter pages, move left/right/down
-js "closeDialog();S.setupSeen=true;S.lite=true;S.perfChosen=true;S.favs=apps.slice(0,6).map(a=>a.pkg);S.recent=apps.slice(6,10).map(a=>a.pkg);applyLook();renderHome();showPage('home');focus(document.querySelector('.tab[data-page=home]'))" 3
+js "closeDialog();S.iptvOn=true;applyIptv();S.setupSeen=true;S.lite=true;S.perfChosen=true;S.favs=apps.slice(0,6).map(a=>a.pkg);S.recent=apps.slice(6,10).map(a=>a.pkg);applyLook();renderHome();showPage('home');focus(document.querySelector('.tab[data-page=home]'))" 3
 shot 01-home-tab
 key DPAD_DOWN; shot 02-home-down
 key DPAD_RIGHT DPAD_RIGHT DPAD_LEFT; shot 03-home-right; chk 03 home
@@ -99,6 +99,7 @@ js "S.theme='apple';applyLook();autoClean(true).then(function(){console.log('TVL
 key SEARCH; sleep 3; shot 51-voice; key BACK; sleep 1
 # volume keys show the on-screen bar
 key VOLUME_UP; sleep 0.5; shot 52-vol-osd
+js "console.log('TVL|iptv-off|'+(function(){S.iptvOn=false;applyIptv();var h=document.querySelector('.tab[data-page=tv]').style.display==='none';S.iptvOn=true;applyIptv();return h?'PASS':'FAIL'})()+'|tab hidden when off')" 1
 # full self-test (network, IPTV, recording, radio, files ...)
 adb push selftest.built.js /sdcard/Download/selftest.js
 js "var s=document.createElement('script');s.src='file:///sdcard/Download/selftest.js';s.onerror=function(){console.log('TVL|load-selftest|FAIL|script load error')};document.body.appendChild(s)" 5

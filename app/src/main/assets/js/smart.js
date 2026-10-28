@@ -409,7 +409,7 @@ AFTER.liveWall = applyLook;
 document.body.dataset.anim = animOf();
 document.body.classList.toggle("livewall", !!S.liveWall);
 window.lifeSettings = function() {
-  return sec("✨ " + L("anim"), field("", seg("anim", [["auto", "🎨 " + L("anAuto")], ["off", L("off")], ["aurora", "🌌 " + L("anAurora")], ["stars", "✨ " + L("anStars")], ["waves", "🌊 " + L("anWaves")], ["bokeh", "🔆 " + L("anBokeh")], ["glow", "💡 " + L("anGlow")], ["lanterns", "🏮 " + L("anLant")]])) + field(L("liveWall"), onoff("liveWall")) + field(L("autoClean"), onoff("autoClean"))) + (_lifeSetA ? _lifeSetA() : "");
+  return sec("📺 " + L("iptvOn"), field(L("iptvOnSub"), onoff("iptvOn"))) + sec("✨ " + L("anim"), field("", seg("anim", [["auto", "🎨 " + L("anAuto")], ["off", L("off")], ["aurora", "🌌 " + L("anAurora")], ["stars", "✨ " + L("anStars")], ["waves", "🌊 " + L("anWaves")], ["bokeh", "🔆 " + L("anBokeh")], ["glow", "💡 " + L("anGlow")], ["lanterns", "🏮 " + L("anLant")]])) + field(L("liveWall"), onoff("liveWall")) + field(L("autoClean"), onoff("autoClean"))) + (_lifeSetA ? _lifeSetA() : "");
 };
 let lastClean = 0, cleaning = false;
 function busyNow() {

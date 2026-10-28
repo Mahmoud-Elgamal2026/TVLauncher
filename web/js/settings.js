@@ -171,7 +171,8 @@ function boot(){
   // show the home screen first; network and heavy work follow once it is on screen
   applyLook(); applyLang(); loadApps(); syncKeyMap(); status(); tick();
   focus(document.querySelector(".tab.on")||document.querySelector(".tab"));
-  if(!S.lite){ setTimeout(()=>{ weather(); loadLists().then(()=>setTimeout(loadEpg,1500)) },250); setTimeout(loadSports,4000) }
+  if(!S.iptvOn){ setTimeout(weather,3000); setTimeout(loadSports,S.lite?20000:4000) }
+  else if(!S.lite){ setTimeout(()=>{ weather(); loadLists().then(()=>setTimeout(loadEpg,1500)) },250); setTimeout(loadSports,4000) }
   else {
     // slow box: the home screen comes first; channels load when needed (or a bit later if the home shows favorite channels), the guide only on the TV page
     setTimeout(weather,3000);
@@ -187,3 +188,14 @@ let listsLoaded=false, listsP=null;
 function loadListsOnce(){ if(listsP) return listsP; if(channels.length){ listsLoaded=true; listsP=Promise.resolve(); return listsP } listsP=loadLists().then(()=>{ listsLoaded=true; setTimeout(loadEpg,S.lite?4000:1500) }); return listsP }
 const _tvEnterL=pageHooks["tv:enter"]; pageHooks["tv:enter"]=function(){ if(_tvEnterL) _tvEnterL(); if(S.lite&&!listsP){ loadListsOnce(); loadHls() } };
 const _vodEnterL=pageHooks["vod:enter"]; pageHooks["vod:enter"]=function(){ if(_vodEnterL) _vodEnterL(); if(S.lite&&!listsP) loadListsOnce() };
+
+// ================= IPTV on/off: when off, nothing about channels is loaded at all =================
+DEF.iptvOn=false;
+Object.assign(T.ar,{iptvOn:"القنوات (IPTV)",iptvOnSub:"لما تقفلها مفيش أي قنوات بتتحمّل والجهاز بيبقى أخف"});
+Object.assign(T.en,{iptvOn:"Channels (IPTV)",iptvOnSub:"When off, no channels are loaded at all and the box stays lighter"});
+function applyIptv(){ ["tv","vod"].forEach(p=>{ const t=document.querySelector(`.tab[data-page="${p}"]`); if(t&&!S.iptvOn) t.style.display="none" });
+  if(S.iptvOn){ const t=document.querySelector('.tab[data-page="tv"]'); if(t) t.style.display="" ; if(!listsP) loadListsOnce() }
+  else if(document.querySelector("#tv.on,#vod.on")) showPage("home") }
+AFTER.iptvOn=()=>{ applyIptv(); renderHome() };
+const _updVodL=window.updVodTab; setInterval(()=>{ if(!S.iptvOn) applyIptv() },4000);
+setTimeout(applyIptv,0);

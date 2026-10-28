@@ -374,7 +374,10 @@ function boot() {
   status();
   tick();
   focus(document.querySelector(".tab.on") || document.querySelector(".tab"));
-  if (!S.lite) {
+  if (!S.iptvOn) {
+    setTimeout(weather, 3e3);
+    setTimeout(loadSports, S.lite ? 2e4 : 4e3);
+  } else if (!S.lite) {
     setTimeout(() => {
       weather();
       loadLists().then(() => setTimeout(loadEpg, 1500));
@@ -421,3 +424,26 @@ pageHooks["vod:enter"] = function() {
   if (_vodEnterL) _vodEnterL();
   if (S.lite && !listsP) loadListsOnce();
 };
+DEF.iptvOn = false;
+Object.assign(T.ar, { iptvOn: "القنوات (IPTV)", iptvOnSub: "لما تقفلها مفيش أي قنوات بتتحمّل والجهاز بيبقى أخف" });
+Object.assign(T.en, { iptvOn: "Channels (IPTV)", iptvOnSub: "When off, no channels are loaded at all and the box stays lighter" });
+function applyIptv() {
+  ["tv", "vod"].forEach((p) => {
+    const t = document.querySelector(`.tab[data-page="${p}"]`);
+    if (t && !S.iptvOn) t.style.display = "none";
+  });
+  if (S.iptvOn) {
+    const t = document.querySelector('.tab[data-page="tv"]');
+    if (t) t.style.display = "";
+    if (!listsP) loadListsOnce();
+  } else if (document.querySelector("#tv.on,#vod.on")) showPage("home");
+}
+AFTER.iptvOn = () => {
+  applyIptv();
+  renderHome();
+};
+const _updVodL = window.updVodTab;
+setInterval(() => {
+  if (!S.iptvOn) applyIptv();
+}, 4e3);
+setTimeout(applyIptv, 0);
