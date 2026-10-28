@@ -71,7 +71,7 @@ function applyPage() {
   const p = +S.homePage || 0, sc = $("home").querySelector(".scroll");
   document.body.dataset.hpage = p;
   if (p === 1) {
-    $("homeApps").innerHTML = visibleApps().filter((a) => !(S.favs || []).includes(a.pkg)).sort((a, b) => appName(a).localeCompare(appName(b))).map(tile).join("");
+    $("homeApps").innerHTML = visibleApps().sort((a, b) => appName(a).localeCompare(appName(b))).map(tile).join("");
   } else $("homeApps").innerHTML = "";
   $("homeMineEmpty").textContent = p === 2 && !(S.libFav || []).length ? L("mineEmpty") : "";
   if (sc) sc.scrollTop = 0;
