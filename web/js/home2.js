@@ -97,3 +97,13 @@ document.addEventListener("keydown",e=>{ if(on("player")&&!on("dlg")&&(e.key==="
 let plWatch=null;
 const _playX=play; play=function(c){ _playX.apply(this,arguments); clearTimeout(plWatch);
   plWatch=setTimeout(()=>{ const v=$("video"); if(on("player")&&v&&(v.readyState<2||v.error)){ stopPlayer(); A.toast(S.lang==="ar"?"القناة مش شغالة — اتقفلت":"Stream didn't start — closed") } },25000) };
+
+// ================= "Clear everything": Boost also stops any channel, radio or sound playing in the background =================
+const _boostNowX=boostNow; boostNow=async function(){
+  try{ if(on("player")) stopPlayer() }catch(e){}
+  try{ const v=$("video"); if(v){ v.pause(); v.removeAttribute("src"); v.load() } }catch(e){}
+  try{ if(typeof adhanAudio!=="undefined"&&adhanAudio) adhanAudio.pause() }catch(e){}
+  try{ nat("stopAudio") }catch(e){}
+  try{ if(typeof pvStop==="function") pvStop() }catch(e){}
+  return _boostNowX.apply(this,arguments) };
+window.boostNow=boostNow;

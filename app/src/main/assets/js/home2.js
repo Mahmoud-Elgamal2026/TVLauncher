@@ -311,3 +311,35 @@ play = function(c) {
     }
   }, 25e3);
 };
+const _boostNowX = boostNow;
+boostNow = function() {
+  return __async(this, arguments, function* () {
+    try {
+      if (on("player")) stopPlayer();
+    } catch (e) {
+    }
+    try {
+      const v = $("video");
+      if (v) {
+        v.pause();
+        v.removeAttribute("src");
+        v.load();
+      }
+    } catch (e) {
+    }
+    try {
+      if (typeof adhanAudio !== "undefined" && adhanAudio) adhanAudio.pause();
+    } catch (e) {
+    }
+    try {
+      nat("stopAudio");
+    } catch (e) {
+    }
+    try {
+      if (typeof pvStop === "function") pvStop();
+    } catch (e) {
+    }
+    return _boostNowX.apply(this, arguments);
+  });
+};
+window.boostNow = boostNow;
