@@ -260,3 +260,22 @@ activators.unshift((el) => {
   }
   return false;
 });
+const FREE_APPS = [["Tubi", "com.tubitv", "🎬"], ["Pluto TV", "tv.pluto.android", "📺"], ["شاهد Shahid", "net.mbc.shahidTV", "🇸🇦"], ["Watch It", "com.watchit.tv", "🇪🇬"], ["YouTube", "com.google.android.youtube.tv", "▶️"], ["Plex", "com.plexapp.android", "🍿"]];
+const _renderLibF = renderLib;
+renderLib = function() {
+  return __async(this, arguments, function* () {
+    yield _renderLibF.apply(this, arguments);
+    if (libCat !== "quran" && libCat !== "arabic") return;
+    const h = `<h3 class="sph">${S.lang === "ar" ? "📺 تطبيقات أفلام ببلاش" : "📺 Free movie apps"}</h3><div class="lbgrid small">${FREE_APPS.map((a) => libCard({ attr: `data-freeapp="${a[1]}"`, icon: a[2], title: a[0], sub: A.isInstalled(a[1]) ? S.lang === "ar" ? "افتح" : "Open" : S.lang === "ar" ? "نزّل من المتجر" : "Install" })).join("")}</div>`;
+    $("libMain").insertAdjacentHTML("afterbegin", h);
+  });
+};
+activators.unshift((el) => {
+  if (el.dataset && el.dataset.freeapp) {
+    const p = el.dataset.freeapp;
+    if (A.isInstalled(p)) launch(p);
+    else nat("openUri", "market://details?id=" + p);
+    return true;
+  }
+  return false;
+});

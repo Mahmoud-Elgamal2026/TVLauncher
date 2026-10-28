@@ -103,3 +103,11 @@ const _renderLibP=renderLib; renderLib=async function(){
   $("libMain").innerHTML=chips+(items.length?`<div class="lbgrid">${items.map(i=>libCard({attr:`data-arch="${esc(i.id)}"`,img:"https://archive.org/services/img/"+i.id,title:i.title,sub:i.year?String(i.year):""})).join("")}</div>`:`<p class="hint">${esc(L("libEmpty"))}</p>`);
 };
 activators.unshift(el=>{ if(el.dataset&&el.dataset.playstar!=null){ libQ=el.dataset.playstar; libCat="plays"; renderLib().then(()=>focus(document.querySelector(`[data-playstar="${libQ}"]`))); return true } return false });
+
+// ---- free streaming apps: one row in the library; opens the app, or its store page when missing
+const FREE_APPS=[["Tubi","com.tubitv","🎬"],["Pluto TV","tv.pluto.android","📺"],["شاهد Shahid","net.mbc.shahidTV","🇸🇦"],["Watch It","com.watchit.tv","🇪🇬"],["YouTube","com.google.android.youtube.tv","▶️"],["Plex","com.plexapp.android","🍿"]];
+const _renderLibF=renderLib; renderLib=async function(){ await _renderLibF.apply(this,arguments);
+  if(libCat!=="quran"&&libCat!=="arabic") return;
+  const h=`<h3 class="sph">${S.lang==="ar"?"📺 تطبيقات أفلام ببلاش":"📺 Free movie apps"}</h3><div class="lbgrid small">${FREE_APPS.map(a=>libCard({attr:`data-freeapp="${a[1]}"`,icon:a[2],title:a[0],sub:A.isInstalled(a[1])?(S.lang==="ar"?"افتح":"Open"):(S.lang==="ar"?"نزّل من المتجر":"Install")})).join("")}</div>`;
+  $("libMain").insertAdjacentHTML("afterbegin",h) };
+activators.unshift(el=>{ if(el.dataset&&el.dataset.freeapp){ const p=el.dataset.freeapp; if(A.isInstalled(p)) launch(p); else nat("openUri","market://details?id="+p); return true } return false });
