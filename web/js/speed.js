@@ -54,3 +54,21 @@ function groupSettings(){
     while(s.firstChild) out[gi].appendChild(s.firstChild); s.parentNode.removeChild(s) });
   out.forEach(d=>{ if(d.children.length>1) box.appendChild(d) });
 }
+
+// ================= Hero = "Now": clock + the match, the next prayer and the weather in one card =================
+Object.assign(T.ar,{nowNext:"الجاي",nowLeft:"باقي",nowNoM:"مفيش ماتشات النهارده"});Object.assign(T.en,{nowNext:"Next",nowLeft:"in",nowNoM:"No matches today"});
+function heroMatch(){ if(typeof matches==="undefined"||!matches.length) return null;
+  const fav=e=>teamFav(e)?0:1, live=matches.filter(e=>evState(e)==="live").sort((a,b)=>fav(a)-fav(b));
+  if(live.length) return {e:live[0],live:true};
+  const up=matches.filter(e=>evState(e)==="ns").sort((a,b)=>(fav(a)-fav(b))||(evTime(a)-evTime(b)));
+  return up.length?{e:up[0],live:false}:null }
+hwBody=(function(prev){ return function(w){ if(w.t!=="hero") return prev(w);
+  const d=new Date(), np=S.prayerOn&&window.nextPrayer&&typeof prayers!=="undefined"&&prayers.length?nextPrayer():null, m=heroMatch(), wn=typeof weatherNow!=="undefined"&&weatherNow;
+  const card=(cls,ic,top,main,sub)=>`<div class="nowc ${cls}"><div class="nowi">${ic}</div><div><div class="nowt">${top}</div><div class="nowm">${main}</div>${sub?`<div class="nows">${sub}</div>`:""}</div></div>`;
+  let cards="";
+  if(m){ const e=m.e; cards+=m.live
+      ? card("live","⚽",`● ${esc(L("live"))}`,`${esc(e.strHomeTeam)} <b>${esc(String(e.intHomeScore||0))} - ${esc(String(e.intAwayScore||0))}</b> ${esc(e.strAwayTeam)}`,"")
+      : card("","⚽",esc(L("nowNext")),`${esc(e.strHomeTeam)} × ${esc(e.strAwayTeam)}`,esc(fmtTime(new Date(evTime(e))))+" · "+esc(L("nowLeft"))+" "+esc(fmtLeft(evTime(e)-Date.now()))) }
+  if(np) cards+=card("","🕌",esc(L("prayers")[np.i]),esc(fmtTime(np.t)),esc(L("nowLeft"))+" "+esc(fmtLeft(np.t-Date.now())));
+  if(wn) cards+=card("","",esc(wn.city||S.city||""),`${esc(wn.i)} ${esc(wn.t)}°`,"");
+  return `<div class="herobox nowbox"><div class="nowclk"><div class="hbig">${esc(fmtTime(d))}</div><div class="hsub">${esc(fmtDate(d))}</div></div><div class="nowcards">${cards}</div></div>` } })(hwBody);
