@@ -6,12 +6,14 @@ Object.assign(T.ar,{fmTitle:"⚡ وضع اللانشر",fmFast:"⚡ لانشر �
 Object.assign(T.en,{fmTitle:"⚡ Launcher mode",fmFast:"⚡ Fast launcher",fmNormal:"🎨 Usual launcher",fmSub:"Fast turns off everything heavy. Usual brings your choices back.",
   fmHeavy:"Heavy features (turn off what you don't need)",fmAuto:"Close any app when I return Home (its settings and data stay)",
   hvAnim:"Animated background",hvLive:"Live wallpaper",hvPrev:"Channel preview while browsing",hvCheck:"Auto channel check",hvTicker:"Bottom ticker",hvLite:"Lite look (no blur/shadows)"});
-const HEAVY=[["anim","hvAnim","off"],["liveWall","hvLive",false],["preview","hvPrev",false],["autoCheck","hvCheck",false],["tickerOn","hvTicker",false],["lite","hvLite",true]];
+const HEAVY=[["anim","hvAnim","off"],["liveWall","hvLive",false],["preview","hvPrev",false],["autoCheck","hvCheck",false],["lite","hvLite",true]];
 function setFast(on){
   if(on){ const snap={}; HEAVY.forEach(([k,,v])=>{ snap[k]=S[k]; S[k]=v }); if(!S.fastMode||!S.fastSnap) S.fastSnap=snap }
   else { const sn=S.fastSnap||{}; HEAVY.forEach(([k])=>{ if(k in sn) S[k]=sn[k] }); S.fastSnap=null }
   S.fastMode=!!on; S.perfChosen=true; try{ applyLook(); if(typeof updateTicker==="function") updateTicker(); if(typeof pvStop==="function"&&on) pvStop() }catch(e){}
 }
+// matches & prayer are never touched by any mode
+if(!S.tickFix){ S.tickFix=true; S.tickerOn=true; S.prayerOn=true; S.sportsOn=true }
 // first run: start in fast mode (the box has 2 GB)
 if(!S.fastSeeded){ S.fastSeeded=true; if(S.fastMode) setFast(true) }
 function fastSection(){
