@@ -208,3 +208,9 @@ renderCreator=function(){ const e=$("creator"); if(!e) return;
   e.innerHTML=`<img src="${CREATOR.img}" onerror="this.remove()" alt=""><div class="cr"><small>DESIGNED BY</small><b>Mahmoud Elgamal</b></div>` };
 renderCreator();
 if(!S.iconSize2){ S.iconSize2=true; S.favSize="m"; setTimeout(()=>{ if(typeof applyHomeLook==="function") applyHomeLook() },0) }
+
+// the clean widget home is the layout in both simple and full mode (full mode just adds tabs and rows);
+// old screen "designs" moved things around and clashed with it, so they no longer apply to Home
+document.body.classList.add("clean");
+const _applyLookCl=applyLook; applyLook=function(){ _applyLookCl.apply(this,arguments); document.body.classList.add("clean"); document.body.dataset.lay="none" };
+setTimeout(()=>{ document.body.dataset.lay="none" },0);

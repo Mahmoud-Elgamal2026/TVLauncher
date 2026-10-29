@@ -585,8 +585,8 @@ body.hwedit .hw{outline:.3vh dashed rgba(255,255,255,.5);outline-offset:.4vh}
 .hw.grabbed{outline:.5vh solid #ffd54a!important;transform:scale(1.08) rotate(-1deg)!important;box-shadow:0 2vh 5vh rgba(0,0,0,.7)!important}
 .lbchips{flex-wrap:wrap;gap:.8vw;padding:1vh 1vw}
 /* simple home: compact header, widgets on a clean 4-column grid that fills the row */
-body.simple #shelf{height:auto!important;min-height:0;padding:0 1vw .5vh}
-body.simple #shelfTitle{font-size:3.4vh!important}body.simple #shelfSub{display:none}
+body.clean #shelf{height:auto!important;min-height:0;padding:0 1vw .5vh}
+body.clean #shelfTitle{font-size:3.4vh!important}body.clean #shelfSub{display:none}
 .hwboard{padding:.6vh 1vw 1.6vh;gap:1.2vw;justify-content:flex-start;box-sizing:border-box;width:100%}
 .hw{height:22vh}
 .hw.sz1{width:calc(25% - .9vw)}
@@ -635,7 +635,7 @@ body:not([data-page=home]) .hrail{display:none}
 .hrail .rb.on{background:#ffd54a;color:#000}
 .hrail .rb.focus{transform:scale(1.15);box-shadow:0 0 0 .4vh #fff}
 .hrail .rb.focus span{opacity:1}
-body.simple #home .scroll{padding-inline-start:9vh}
+body.clean #home .scroll{padding-inline-start:9vh}
 /* page 0 = widgets only; page 1 = favorites + folders + all apps */
 
 body[data-hpage="1"] #home .scroll > #folderRow{display:flex!important}
@@ -677,17 +677,17 @@ body[data-favsz] #homeApps .app .nm{opacity:.8!important}
 #creator .cr small{font-size:.95vh;letter-spacing:.25em;opacity:.6;font-weight:500}
 #creator .cr b{font-size:1.55vh;font-weight:600;color:#fff!important;letter-spacing:.04em}
 /* simple home: favorites are a normal row — no design bars/backgrounds/fixed positions */
-body.simple #favRow{position:static!important;background:none!important;box-shadow:none!important;border:0!important;max-height:none!important;padding:1vh 1vw 3vh!important;flex-wrap:wrap!important;overflow:visible!important;gap:2.2vh 1.6vw!important;top:auto!important;bottom:auto!important;left:auto!important;right:auto!important}
-body.simple #favRow::before,body.simple #favRow::after{display:none!important}
+body.clean #favRow{position:static!important;background:none!important;box-shadow:none!important;border:0!important;max-height:none!important;padding:1vh 1vw 3vh!important;flex-wrap:wrap!important;overflow:visible!important;gap:2.2vh 1.6vw!important;top:auto!important;bottom:auto!important;left:auto!important;right:auto!important}
+body.clean #favRow::before,body.clean #favRow::after{display:none!important}
 /* nicer app tiles: uniform rounded cards with the name always under them */
-body.simple #favRow .app,body.simple #homeApps .app{border-radius:1.6vh!important;box-shadow:0 .8vh 2vh rgba(0,0,0,.35)}
-body.simple #favRow .app .nm,body.simple #homeApps .app .nm{opacity:.9!important;font-size:1.6vh!important;margin-top:1vh}
-body.simple #favRow .app.focus .nm{opacity:1!important;font-weight:600}
+body.clean #favRow .app,body.clean #homeApps .app{border-radius:1.6vh!important;box-shadow:0 .8vh 2vh rgba(0,0,0,.35)}
+body.clean #favRow .app .nm,body.clean #homeApps .app .nm{opacity:.9!important;font-size:1.6vh!important;margin-top:1vh}
+body.clean #favRow .app.focus .nm{opacity:1!important;font-weight:600}
 body[data-favsz=xs] #favRow .app,body[data-favsz=xs] #homeApps .app{width:8vw!important}
 body[data-favsz=s] #favRow .app,body[data-favsz=s] #homeApps .app{width:10.5vw!important}
 body[data-favsz=m] #favRow .app,body[data-favsz=m] #homeApps .app{width:12.5vw!important}
 body[data-favsz=l] #favRow .app,body[data-favsz=l] #homeApps .app{width:15vw!important}
-body.simple #home h2.favh{display:block!important;position:static!important}
+body.clean #home h2.favh{display:block!important;position:static!important}
 /* professional screensaver layout */
 body.fwpro #fwBox .fw{position:fixed;left:auto;right:auto;top:auto;bottom:auto;transform:none!important;background:none;box-shadow:none;padding:0;border-radius:0}
 body.fwpro #fw_clock{left:5vw!important;bottom:7vh!important;text-align:left;direction:ltr}
@@ -701,3 +701,19 @@ body.fwpro #fw_mon{top:44vh!important;font-size:1.8vh}
 body.fwpro #fw_weather b{font-size:3.6vh}
 body.fwpro #fw_prayer .fwt2{font-size:3.4vh;font-weight:600}
 body.fwpro #fw_azkar{right:4vw!important;bottom:7vh!important;max-width:38vw;font-size:2.4vh;line-height:1.6;text-align:right;opacity:.92;text-shadow:0 .3vh 1.5vh rgba(0,0,0,.6)}
+
+body.clean #allAppsW,body.clean h2[data-row=allAppsW],body.clean .dockx{display:none!important}
+body.clean .tab[data-page="apps"]{display:none!important}
+/* all app rows on Home use the same tile size */
+body[data-favsz=xs].clean #home .row .app{width:8vw!important}
+body[data-favsz=s].clean #home .row .app{width:10.5vw!important}
+body[data-favsz=m].clean #home .row .app{width:12.5vw!important}
+body[data-favsz=l].clean #home .row .app{width:15vw!important}
+body.clean #home .row{flex-wrap:wrap;gap:2.2vh 1.6vw;padding:1vh 1vw 3vh}
+/* animated backgrounds: clearly visible (they were too faint behind the widgets) */
+body[data-anim=aurora] #animBg i{opacity:.85!important}
+body[data-anim=glow] #animBg i{opacity:.7!important}
+body[data-anim=waves] #animBg i{opacity:.6!important}
+body[data-anim=bokeh] #animBg i{opacity:1!important}
+#animBg{z-index:-2!important}
+body.wallimg:not([data-anim=off]) #animBg{display:block!important;mix-blend-mode:screen}
