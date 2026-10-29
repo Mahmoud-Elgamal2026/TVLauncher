@@ -186,8 +186,10 @@ function hwBody(w) {
       const list = typeof matches !== "undefined" ? matches : [];
       if (!list.length) return `<div class="hwico">⚽</div><div class="hwsub">${esc(L(sportsTried ? "mNone" : "mLoad"))}</div>`;
       const live = list.filter((e) => evState(e) === "live"), up = list.filter((e) => evState(e) === "ns"), done = list.filter((e) => evState(e) === "ft");
-      const fav = (e) => typeof teamFav === "function" && teamFav(e) ? 0 : 1;
-      const show = live.concat(up, done).sort((a, b) => fav(a) - fav(b)).slice(0, w.sz > 2 ? 6 : w.sz > 1 ? 4 : 2);
+      const tm = (e) => +evTime(e) || 0;
+      up.sort((a, b) => tm(a) - tm(b));
+      done.sort((a, b) => tm(b) - tm(a));
+      const show = live.concat(up, done).slice(0, w.sz > 2 ? 6 : w.sz > 1 ? 4 : 2);
       return `<div class="hwml">${show.map((e) => {
         const st = evState(e);
         return `<div class="hwm"><span class="tn">${esc(e.strHomeTeam)}</span><b class="${st === "live" ? "live" : ""}">${st === "ns" ? esc(fmtTime(evTime(e))) : (e.intHomeScore || 0) + " - " + (e.intAwayScore || 0)}</b><span class="tn">${esc(e.strAwayTeam)}</span></div>`;
