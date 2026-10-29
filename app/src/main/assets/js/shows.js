@@ -159,3 +159,81 @@ function showMenu(i) {
 }
 setTimeout(() => showsRefresh(false), 12e3);
 setInterval(() => showsRefresh(false), 36e5);
+Object.assign(T.ar, { shSrc: "المسلسل ده بيتعرض فين؟", shYt: "▶️ يوتيوب (لينك القناة أو قايمة الحلقات)", shApp2: "📱 تطبيق تاني (الأسطورة، أوسكار…)", shYtLink: "الصق لينك قايمة حلقات المسلسل أو القناة", shOpenEp: "▶ افتح آخر حلقة" });
+Object.assign(T.en, { shSrc: "Where does this show air?", shYt: "▶️ YouTube (channel or episode playlist link)", shApp2: "📱 Another app", shYtLink: "Paste the episode playlist or channel link", shOpenEp: "▶ Open latest episode" });
+function ytShowFetch(sh) {
+  return __async(this, null, function* () {
+    try {
+      const feed = sh.ytPl ? "playlist_id=" + sh.ytPl : "channel_id=" + sh.ytCh;
+      const x = yield A.fetchText("https://www.youtube.com/feeds/videos.xml?" + feed), doc = new DOMParser().parseFromString(x, "text/xml"), e = doc.getElementsByTagName("entry")[0];
+      if (e) {
+        const g = (t) => {
+          const n = e.getElementsByTagName(t)[0];
+          return n ? n.textContent : "";
+        };
+        const title = g("title"), num = (title.match(/(?:الحلقة|حلقة|ep(?:isode)?\.?)\s*(\d+)/i) || title.match(/(\d+)\s*$/) || [])[1];
+        sh.last = { season: 1, number: num ? +num : 0, date: (g("published") || "").slice(0, 10), title, v: g("yt:videoId") };
+      }
+      sh.at = Date.now();
+      sh.manual = false;
+    } catch (e) {
+      sh.at = Date.now();
+    }
+    return sh;
+  });
+}
+const _showFetchY = showFetch;
+showFetch = function(sh) {
+  return __async(this, null, function* () {
+    if (sh.ytPl || sh.ytCh) return ytShowFetch(sh);
+    return _showFetchY(sh);
+  });
+};
+showAdd = function() {
+  prompt2(L("shName"), "", (v) => {
+    if (!v) return;
+    dialog(L("shSrc"), [
+      { icon: "▶️", label: L("shYt"), pri: 1, fn: () => setTimeout(() => prompt2(L("shYtLink"), "", (u) => __async(this, null, function* () {
+        if (!u) return;
+        const sh = { q: v, name: v, mine: null };
+        const pl = u.match(/[?&]list=([\w-]+)/);
+        if (pl) sh.ytPl = pl[1];
+        else {
+          try {
+            const r = yield ytResolve(u);
+            if (r) sh.ytCh = r.id;
+          } catch (e) {
+          }
+        }
+        if (!sh.ytPl && !sh.ytCh) return A.toast(L("ytBad"));
+        sh.app = ["com.google.android.youtube.tv", "com.liskovsoft.smarttubetv", "com.google.android.youtube"].find((p) => A.isInstalled(p)) || "";
+        yield ytShowFetch(sh);
+        S.shows = (S.shows || []).concat([sh]);
+        if (!hwHas("shows")) hwSave(hwList().concat([{ id: "shows", t: "shows", sz: 2, st: "glass" }]));
+        else renderHW();
+      }), "https://youtube.com/playlist?list=…"), 30) },
+      { icon: "📱", label: L("shApp2"), fn: () => setTimeout(() => __async(this, null, function* () {
+        let sh = { q: v, mine: null };
+        sh = yield _showFetchY(sh);
+        if (sh.manual) A.toast(L("shManual"));
+        dialog(L("shApp"), visibleApps().slice(0, 50).map((a) => ({ label: appName(a), fn: () => {
+          sh.app = a.pkg;
+          S.shows = (S.shows || []).concat([sh]);
+          if (!hwHas("shows")) hwSave(hwList().concat([{ id: "shows", t: "shows", sz: 2, st: "glass" }]));
+          else renderHW();
+        } })));
+      }), 30) }
+    ]);
+  });
+};
+const _showMenuY = showMenu;
+showMenu = function(i) {
+  _showMenuY(i);
+  const sh = (S.shows || [])[i];
+  if (!sh || !sh.last || !sh.last.v) return;
+  const box = $("dbox"), items = box._items, g = box.querySelector(".mgrid,.dlist");
+  if (!items || !g) return;
+  items.unshift({ icon: "▶", label: L("shOpenEp") + (sh.last.title ? ": " + sh.last.title.slice(0, 40) : ""), pri: 1, fn: () => openYt(sh.last.v) });
+  g.innerHTML = items.map((it, k) => `<button class="btn f${it.pri ? " pri" : ""}" data-di="${k}">${it.icon ? `<b>${esc(it.icon)}</b>` : ""}${esc(it.label)}</button>`).join("");
+  focus(g.querySelector(".f"));
+};

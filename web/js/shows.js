@@ -40,3 +40,29 @@ function showMenu(i){ const l=(S.shows||[]).map(x=>Object.assign({},x)), sh=l[i]
     {icon:"🗑",label:L("shRemove"),fn:()=>{ l.splice(i,1); S.shows=l; renderHW() }},{label:L("done"),fn:()=>{}}],
     {sub:`${sh.last?L("shLast")+": "+epTag(sh.last)+" ("+sh.last.date+")":L("shManual")}${sh.next?" · "+L("shNext")+": "+epTag(sh.next)+" ("+sh.next.date+")":""}${sh.mine?" · "+L("shMine")+" "+epTag(sh.mine):""}`}) }
 setTimeout(()=>showsRefresh(false),12000); setInterval(()=>showsRefresh(false),3600000);
+
+// ---- series that air on YouTube (channel or playlist): real latest episode from the YouTube feed, opens the episode itself
+Object.assign(T.ar,{shSrc:"المسلسل ده بيتعرض فين؟",shYt:"▶️ يوتيوب (لينك القناة أو قايمة الحلقات)",shApp2:"📱 تطبيق تاني (الأسطورة، أوسكار…)",shYtLink:"الصق لينك قايمة حلقات المسلسل أو القناة",shOpenEp:"▶ افتح آخر حلقة"});
+Object.assign(T.en,{shSrc:"Where does this show air?",shYt:"▶️ YouTube (channel or episode playlist link)",shApp2:"📱 Another app",shYtLink:"Paste the episode playlist or channel link",shOpenEp:"▶ Open latest episode"});
+async function ytShowFetch(sh){ try{
+    const feed=sh.ytPl?"playlist_id="+sh.ytPl:"channel_id="+sh.ytCh;
+    const x=await A.fetchText("https://www.youtube.com/feeds/videos.xml?"+feed), doc=new DOMParser().parseFromString(x,"text/xml"), e=doc.getElementsByTagName("entry")[0];
+    if(e){ const g=t=>{ const n=e.getElementsByTagName(t)[0]; return n?n.textContent:"" };
+      const title=g("title"), num=(title.match(/(?:الحلقة|حلقة|ep(?:isode)?\.?)\s*(\d+)/i)||title.match(/(\d+)\s*$/)||[])[1];
+      sh.last={season:1,number:num?+num:0,date:(g("published")||"").slice(0,10),title,v:g("yt:videoId")} }
+    sh.at=Date.now(); sh.manual=false }catch(e){ sh.at=Date.now() } return sh }
+const _showFetchY=showFetch; showFetch=async function(sh){ if(sh.ytPl||sh.ytCh) return ytShowFetch(sh); return _showFetchY(sh) };
+showAdd=function(){ prompt2(L("shName"),"",v=>{ if(!v) return;
+  dialog(L("shSrc"),[
+    {icon:"▶️",label:L("shYt"),pri:1,fn:()=>setTimeout(()=>prompt2(L("shYtLink"),"",async u=>{ if(!u) return; const sh={q:v,name:v,mine:null};
+      const pl=u.match(/[?&]list=([\w-]+)/); if(pl) sh.ytPl=pl[1]; else { try{ const r=await ytResolve(u); if(r) sh.ytCh=r.id }catch(e){} }
+      if(!sh.ytPl&&!sh.ytCh) return A.toast(L("ytBad"));
+      sh.app=["com.google.android.youtube.tv","com.liskovsoft.smarttubetv","com.google.android.youtube"].find(p=>A.isInstalled(p))||"";
+      await ytShowFetch(sh); S.shows=(S.shows||[]).concat([sh]); if(!hwHas("shows")) hwSave(hwList().concat([{id:"shows",t:"shows",sz:2,st:"glass"}])); else renderHW() },"https://youtube.com/playlist?list=…"),30)},
+    {icon:"📱",label:L("shApp2"),fn:()=>setTimeout(async()=>{ let sh={q:v,mine:null}; sh=await _showFetchY(sh); if(sh.manual) A.toast(L("shManual"));
+      dialog(L("shApp"),visibleApps().slice(0,50).map(a=>({label:appName(a),fn:()=>{ sh.app=a.pkg; S.shows=(S.shows||[]).concat([sh]); if(!hwHas("shows")) hwSave(hwList().concat([{id:"shows",t:"shows",sz:2,st:"glass"}])); else renderHW() }}))) },30)}]) }) };
+// for YouTube shows: "open" plays the latest episode directly
+const _showMenuY=showMenu; showMenu=function(i){ _showMenuY(i); const sh=(S.shows||[])[i]; if(!sh||!sh.last||!sh.last.v) return;
+  const box=$("dbox"), items=box._items, g=box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
+  items.unshift({icon:"▶",label:L("shOpenEp")+(sh.last.title?": "+sh.last.title.slice(0,40):""),pri:1,fn:()=>openYt(sh.last.v)});
+  g.innerHTML=items.map((it,k)=>`<button class="btn f${it.pri?" pri":""}" data-di="${k}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };
