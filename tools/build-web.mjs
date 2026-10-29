@@ -22,7 +22,7 @@ let jsCount = 0;
 for (const f of readdirSync(join(OUT, "js"))) {
   if (!f.endsWith(".js") || f.startsWith("lib-")) continue;
   const p = join(OUT, "js", f);
-  const { code } = transformSync(readFileSync(p, "utf8"), { loader: "js", target: TARGET, charset: "utf8", legalComments: "none" });
+  const { code } = transformSync(readFileSync(p, "utf8"), { loader: "js", target: TARGET, charset: "utf8", legalComments: "none", minify: true });
   try { acorn.parse(code, { ecmaVersion: 2016, sourceType: "script" }); }
   catch (e) { console.error(`✗ ${f}: syntax newer than ES2016 remains — ${e.message}`); process.exit(1); }
   writeFileSync(p, code); jsCount++;

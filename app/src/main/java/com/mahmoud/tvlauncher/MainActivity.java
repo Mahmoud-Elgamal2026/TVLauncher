@@ -144,6 +144,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() { inFront = false; super.onPause(); }
 
+    /** Launcher hidden behind another app: stop drawing and tell the page to idle, so the app in front gets the CPU. */
+    @Override
+    protected void onStop() { super.onStop(); if (web != null) { web.onPause(); js("window.onBg&&onBg(1)"); } }
+
+    @Override
+    protected void onStart() { super.onStart(); if (web != null) { web.onResume(); js("window.onBg&&onBg(0)"); } }
+
     @Override
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
