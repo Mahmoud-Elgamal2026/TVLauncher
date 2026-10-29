@@ -177,6 +177,10 @@ function remoteCmd(m) {
       nat("openUri", u);
       return { ok: 1, did: "link" };
     }
+    case "photoReset":
+      if (m.what === "frames") window.remoteFramesReset && remoteFramesReset();
+      else window.remoteWallReset && remoteWallReset();
+      return { ok: 1 };
     case "photo": {
       const u = nat("saveImageB64", String(m.data || ""));
       if (!u) return { error: "photo" };

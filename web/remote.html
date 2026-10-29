@@ -218,6 +218,7 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
 <div style="padding:10px 14px"><h2 style="margin:6px 0">🖼 صورك على التليفزيون</h2>
 <div style="display:flex;gap:10px"><button id="phWall" style="flex:1;padding:14px;border-radius:14px;border:0;background:#2a7d4f;color:#fff;font-size:16px">خلفية للانشر</button>
 <button id="phFrame" style="flex:1;padding:14px;border-radius:14px;border:0;background:#7a3bff;color:#fff;font-size:16px">صور للبرواز (أكتر من صورة)</button></div>
+<div style="display:flex;gap:10px;margin-top:10px"><button id="phWallX" style="flex:1;padding:12px;border-radius:14px;border:0;background:#3a2230;color:#fff;font-size:15px">🗑 شيل الخلفية</button><button id="phFrameX" style="flex:1;padding:12px;border-radius:14px;border:0;background:#3a2230;color:#fff;font-size:15px">🗑 امسح صور البرواز</button></div>
 <input type="file" id="phFile" accept="image/*" style="display:none"><div id="phMsg" style="color:#8a90a8;margin-top:6px;font-size:14px"></div></div>
 <div id="tpWrap" style="padding:10px 14px"><input id="liveType" placeholder="⌨️ اكتب هنا — بيتكتب على التليفزيون على طول" style="width:100%;box-sizing:border-box;margin-bottom:10px;padding:14px;border-radius:14px;border:0;background:#1b1e2b;color:#fff;font-size:16px"><div id="tpad" style="height:230px;border-radius:18px;background:#1b1e2b;display:flex;align-items:center;justify-content:center;color:#8a90a8;font-size:15px;user-select:none;touch-action:none">اسحب للأسهم · دوس = OK · دوستين = رجوع</div>
 <div style="display:flex;gap:10px;margin-top:10px"><button id="micBtn" style="flex:1;padding:14px;border-radius:14px;border:0;background:#3b6cff;color:#fff;font-size:17px">🎤 بحث بالصوت</button></div></div>
@@ -232,6 +233,8 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
   document.getElementById("micBtn").onclick=function(){ if(window.PhoneApp&&PhoneApp.voice){ PhoneApp.voice() } else { var q=prompt("قول أو اكتب اللي بتدوّر عليه (استخدم مايك الكيبورد)"); if(q) api("search",{t:q}) } };
   var phMode="wall", fi=document.getElementById("phFile"), pm=document.getElementById("phMsg");
   document.getElementById("phWall").onclick=function(){ phMode="wall"; fi.multiple=false; fi.click() };
+  document.getElementById("phWallX").onclick=function(){ api("photoReset",{what:"wall"}); pm.textContent="✓ رجعت الخلفية الأصلية" };
+  document.getElementById("phFrameX").onclick=function(){ api("photoReset",{what:"frames"}); pm.textContent="✓ اتمسحت صور البرواز" };
   document.getElementById("phFrame").onclick=function(){ phMode="frame"; fi.multiple=true; fi.click() };
   function shrink(file){ return new Promise(function(res,rej){ var img=new Image(), r=new FileReader(); r.onload=function(){ img.onload=function(){ var W=1920,H=1080,s=Math.min(1,Math.max(W/img.width,H/img.height)), c=document.createElement("canvas"); c.width=Math.round(img.width*s); c.height=Math.round(img.height*s); c.getContext("2d").drawImage(img,0,0,c.width,c.height); res(c.toDataURL("image/jpeg",0.82)) }; img.onerror=rej; img.src=r.result }; r.onerror=rej; r.readAsDataURL(file) }) }
   fi.onchange=async function(){ var fs=[].slice.call(fi.files||[]); if(!fs.length) return; var n=0;

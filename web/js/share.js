@@ -72,3 +72,15 @@ const _homeLookU=homeLookMenu; homeLookMenu=function(){ _homeLookU();
   g.innerHTML=items.map((it,i)=>`<button class="btn f${it.pri?" pri":""}" data-di="${i}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };
 // people who already use advanced features keep seeing them
 if(!S.advSeeded){ S.advSeeded=true; if(S.tgToken||(S.lists||[]).length||S.schedOn||S.bootPlay) S.advanced=true }
+
+// ================= Remove a wallpaper / frame photos sent from the phone =================
+Object.assign(T.ar,{wallRemove:"🗑 شيل الخلفية (ارجع للأصلية)",framesRemove:"🗑 امسح صور البرواز اللي بعتها",wallRemoved:"رجعت الخلفية الأصلية",framesRemoved:"اتمسحت صور البرواز"});
+Object.assign(T.en,{wallRemove:"🗑 Remove wallpaper (back to default)",framesRemove:"🗑 Delete the frame photos you sent",wallRemoved:"Default wallpaper restored",framesRemoved:"Frame photos deleted"});
+function wallReset(){ const u=S.wallImg; S.wall="dynamic"; S.wallImg=""; S.wallAuto=""; applyLook(); if(u&&/^file:/.test(u)) try{ nat("deleteFrame",u) }catch(e){} banner("🖼",L("wallRemoved"),"",3000) }
+function framesReset(){ (S.frames||[]).forEach(u=>{ try{ nat("deleteFrame",u) }catch(e){} }); S.frames=[]; if(S.frameSrc==="mine") S.frameSrc="online"; banner("🖼",L("framesRemoved"),"",3000) }
+const _wallMenuR=wallMenu; wallMenu=function(){ _wallMenuR();
+  const box=$("dbox"), items=box._items, g=box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
+  items.unshift({icon:"🗑",label:L("wallRemove"),fn:wallReset},{icon:"🗑",label:L("framesRemove"),fn:framesReset});
+  g.innerHTML=items.map((it,i)=>`<button class="btn f${it.pri?" pri":""}" data-di="${i}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };
+// the phone can do it too
+window.remoteWallReset=wallReset; window.remoteFramesReset=framesReset;

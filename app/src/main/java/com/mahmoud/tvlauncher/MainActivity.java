@@ -557,7 +557,7 @@ public class MainActivity extends Activity {
         public void deleteFrame(String url) {
             if (url == null || !url.startsWith("file://")) return;
             File f = new File(url.substring(7));
-            if (f.getParentFile() != null && f.getParentFile().getName().equals("frames")) f.delete();
+            if (f.getParentFile() != null && f.getParentFile().getName().matches("frames|mine")) f.delete();
         }
 
         @JavascriptInterface
