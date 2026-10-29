@@ -876,3 +876,4 @@ body.wallimg #shelfBg{background:#000!important}
 body.guest #favRow,body.guest h2.favh,body.guest #folderRow,body.guest #libFavH,body.guest #libFavRow,body.guest #ytH,body.guest #ytRow,body.guest #recentRow,body.guest h2[data-row=recentRow],body.guest #watchRow,body.guest h2[data-row=watchRow],
 body.guest #hwBoard .hw-shows,body.guest #hwBoard .hw-note,body.guest #hwBoard .hw-cont,body.guest #hwBoard .hw-yt,body.guest #creator{display:none!important}
 body.guest #wall{background-image:none!important}
+#railMic{display:none!important}
