@@ -757,3 +757,7 @@ body[data-favsz=xxs] #homeApps .app .nm,body[data-favsz=xxs] #favRow .app .nm{fo
 .nowm{font-size:2.2vh;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nowm b{font-size:2.6vh;margin:0 .3vw}
 .nows{font-size:1.6vh;opacity:.85}
+/* final home: the "Now" card is the single source for clock/weather; widget toolbar hidden (long-press a widget / rail ＋) */
+body[data-page=home] .clock,body[data-page=home] .top .weather{display:none!important}
+#hwH{display:none!important}
+.nowc.live{background:rgba(140,20,30,.78)!important}

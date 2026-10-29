@@ -72,3 +72,5 @@ hwBody=(function(prev){ return function(w){ if(w.t!=="hero") return prev(w);
   if(np) cards+=card("","🕌",esc(L("prayers")[np.i]),esc(fmtTime(np.t)),esc(L("nowLeft"))+" "+esc(fmtLeft(np.t-Date.now())));
   if(wn) cards+=card("","",esc(wn.city||S.city||""),`${esc(wn.i)} ${esc(wn.t)}°`,"");
   return `<div class="herobox nowbox"><div class="nowclk"><div class="hbig">${esc(fmtTime(d))}</div><div class="hsub">${esc(fmtDate(d))}</div></div><div class="nowcards">${cards}</div></div>` } })(hwBody);
+// final home clean-up (once): prayer + device-monitor widgets are covered by the "Now" card
+if(!S.finalHome1){ S.finalHome1=true; const l=hwList().filter(w=>w.t!=="prayer"&&w.t!=="mon"); if(l.length!==hwList().length) setTimeout(()=>hwSave(l),0) }
