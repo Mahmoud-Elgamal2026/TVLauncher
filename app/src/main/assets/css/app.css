@@ -912,3 +912,30 @@ html[dir=rtl].nofg .nowc > * + *{margin-right:.8vw}
 body[data-page=home] .clock,body[data-page=home] .top .weather{display:none!important}
 #hwH{display:none!important}
 .nowc.live{background:rgba(140,20,30,.78)!important}
+/* ================= Luxe night look: deep navy, dark glass cards, one gold accent ================= */
+html body{--sel:#e9c46a;--selText:#111;--glass:rgba(255,255,255,.06);--ring:0 0 0 .35vh #e9c46a}
+html body #shelfBg{background:radial-gradient(120% 90% at 85% 0%,#1b2440 0%,#0c1124 45%,#05070f 100%)!important}
+html body #animBg{display:none!important}
+/* widget cards: dark frosted glass, hairline border, no dashes */
+html body .hw,html body .hw.st-glass,html body .hw.st-solid,html body .hw.st-accent,html body .hw.st-grad{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.025))!important;border:1px solid rgba(255,255,255,.08)!important;color:#fff}
+html body .hw.st-clear,html body .hw.hw-hero{border:1px solid rgba(255,255,255,.08)!important}
+html body .hw.hw-hero{background-color:#0d1328!important}
+html body .herobox.nowbox{background:linear-gradient(90deg,rgba(5,8,20,.75),rgba(5,8,20,.35))!important}
+html body .nowc{background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.08)}
+html body .nowc.live{background:rgba(140,20,30,.8)!important;border-color:rgba(255,90,90,.35)}
+html body .hw.f.focus,html body .hw:focus{box-shadow:0 0 0 .35vh #e9c46a!important}
+/* bigger match text */
+html body .hwm{font-size:2.2vh!important}
+html body .hwm b{font-size:2.3vh}
+/* app tiles: one shape for all — same radius, dark plate, hairline, image fitted */
+html body #favRow .app,html body #homeApps .app,html body #home .row .app{border-radius:1.6vh!important;background:#141a2e!important;border:1px solid rgba(255,255,255,.08);overflow:hidden}
+html body #favRow .app img,html body #homeApps .app img,html body #home .row .app img{object-fit:contain}
+html body #favRow .app img:not(.banner):not(.cover),html body #homeApps .app img:not(.banner):not(.cover){padding:12%}
+html body #favRow .app img.banner,html body #homeApps .app img.banner{width:100%;height:100%;object-fit:cover}
+html body .app .badge{display:none}
+/* top bar: only search and profile stay */
+html body #boostBtn,html body #qBtn,html body #browserBtn{display:none!important}
+/* tabs + side rail in the same dark glass */
+html body .tabs{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.08)}
+html body .rb{background:rgba(255,255,255,.06)!important}
+html body .rb.on,html body .rb.f.focus{background:#e9c46a!important;color:#111}
