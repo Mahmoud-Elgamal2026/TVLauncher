@@ -36,7 +36,7 @@ document.body.classList.add("showfolders");
 
 // ---- 4) time-aware order (display only; your saved order stays)
 const _hwListT=hwList;
-function smartOrder(l){ if(!S.smartHome||hwEdit.on) return l; const h=new Date().getHours(), live=typeof matches!=="undefined"&&matches.some(e=>evState(e)==="live");
+function smartOrder(l){ return l; if(!S.smartHome||hwEdit.on) return l; const h=new Date().getHours(), live=typeof matches!=="undefined"&&matches.some(e=>evState(e)==="live");
   const pri=t=>t==="hero"?-10:live&&t==="matches"?-5:(h>=4&&h<11)&&(t==="azkarA"||t==="wird"||t==="weather")?-3:(h>=20||h<2)&&(t==="live"||t==="cont")?-3:(h>=15&&h<19)&&t==="azkarA"?-2:0;
   return l.map((w,i)=>({w,i})).sort((a,b)=>(pri(a.w.t)-pri(b.w.t))||(a.i-b.i)).map(x=>live&&x.w.t==="matches"?Object.assign({},x.w,{sz:3}):x.w) }
 const _renderHWT=renderHW; renderHW=function(){ const real=S.hw; const tmp=smartOrder(_hwListT()); const b=$("hwBoard");
@@ -55,7 +55,6 @@ const _hwPresetL=hwPresetMenu; hwPresetMenu=function(){ if(lockedNow()) return; 
 const _homeLookL=homeLookMenu; homeLookMenu=function(){ _homeLookL();
   const box=$("dbox"), items=box._items, g=box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
   items.splice(items.length-1,0,
-    {icon:"🕒",label:L("hoSmart")+": "+L(S.smartHome?"hoShow":"hoHide"),keep:1,fn:()=>{ S.smartHome=!S.smartHome; renderHW(); setTimeout(homeLookMenu,30) }},
     {icon:"🔒",label:L("hoLock")+": "+L(S.homeLock?"hoLockOn":"hoLockOff"),keep:1,fn:()=>{ const flip=()=>{ S.homeLock=!S.homeLock; setTimeout(homeLookMenu,30) }; if(S.homeLock&&S.pin) guard(true,flip); else flip() }});
   g.innerHTML=items.map((it,i)=>`<button class="btn f${it.pri?" pri":""}" data-di="${i}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };
 // app long-press: moving favorites is blocked while locked
