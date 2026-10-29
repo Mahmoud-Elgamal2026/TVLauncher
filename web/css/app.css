@@ -732,3 +732,7 @@ body.guest #hwBoard .hw-shows,body.guest #hwBoard .hw-note,body.guest #hwBoard .
 body.guest #wall{background-image:none!important}
 #railMic{display:none!important}
 #smartRow,h2[data-row=smartRow]{display:none!important}
+/* speed on weak boxes: full-screen blur filters and big shadows are the heaviest thing for an old GPU */
+body.lite #shelfImg{filter:none!important;display:none!important}
+body.lite *{box-shadow:none!important;text-shadow:none!important}
+body.lite #wall{filter:none!important}
