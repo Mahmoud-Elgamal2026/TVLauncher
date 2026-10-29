@@ -47,3 +47,6 @@ const _renderPagerG=renderPager; renderPager=function(){ _renderPagerG(); const 
   if(!b){ const m=$("railBoost"); const h=`<button class="rb f" id="railGuest"><b>👥</b><span>${esc(L("guest"))}</span></button>`; if(m) m.insertAdjacentHTML("beforebegin",h); else d.insertAdjacentHTML("beforeend",h); b=$("railGuest") }
   b.classList.toggle("on",!!S.guest) };
 activators.unshift(el=>{ if(el.id==="railGuest"){ setGuest(!S.guest); return true } return false });
+
+// widget order is also kept on the box's own storage, so a WebView restart never brings back the old layout
+try{ const v=nat("getPref","hw"); if(v){ const l=JSON.parse(v); if(Array.isArray(l)&&l.length&&JSON.stringify(l)!==JSON.stringify(S.hw)) S.hw=l } }catch(e){}

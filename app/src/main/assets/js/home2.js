@@ -407,7 +407,7 @@ renderPager = function() {
   _renderPagerB();
   const d = $("homePager");
   if (!d || $("railBoost")) return;
-  d.insertAdjacentHTML("beforeend", `<button class="rb f boostrb" id="railBoost"><b>🚀</b><span>${esc(S.lang === "ar" ? "تسريع وقفل كل حاجة" : "Boost & close all")}</span></button>`);
+  d.insertAdjacentHTML("beforeend", `<button class="rb f boostrb" id="railBoost"><b>🚀</b><span>${esc(S.lang === "ar" ? "تسريع وقفل كل حاجة" : "Boost & close all")}</span></button><button class="rb f addwrb" id="hwAddBtn2"><b>＋</b><span>${esc(L("hwAdd"))}</span></button>`);
 };
 activators.unshift((el) => {
   if (el.id === "railBoost") {

@@ -140,7 +140,7 @@ setTimeout(()=>{ if(!sportsTried&&S.sportsOn!==false){ sportsTried=true; loadSpo
 
 // fixed Boost / clear-all button at the bottom of the side rail, always in view on Home
 const _renderPagerB=renderPager; renderPager=function(){ _renderPagerB(); const d=$("homePager"); if(!d||$("railBoost")) return;
-  d.insertAdjacentHTML("beforeend",`<button class="rb f boostrb" id="railBoost"><b>🚀</b><span>${esc(S.lang==="ar"?"تسريع وقفل كل حاجة":"Boost & close all")}</span></button>`) };
+  d.insertAdjacentHTML("beforeend",`<button class="rb f boostrb" id="railBoost"><b>🚀</b><span>${esc(S.lang==="ar"?"تسريع وقفل كل حاجة":"Boost & close all")}</span></button><button class="rb f addwrb" id="hwAddBtn2"><b>＋</b><span>${esc(L("hwAdd"))}</span></button>`) };
 activators.unshift(el=>{ if(el.id==="railBoost"){ boostNow(); return true } return false });
 // phone page can add a YouTube channel
 window.ytAddFromPhone=async v=>{ if(!v) return; try{ const r=await ytResolve(v); if(!r) return A.toast(L("ytBad"));

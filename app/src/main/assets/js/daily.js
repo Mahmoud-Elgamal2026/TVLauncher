@@ -160,3 +160,11 @@ activators.unshift((el) => {
   }
   return false;
 });
+try {
+  const v = nat("getPref", "hw");
+  if (v) {
+    const l = JSON.parse(v);
+    if (Array.isArray(l) && l.length && JSON.stringify(l) !== JSON.stringify(S.hw)) S.hw = l;
+  }
+} catch (e) {
+}

@@ -882,3 +882,5 @@ body.guest #wall{background-image:none!important}
 body.lite #shelfImg{filter:none!important;display:none!important}
 body.lite *{box-shadow:none!important;text-shadow:none!important}
 body.lite #wall{filter:none!important}
+.addwrb{opacity:.75;font-size:.85em;padding-block:.6vh!important}
+.addwrb b{font-size:1.6vh}

@@ -135,6 +135,10 @@ const HW_STYLES = ["glass", "solid", "accent", "grad", "clear"], HW_STNAME = { g
 let hwList = () => Array.isArray(S.hw) ? S.hw : [];
 const hwSave = (l) => {
   S.hw = l.map((x) => Object.assign({}, x));
+  try {
+    nat("putPref", "hw", JSON.stringify(S.hw));
+  } catch (e) {
+  }
   renderHW();
 };
 const hwGet = (id) => hwList().find((w) => w.id === id);
@@ -231,7 +235,8 @@ function hwCard(w) {
   const t = HW_TYPES.find((x) => x[0] === w.t) || [w.t, "", ""];
   return `<div class="hw f hw-${esc(w.t)} sz${w.sz || 1} st-${esc(w.st || "glass")}" tabindex="0" data-hw="${esc(w.id)}"><div class="hwt">${esc(t[1])} ${esc(L(t[2]))}</div><div class="hwb">${hwBody(w)}</div></div>`;
 }
-const addCard = () => `<div class="hw f hwadd sz1 st-clear" tabindex="0" id="hwAddBtn"><div class="hwb"><div class="hwico">＋</div><div class="hwsub">${esc(L("hwAdd"))}</div></div></div>`;
+const addCard = () => "";
+const _addCardOld = () => `<div class="hw f hwadd sz1 st-clear" tabindex="0" id="hwAddBtn"><div class="hwb"><div class="hwico">＋</div><div class="hwsub">${esc(L("hwAdd"))}</div></div></div>`;
 function renderHW() {
   const b = $("hwBoard");
   if (!b) return;

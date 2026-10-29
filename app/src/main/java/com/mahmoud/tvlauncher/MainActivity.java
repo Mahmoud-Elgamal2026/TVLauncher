@@ -1427,6 +1427,13 @@ public class MainActivity extends Activity {
             }).start();
         }
 
+        /** Crash-safe key/value (written to disk immediately; survives a WebView restart). */
+        @JavascriptInterface
+        public boolean putPref(String k, String v) { return prefs.edit().putString("js_" + k, v).commit(); }
+
+        @JavascriptInterface
+        public String getPref(String k) { return prefs.getString("js_" + k, ""); }
+
         /** Plain file write/read for the USB backup (only inside storage roots). */
         @JavascriptInterface
         public boolean writeText(String path, String text) {
