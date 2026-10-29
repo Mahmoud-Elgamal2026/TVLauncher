@@ -458,6 +458,19 @@ public class MainActivity extends Activity {
             try { startActivity(i); return true; } catch (Exception e) { return false; }
         }
 
+        /** Opens an app straight on its search for a show (falls back to just opening the app). */
+        @JavascriptInterface
+        public boolean searchInApp(String pkg, String q) {
+            String[] acts = {Intent.ACTION_SEARCH, "com.google.android.gms.actions.SEARCH_ACTION"};
+            for (String act : acts) {
+                try {
+                    Intent i = new Intent(act).setPackage(pkg).putExtra(android.app.SearchManager.QUERY, q).putExtra("query", q).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    if (i.resolveActivity(getPackageManager()) != null) { startActivity(i); return true; }
+                } catch (Exception ignored) {}
+            }
+            return launch(pkg);
+        }
+
         @JavascriptInterface
         public boolean isInstalled(String pkg) {
             try { getPackageManager().getPackageInfo(pkg, 0); return true; }

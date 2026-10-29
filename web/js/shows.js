@@ -7,7 +7,7 @@ Object.assign(T.en,{hwShows:"My shows",shAdd:"＋ Follow a show",shName:"Show na
   shLast:"Latest aired",shNext:"Next",shMine:"You stopped at",shEp:"ep",shNew:"NEW",shWatched:"✓ Watched this episode",shBack:"↩ One episode back",shOpen:"▶ Open",shRemove:"🗑 Unfollow",
   shManual:"No online data — tracking it manually (you set the episode)",shUpdated:"Updated"});
 HW_TYPES.push(["shows","🎬","hwShows"]);
-const epTag=e=>e?`S${e.season}·E${e.number}`:"";
+const epTag=e=>e?(e.season>1?`S${e.season}·E${e.number}`:`${L("shEp")} ${e.number}`):"";
 async function showFetch(sh){
   try{ const r=await A.fetchJSON("https://api.tvmaze.com/singlesearch/shows?q="+encodeURIComponent(sh.q)+"&embed[]=previousepisode&embed[]=nextepisode");
     const em=r._embedded||{}, pe=em.previousepisode, ne=em.nextepisode;
@@ -66,3 +66,50 @@ const _showMenuY=showMenu; showMenu=function(i){ _showMenuY(i); const sh=(S.show
   const box=$("dbox"), items=box._items, g=box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
   items.unshift({icon:"▶",label:L("shOpenEp")+(sh.last.title?": "+sh.last.title.slice(0,40):""),pri:1,fn:()=>openYt(sh.last.v)});
   g.innerHTML=items.map((it,k)=>`<button class="btn f${it.pri?" pri":""}" data-di="${k}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };
+
+// ================= Follow a show 2.0: pick the right show from a list → pick the app → episodes counted by its air days =================
+Object.assign(T.ar,{sh2Find:"بدوّر…",sh2Pick:"اختار المسلسل",sh2Typed:"✍️ استخدم الاسم زي ما كتبته",sh2Days:"بيتعرض إمتى؟",sh2Daily:"كل يوم",sh2Week5:"من السبت للأربع (5 أيام)",sh2Wk5b:"من الأحد للخميس",sh2Weekly:"مرة في الأسبوع",sh2LastEp:"آخر حلقة نزلت رقم كام؟",sh2Ep:"الحلقة",sh2Out:"نزلت",sh2Watch:"▶ افتح المسلسل في",sh2Days2:"🗓 أيام العرض",sh2Fix:"✏️ صحّح رقم آخر حلقة"});
+Object.assign(T.en,{sh2Find:"Searching…",sh2Pick:"Pick the show",sh2Typed:"✍️ Use the name as typed",sh2Days:"When does it air?",sh2Daily:"Every day",sh2Week5:"Sat–Wed (5 days)",sh2Wk5b:"Sun–Thu",sh2Weekly:"Once a week",sh2LastEp:"Latest aired episode number?",sh2Ep:"Ep",sh2Out:"out",sh2Watch:"▶ Open the show in",sh2Days2:"🗓 Air days",sh2Fix:"✏️ Fix latest episode number"});
+const VIDEO_APPS=/shahid|watchit|youtube|smarttube|netflix|osn|starz|tod|mbc|yango|vlc|kodi|stc|jawwy|anghami|wavo|weyyak|aflam|tv/i;
+async function showSearch(q){ const out=[], seen={};
+  const add=(name,sub,extra)=>{ const k=name.trim(); if(!k||seen[k]) return; seen[k]=1; out.push(Object.assign({name:k,sub:sub||""},extra||{})) };
+  await Promise.all([
+    A.fetchJSON("https://ar.wikipedia.org/w/api.php?action=query&list=search&srlimit=20&format=json&srsearch="+encodeURIComponent(q+" مسلسل")).then(r=>{
+      ((r.query||{}).search||[]).forEach(x=>{ const sn=String(x.snippet||"").replace(/<[^>]+>/g,""); if(/مسلسل/.test(x.title+sn)) add(x.title.replace(/\s*\((مسلسل|مسلسل تلفزيوني)[^)]*\)\s*/,""),(sn.match(/(20\d\d)/)||[])[1]||"") }) }).catch(()=>{}),
+    A.fetchJSON("https://api.tvmaze.com/search/shows?q="+encodeURIComponent(q)).then(r=>{
+      (r||[]).slice(0,10).forEach(x=>{ const s=x.show||{}; add(s.name,[(s.premiered||"").slice(0,4),s.status==="Running"?"🟢":""].filter(Boolean).join(" "),{tv:s.id,img:(s.image&&s.image.medium)||""}) }) }).catch(()=>{})]);
+  // newest first (what's airing now on top)
+  out.sort((a,b)=>(parseInt(b.sub)||0)-(parseInt(a.sub)||0));
+  return out }
+const DAYSETS={daily:[0,1,2,3,4,5,6],sw:[6,0,1,2,3],st:[0,1,2,3,4],weekly:null};
+function airedSince(sh){ // episodes aired after the day the user told us the number
+  if(!sh.days||!sh.base) return 0; const set=DAYSETS[sh.days]; let n=0; const d0=new Date(sh.base.d); d0.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+  for(let t=d0.getTime()+86400000;t<=today.getTime();t+=86400000){ const wd=new Date(t).getDay(); if(set?set.indexOf(wd)>=0:wd===sh.base.wd) n++ } return n }
+function schedLast(sh){ const n=sh.base?sh.base.n+airedSince(sh):0; return n?{season:1,number:n,date:new Date().toISOString().slice(0,10)}:null }
+const _showFetch2=showFetch; showFetch=async function(sh){ if(sh.days){ sh.last=schedLast(sh); sh.manual=false; sh.at=Date.now(); return sh }
+  if(sh.tv){ try{ const r=await A.fetchJSON("https://api.tvmaze.com/shows/"+sh.tv+"?embed[]=previousepisode&embed[]=nextepisode"), em=r._embedded||{}, pe=em.previousepisode, ne=em.nextepisode;
+      Object.assign(sh,{img:(r.image&&r.image.medium)||sh.img||"",last:pe?{season:pe.season,number:pe.number,date:pe.airdate}:null,next:ne?{season:ne.season,number:ne.number,date:ne.airdate}:null,at:Date.now(),manual:false}); return sh }catch(e){} }
+  return _showFetch2(sh) };
+function pickApp(cb){ const l=visibleApps().slice().sort((a,b)=>(VIDEO_APPS.test(b.pkg+appName(b))?1:0)-(VIDEO_APPS.test(a.pkg+appName(a))?1:0));
+  dialog(L("shApp"),l.slice(0,40).map(a=>({label:appName(a),fn:()=>cb(a.pkg)})),{grid:3}) }
+function pickDays(cb){ dialog(L("sh2Days"),[["daily","sh2Daily"],["sw","sh2Week5"],["st","sh2Wk5b"],["weekly","sh2Weekly"]].map(([k,l])=>({label:L(l),fn:()=>cb(k)}))) }
+function saveNewShow(sh){ S.shows=(S.shows||[]).concat([sh]); if(!hwHas("shows")) hwSave(hwList().concat([{id:"shows",t:"shows",sz:2,st:"glass"}])); else renderHW(); A.toast("🎬 "+sh.name) }
+showAdd=function(){ prompt2(L("shName"),"",async v=>{ if(!v) return; A.toast(L("sh2Find"));
+  const res=await showSearch(v);
+  const go=pick=>setTimeout(()=>{ const sh={q:pick.name,name:pick.name,tv:pick.tv||null,img:pick.img||"",mine:null};
+    pickApp(pkg=>{ sh.app=pkg; setTimeout(async()=>{
+      if(sh.tv){ await showFetch(sh); if(sh.last) return saveNewShow(sh) }
+      // no online episode data: the user says the latest number once, then it counts itself on the air days
+      pickDays(days=>setTimeout(()=>prompt2(L("sh2LastEp"),"",n=>{ const d=new Date(); sh.days=days; sh.base={n:Math.max(0,parseInt(n)||0),d:d.toISOString(),wd:d.getDay()}; sh.tv=null; sh.last=schedLast(sh); sh.mine=sh.last?{season:1,number:sh.last.number}:null; saveNewShow(sh) },"12"),30)) },60) }) },30);
+  dialog(L("sh2Pick"),res.slice(0,14).map(x=>({icon:x.img?"📺":"🎬",label:x.name+(x.sub?"  ·  "+x.sub:""),fn:()=>go(x)})).concat([{icon:"✍️",label:L("sh2Typed")+": "+v,fn:()=>go({name:v})}])) }) };
+// the show menu: open right on the show inside its app, fix the number, change air days
+const _showMenu2=showMenu; showMenu=function(i){ _showMenu2(i); const sh=(S.shows||[])[i]; if(!sh) return; const box=$("dbox"), items=box._items, g=box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
+  const app=sh.app&&byPkg(sh.app);
+  if(app&&!(sh.last&&sh.last.v)){ const k=items.findIndex(it=>it.icon==="▶"); const it={icon:"▶",label:L("sh2Watch")+" "+appName(app),pri:1,fn:()=>{ if(!nat("searchInApp",app.pkg,sh.name||sh.q)) launch(app.pkg) }}; if(k>=0) items[k]=it; else items.unshift(it) }
+  if(sh.days){ items.splice(items.length-1,0,
+    {icon:"✏️",label:L("sh2Fix"),fn:()=>setTimeout(()=>prompt2(L("sh2LastEp"),String(sh.last?sh.last.number:""),n=>{ const l=(S.shows||[]).map(x=>Object.assign({},x)), d=new Date(); l[i].base={n:Math.max(0,parseInt(n)||0),d:d.toISOString(),wd:d.getDay()}; l[i].last=schedLast(l[i]); S.shows=l; renderHW() }),30)},
+    {icon:"🗓",label:L("sh2Days2"),fn:()=>setTimeout(()=>pickDays(k=>{ const l=(S.shows||[]).map(x=>Object.assign({},x)); l[i].days=k; l[i].last=schedLast(l[i]); S.shows=l; renderHW() }),30)}) }
+  g.innerHTML=items.map((it,k)=>`<button class="btn f${it.pri?" pri":""}" data-di="${k}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };
+// scheduled shows: recount every time Home is drawn (cheap, no network)
+const _hwBodySh2=hwBody; hwBody=function(w){ if(w.t==="shows"){ const l=S.shows||[]; let ch=false; l.forEach(sh=>{ if(sh.days){ const n=schedLast(sh); if(JSON.stringify(n&&n.number)!==JSON.stringify(sh.last&&sh.last.number)){ sh.last=n; ch=true } } }); if(ch) S.shows=l } return _hwBodySh2(w) };
