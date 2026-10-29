@@ -74,3 +74,32 @@ hwBody=(function(prev){ return function(w){ if(w.t!=="hero") return prev(w);
   return `<div class="herobox nowbox"><div class="nowclk"><div class="hbig">${esc(fmtTime(d))}</div><div class="hsub">${esc(fmtDate(d))}</div></div><div class="nowcards">${cards}</div></div>` } })(hwBody);
 // final home clean-up (once): prayer + device-monitor widgets are covered by the "Now" card
 if(!S.finalHome1){ S.finalHome1=true; const l=hwList().filter(w=>w.t!=="prayer"&&w.t!=="mon"); if(l.length!==hwList().length) setTimeout(()=>hwSave(l),0) }
+
+// ================= Daily helpers (all event-driven or once a minute — no load) =================
+Object.assign(T.ar,{lastApp:"آخر تطبيق",numHint:"أرقام الريموت بتفتح المفضلة بالترتيب (1 = الأولى)",nightSleep:"😴 الشاشة هتنام (مفيش استخدام بالليل)",nightClean:"🧹 تنضيف الليل"});
+Object.assign(T.en,{lastApp:"Last app",numHint:"Remote digits open favorites in order",nightSleep:"😴 Sleeping (no use at night)",nightClean:"🧹 Night clean"});
+// 1) "last app" button on the side rail
+const _renderPagerL=renderPager; renderPager=function(){ _renderPagerL(); const d=$("homePager"); if(!d||$("railLast")) return;
+  d.insertAdjacentHTML("beforeend",`<button class="rb f" id="railLast"><b>↩</b><span>${esc(L("lastApp"))}</span></button>`) };
+const lastPkg=()=>(typeof openedApps!=="undefined"&&openedApps[0])||S.lastPkg||"";
+const _launchL=launch; launch=function(pkg){ if(pkg) S.lastPkg=pkg; return _launchL.apply(this,arguments) };
+activators.unshift(el=>{ if(el.id==="railLast"){ const p=lastPkg(); if(p) launch(p); else A.toast("—"); return true } return false });
+// 2) remote digits 1-9 open favorites in order (Home only, not while typing / in a dialog)
+keyHooks.unshift(e=>{ const k=e.key; if(!/^[1-9]$/.test(k)||!document.querySelector("#home.on")||on("dlg")||on("player")||(document.activeElement&&document.activeElement.tagName==="INPUT")) return false;
+  const f=(S.favs||[])[+k-1]; if(f&&byPkg(f)){ launch(f); return true } return false });
+// 3) your teams' matches get the 15-minute alert automatically (opens your match app)
+setInterval(()=>{ if(typeof matches==="undefined"||!matches.length) return; const a=Object.assign({},S.matchAlerts||{}); let ch=false;
+  matches.forEach(e=>{ if(evState(e)!=="ns"||!teamFav(e)||a[e.idEvent]) return; const t=evTime(e); if(!t||t-Date.now()>24*3600000) return;
+    a[e.idEvent]={t:+t,n:`${e.strHomeTeam} × ${e.strAwayTeam} · ${fmtTime(new Date(t))}`}; ch=true });
+  if(!S.matchApp){ const y=apps.find(x=>/yacine|koora|yalla|ssc|beinsports/i.test(x.pkg+x.name)); if(y) S.matchApp=y.pkg }
+  if(ch) S.matchAlerts=a },60000);
+// 4) night sleep: 1–6 AM, launcher in front and untouched for 20 minutes → screen off
+// 6) night clean: once a night at ~4 AM while nobody is using it
+let nightDone="";
+setInterval(()=>{ /* autoSleep */ const h=new Date().getHours(), day=new Date().toDateString();
+  if(!window.__bg&&h>=1&&h<6&&!on("player")&&Date.now()-idleAt>20*60000&&!$("blackout").classList.contains("on")){ banner("😴",L("nightSleep"),"",3000); setTimeout(()=>{ if(!nat("sleepNow")) $("blackout").classList.add("on") },3000) }
+  if(h===4&&nightDone!==day&&Date.now()-idleAt>30*60000&&!on("player")){ nightDone=day; try{ autoClean(true) }catch(e){} }
+},60000);
+// 5) back on Home: the remote stands on the app you just left
+const _onBgL=window.onBg; window.onBg=function(b){ _onBgL(b); if(b) return; const p=lastPkg(); if(!p) return;
+  setTimeout(()=>{ if(window.__bg||!document.querySelector("#home.on")||on("dlg")) return; const e=document.querySelector(`#home [data-pkg="${cssq(p)}"]`); if(e) focus(e) },350) };
