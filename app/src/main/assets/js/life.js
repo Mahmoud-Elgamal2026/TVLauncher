@@ -496,7 +496,7 @@ weather = function() {
   });
 };
 DEF.wallAuto = "";
-const WALL_CATS = () => [["bing", "🌍", L("wBing")], ["nature", "🌳", L("wNature")], ["space", "🌌", L("wSpace")], ["city", "🏙", L("wCity")], ["mountains", "🏔", L("wMount")], ["ocean", "🌊", L("wSea")], ["cars", "🚗", L("wCars")], ["minimalism", "◻️", L("wMinimal")], ["islamic architecture", "🕌", L("wMosque")]];
+let WALL_CATS = () => [["bing", "🌍", L("wBing")], ["nature", "🌳", L("wNature")], ["space", "🌌", L("wSpace")], ["city", "🏙", L("wCity")], ["mountains", "🏔", L("wMount")], ["ocean", "🌊", L("wSea")], ["cars", "🚗", L("wCars")], ["minimalism", "◻️", L("wMinimal")], ["islamic architecture", "🕌", L("wMosque")]];
 function wallMenu() {
   const items = [{ icon: "🔄", label: L("wBingAuto") + (S.wallAuto === "bing" ? " ✓" : ""), pri: S.wallAuto === "bing" ? 1 : 0, fn: () => {
     S.wallAuto = "bing";

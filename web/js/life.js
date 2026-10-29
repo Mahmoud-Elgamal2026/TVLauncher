@@ -187,7 +187,7 @@ const _weather=weather; weather=async function(){ await _weather(); loadForecast
 
 // ================= 4K wallpapers (Bing daily + Wallhaven SFW) =================
 DEF.wallAuto="";
-const WALL_CATS=()=>[["bing","🌍",L("wBing")],["nature","🌳",L("wNature")],["space","🌌",L("wSpace")],["city","🏙",L("wCity")],["mountains","🏔",L("wMount")],["ocean","🌊",L("wSea")],["cars","🚗",L("wCars")],["minimalism","◻️",L("wMinimal")],["islamic architecture","🕌",L("wMosque")]];
+let WALL_CATS=()=>[["bing","🌍",L("wBing")],["nature","🌳",L("wNature")],["space","🌌",L("wSpace")],["city","🏙",L("wCity")],["mountains","🏔",L("wMount")],["ocean","🌊",L("wSea")],["cars","🚗",L("wCars")],["minimalism","◻️",L("wMinimal")],["islamic architecture","🕌",L("wMosque")]];
 function wallMenu(){
   const items=[{icon:"🔄",label:L("wBingAuto")+(S.wallAuto==="bing"?" ✓":""),pri:S.wallAuto==="bing"?1:0,fn:()=>{ S.wallAuto="bing"; bingToday(true) }}]
     .concat(WALL_CATS().map(c=>({icon:c[1],label:c[2],fn:()=>setTimeout(()=>wallBrowse(c[0],c[2],1),30)})));

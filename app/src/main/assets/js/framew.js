@@ -300,3 +300,40 @@ frameWidgetMenu = function() {
   g.innerHTML = items.map((it, i) => `<button class="btn f${it.pri ? " pri" : ""}" data-di="${i}">${it.icon ? `<b>${esc(it.icon)}</b>` : ""}${esc(it.label)}</button>`).join("");
   focus(g.querySelector(".f"));
 };
+Object.assign(T.ar, { wIslam: "🕋 صور إسلامية (الكعبة والحرم)" });
+Object.assign(T.en, { wIslam: "🕋 Islamic (Kaaba & Haram)" });
+const _wallListI = wallList;
+wallList = function(src, page) {
+  return __async(this, null, function* () {
+    if (src !== "islamic") return _wallListI(src, page);
+    const qs = ["kaaba", "mecca", "masjid al haram", "medina mosque", "mosque"], out = [], seen = {};
+    yield Promise.all(qs.map((q) => __async(this, null, function* () {
+      try {
+        const r = yield A.fetchJSON(`https://wallhaven.cc/api/v1/search?q=${encodeURIComponent(q)}&categories=100&purity=100&atleast=1920x1080&ratios=16x9&sorting=relevance&page=${page || 1}`);
+        (r.data || []).forEach((d) => {
+          if (!seen[d.path]) {
+            seen[d.path] = 1;
+            out.push({ full: d.path, thumb: d.thumbs && (d.thumbs.small || d.thumbs.original) });
+          }
+        });
+      } catch (e) {
+      }
+    })));
+    return out;
+  });
+};
+window.wallList = wallList;
+const _WALL_CATSI = WALL_CATS;
+WALL_CATS = () => [["islamic", "🕋", L("wIslam")]].concat(_WALL_CATSI());
+const _renderSettingsI = renderSettings;
+renderSettings = function() {
+  _renderSettingsI.apply(this, arguments);
+  const b = document.querySelector('#setScroll [data-set^="frameCat:"]');
+  if (b && !document.querySelector('#setScroll [data-set="frameCat:islamic"]')) b.insertAdjacentHTML("beforebegin", `<button class="btn f${S.frameCat === "islamic" ? " pri" : ""}" data-set="frameCat:islamic">${esc(L("wIslam"))}</button>`);
+};
+if (!S.islamSeeded) {
+  S.islamSeeded = true;
+  S.frameCat = "islamic";
+  S.frameSrc = "online";
+  fPool = [];
+}

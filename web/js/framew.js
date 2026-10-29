@@ -103,3 +103,18 @@ const _frameWidgetMenuP=frameWidgetMenu; frameWidgetMenu=function(){ _frameWidge
   const box=$("dbox"), items=box._items, g=box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
   items.push({icon:"✨",label:(S.lang==="ar"?"ترتيب احترافي تلقائي":"Professional auto layout")+(S.frameFree?"":" ✓"),fn:()=>{ S.frameFree=false; fwApply() }});
   g.innerHTML=items.map((it,i)=>`<button class="btn f${it.pri?" pri":""}" data-di="${i}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };
+
+// ================= Islamic photos (Kaaba, Masjid al-Haram, Prophet's Mosque, mosques) for the screensaver and wallpapers =================
+Object.assign(T.ar,{wIslam:"🕋 صور إسلامية (الكعبة والحرم)"}); Object.assign(T.en,{wIslam:"🕋 Islamic (Kaaba & Haram)"});
+const _wallListI=wallList; wallList=async function(src,page){
+  if(src!=="islamic") return _wallListI(src,page);
+  const qs=["kaaba","mecca","masjid al haram","medina mosque","mosque"], out=[], seen={};
+  await Promise.all(qs.map(async q=>{ try{ const r=await A.fetchJSON(`https://wallhaven.cc/api/v1/search?q=${encodeURIComponent(q)}&categories=100&purity=100&atleast=1920x1080&ratios=16x9&sorting=relevance&page=${page||1}`);
+    (r.data||[]).forEach(d=>{ if(!seen[d.path]){ seen[d.path]=1; out.push({full:d.path,thumb:d.thumbs&&(d.thumbs.small||d.thumbs.original)}) } }) }catch(e){} }));
+  return out };
+window.wallList=wallList;
+const _WALL_CATSI=WALL_CATS; WALL_CATS=()=>[["islamic","🕋",L("wIslam")]].concat(_WALL_CATSI());
+const _renderSettingsI=renderSettings; renderSettings=function(){ _renderSettingsI.apply(this,arguments);
+  const b=document.querySelector('#setScroll [data-set^="frameCat:"]'); if(b&&!document.querySelector('#setScroll [data-set="frameCat:islamic"]')) b.insertAdjacentHTML("beforebegin",`<button class="btn f${S.frameCat==="islamic"?" pri":""}" data-set="frameCat:islamic">${esc(L("wIslam"))}</button>`) };
+// asked for: the screensaver now shows the Islamic photos
+if(!S.islamSeeded){ S.islamSeeded=true; S.frameCat="islamic"; S.frameSrc="online"; fPool=[] }
