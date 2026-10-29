@@ -87,10 +87,14 @@ renderSettings = function() {
   if (!box) return;
   box.querySelectorAll(".sec").forEach((sc) => {
     const h = sc.querySelector("h3");
-    if (h && ADV_RX.test(h.textContent)) sc.classList.add("advsec");
+    if (h && ADV_RX.test(h.textContent)) {
+      sc.classList.add("advsec");
+      if (!S.advanced) sc.remove();
+    }
   });
-  document.body.classList.toggle("showadv", !!S.advanced);
-  if (!$("advBtn")) box.insertAdjacentHTML("beforeend", `<div class="sec"><div class="inline"><button class="btn f" id="advBtn">${esc(L(S.advanced ? "advHide" : "advShow"))}</button><button class="btn pri f" id="reportBtn">${esc(L("report"))}</button></div></div>`);
+  if (!$("advBtn")) box.insertAdjacentHTML("beforeend", `<div class="sec"><h3>⚙️ ${esc(S.lang === "ar" ? "متقدم ومشكلة" : "Advanced & report")}</h3><div class="inline"><button class="btn f${S.advanced ? " pri" : ""}" id="advBtn">${esc(L(S.advanced ? "advHide" : "advShow"))}</button><button class="btn pri f" id="reportBtn">${esc(L("report"))}</button></div></div>`);
+  document.body.classList.add("showadv");
+  if (typeof buildSetCats === "function") buildSetCats();
 };
 pageHooks["settings:enter"] = renderSettings;
 const errLog = [];
@@ -122,6 +126,8 @@ activators.unshift((el) => {
   if (el.id === "advBtn") {
     S.advanced = !S.advanced;
     renderSettings();
+    const secs = [].slice.call($("setScroll").children).filter((e) => e.classList.contains("sec"));
+    if (typeof showSetCat === "function") showSetCat(secs.length - 1);
     focus($("advBtn"));
     return true;
   }
@@ -199,3 +205,7 @@ homeLookMenu = function() {
   g.innerHTML = items.map((it, i) => `<button class="btn f${it.pri ? " pri" : ""}" data-di="${i}">${it.icon ? `<b>${esc(it.icon)}</b>` : ""}${esc(it.label)}</button>`).join("");
   focus(g.querySelector(".f"));
 };
+if (!S.advSeeded) {
+  S.advSeeded = true;
+  if (S.tgToken || (S.lists || []).length || S.schedOn || S.bootPlay) S.advanced = true;
+}

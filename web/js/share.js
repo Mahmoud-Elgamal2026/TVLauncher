@@ -25,9 +25,11 @@ DEF.advanced=false;
 const ADV_RX=/IPTV|تيليجرام|Telegram|^القنوات$|^Channels$|قنوات مجانية|Free channels|مشغّل القنوات|Channel player|تسجيل|Recording|زراير الريموت|Remote buttons|تشغيل البوكس|Start-up|جدول تشغيل|Screen schedule/i;
 const _renderSettingsA=renderSettings; renderSettings=function(){ _renderSettingsA.apply(this,arguments);
   const box=$("setScroll"); if(!box) return;
-  box.querySelectorAll(".sec").forEach(sc=>{ const h=sc.querySelector("h3"); if(h&&ADV_RX.test(h.textContent)) sc.classList.add("advsec") });
-  document.body.classList.toggle("showadv",!!S.advanced);
-  if(!$("advBtn")) box.insertAdjacentHTML("beforeend",`<div class="sec"><div class="inline"><button class="btn f" id="advBtn">${esc(L(S.advanced?"advHide":"advShow"))}</button><button class="btn pri f" id="reportBtn">${esc(L("report"))}</button></div></div>`);
+  // advanced sections: taken out of the list unless "show advanced" is on, then the side list is rebuilt
+  box.querySelectorAll(".sec").forEach(sc=>{ const h=sc.querySelector("h3"); if(h&&ADV_RX.test(h.textContent)){ sc.classList.add("advsec"); if(!S.advanced) sc.remove() } });
+  if(!$("advBtn")) box.insertAdjacentHTML("beforeend",`<div class="sec"><h3>⚙️ ${esc(S.lang==="ar"?"متقدم ومشكلة":"Advanced & report")}</h3><div class="inline"><button class="btn f${S.advanced?" pri":""}" id="advBtn">${esc(L(S.advanced?"advHide":"advShow"))}</button><button class="btn pri f" id="reportBtn">${esc(L("report"))}</button></div></div>`);
+  document.body.classList.add("showadv");
+  if(typeof buildSetCats==="function") buildSetCats();
 };
 pageHooks["settings:enter"]=renderSettings;
 
@@ -40,7 +42,7 @@ function reportDialog(){
   const url="https://github.com/Mahmoud-Elgamal2026/TVLauncher/issues/new?title="+encodeURIComponent("["+ver+"] ")+"&body="+encodeURIComponent(body);
   dialog(L("report"),[{label:L("done"),fn:()=>{}}],{html:`<div style="display:flex;align-items:center;justify-content:center;gap:2vw"><div style="background:#fff;padding:1.2vh;border-radius:1.4vh;line-height:0">${qrSvg(url,320)}</div><div style="font-size:2vh;line-height:1.8;max-width:30vw">${esc(L("reportSub"))}</div></div><div class="dlist" style="margin-top:1vh"><button class="btn pri f" data-di="0">${L("done")}</button></div>`});
 }
-activators.unshift(el=>{ if(el.id==="advBtn"){ S.advanced=!S.advanced; renderSettings(); focus($("advBtn")); return true } if(el.id==="reportBtn"){ reportDialog(); return true } return false });
+activators.unshift(el=>{ if(el.id==="advBtn"){ S.advanced=!S.advanced; renderSettings(); const secs=[].slice.call($("setScroll").children).filter(e=>e.classList.contains("sec")); if(typeof showSetCat==="function") showSetCat(secs.length-1); focus($("advBtn")); return true } if(el.id==="reportBtn"){ reportDialog(); return true } return false });
 
 // ================= Update channel (stable for everyone, beta for the developer's box) =================
 DEF.channel="stable";
@@ -68,3 +70,5 @@ const _homeLookU=homeLookMenu; homeLookMenu=function(){ _homeLookU();
   const box=$("dbox"), items=box._items, g=box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
   items.splice(items.length-1,0,{icon:"📊",label:L("usTitle"),fn:()=>setTimeout(usageDialog,30)});
   g.innerHTML=items.map((it,i)=>`<button class="btn f${it.pri?" pri":""}" data-di="${i}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };
+// people who already use advanced features keep seeing them
+if(!S.advSeeded){ S.advSeeded=true; if(S.tgToken||(S.lists||[]).length||S.schedOn||S.bootPlay) S.advanced=true }
