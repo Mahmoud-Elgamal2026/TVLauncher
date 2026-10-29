@@ -609,3 +609,10 @@ renderCreator = function() {
   e.innerHTML = `<img src="${CREATOR.img}" onerror="this.remove()" alt=""><div class="cr"><small>DESIGNED BY</small><b>Mahmoud Elgamal</b></div>`;
 };
 renderCreator();
+if (!S.iconSize2) {
+  S.iconSize2 = true;
+  S.favSize = "m";
+  setTimeout(() => {
+    if (typeof applyHomeLook === "function") applyHomeLook();
+  }, 0);
+}

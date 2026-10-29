@@ -185,7 +185,7 @@ const THEME_ICON={apple:["wide","lift"],google:["wide","ring"],shield:["wide","p
   light:["square","lift"],neon:["circle","pop"],startpage:["icon","lift"],dock:["icon","pop"],amoled:["circle","ring"],ramadan:["circle","lift"],vidaa:["square","pop"]};
 DEF.iconShape=""; DEF.iconFx="";
 function applyIconLook(){
-  const d=THEME_ICON[S.theme]||["wide","zoom"], shape=S.iconShape||d[0], fx=S.iconFx||d[1];
+  const d=THEME_ICON[S.theme]||["wide","zoom"], shape=S.iconShape||(S.simple?"wide":d[0]), fx=S.iconFx||d[1];
   document.body.dataset.fx=fx;
   const fr=$("favRow"); if(fr){ const st=((typeof lay==="function"&&lay().fav)||{}).st||{}; if(!st.shape) fr.setAttribute("data-wshape",shape==="wide"?"":shape); if(fr.getAttribute("data-wshape")==="") fr.removeAttribute("data-wshape") }
   document.querySelectorAll("#favRow .app").forEach(a=>{ a.__w=null; a.style.height="" }); if(window.__fixAspect) __fixAspect();

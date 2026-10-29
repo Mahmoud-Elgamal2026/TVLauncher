@@ -676,3 +676,15 @@ body[data-favsz] #homeApps .app .nm{opacity:.8!important}
 #creator .cr{display:flex;flex-direction:column;line-height:1.15;text-align:left}
 #creator .cr small{font-size:.95vh;letter-spacing:.25em;opacity:.6;font-weight:500}
 #creator .cr b{font-size:1.55vh;font-weight:600;color:#fff!important;letter-spacing:.04em}
+/* simple home: favorites are a normal row — no design bars/backgrounds/fixed positions */
+body.simple #favRow{position:static!important;background:none!important;box-shadow:none!important;border:0!important;max-height:none!important;padding:1vh 1vw 3vh!important;flex-wrap:wrap!important;overflow:visible!important;gap:2.2vh 1.6vw!important;top:auto!important;bottom:auto!important;left:auto!important;right:auto!important}
+body.simple #favRow::before,body.simple #favRow::after{display:none!important}
+/* nicer app tiles: uniform rounded cards with the name always under them */
+body.simple #favRow .app,body.simple #homeApps .app{border-radius:1.6vh!important;box-shadow:0 .8vh 2vh rgba(0,0,0,.35)}
+body.simple #favRow .app .nm,body.simple #homeApps .app .nm{opacity:.9!important;font-size:1.6vh!important;margin-top:1vh}
+body.simple #favRow .app.focus .nm{opacity:1!important;font-weight:600}
+body[data-favsz=xs] #favRow .app,body[data-favsz=xs] #homeApps .app{width:8vw!important}
+body[data-favsz=s] #favRow .app,body[data-favsz=s] #homeApps .app{width:10.5vw!important}
+body[data-favsz=m] #favRow .app,body[data-favsz=m] #homeApps .app{width:12.5vw!important}
+body[data-favsz=l] #favRow .app,body[data-favsz=l] #homeApps .app{width:15vw!important}
+body.simple #home h2.favh{display:block!important;position:static!important}

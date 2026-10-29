@@ -554,7 +554,7 @@ const THEME_ICON = {
 DEF.iconShape = "";
 DEF.iconFx = "";
 function applyIconLook() {
-  const d = THEME_ICON[S.theme] || ["wide", "zoom"], shape = S.iconShape || d[0], fx = S.iconFx || d[1];
+  const d = THEME_ICON[S.theme] || ["wide", "zoom"], shape = S.iconShape || (S.simple ? "wide" : d[0]), fx = S.iconFx || d[1];
   document.body.dataset.fx = fx;
   const fr = $("favRow");
   if (fr) {
