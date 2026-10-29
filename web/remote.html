@@ -259,7 +259,7 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
   var lt=document.getElementById("liveType"), ltT=null;
   lt.addEventListener("input",function(){ clearTimeout(ltT); ltT=setTimeout(function(){ api("text",{t:lt.value,submit:false}) },300) });
   lt.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); api("text",{t:lt.value,submit:true}); lt.value=""; lt.blur() } });
-  window.onPhoneVoice=function(t){ if(t) api("search",{t:t}) };
+  window.onPhoneVoice=function(t){ if(t) api("voice",{t:t}) };
   window.onPhoneShare=function(u){ if(u) api("share",{u:u}) };
   window.onPhoneVolume=function(d){ api("volume",{d:d}) };
   if(window.PhoneApp&&PhoneApp.pending){ var x=PhoneApp.pending(); if(x) setTimeout(function(){ onPhoneShare(x) },800) }
