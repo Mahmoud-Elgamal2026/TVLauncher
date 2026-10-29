@@ -940,3 +940,9 @@ html body .tabs{background:rgba(255,255,255,.06)!important;border:1px solid rgba
 html body .rb{background:rgba(255,255,255,.06)!important}
 html body .rb.on,html body .rb.f.focus{background:#e9c46a!important;color:#111}
 html body #shade{background:linear-gradient(180deg,rgba(0,0,0,0) 0,rgba(0,0,0,.12) 60%,rgba(0,0,0,.3) 100%)!important}
+/* phone-style icons: the real app icon, no plate, name under it */
+html body #favRow .app,html body #homeApps .app,html body #home .row .app{background:transparent!important;border:0!important;overflow:visible;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;height:auto!important;aspect-ratio:auto!important;padding:1vh 0}
+html body #favRow .app img,html body #homeApps .app img,html body #home .row .app img{width:62%!important;height:auto!important;aspect-ratio:1;object-fit:contain!important;padding:0!important;border-radius:22%;position:static!important}
+html body #favRow .app .nm,html body #homeApps .app .nm,html body #home .row .app .nm{position:static!important;display:block!important;opacity:.9!important;font-size:1.6vh;margin-top:.8vh;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;background:none!important}
+html body #favRow .app .lbl,html body #homeApps .app .lbl{width:62%;aspect-ratio:1;border-radius:22%;background:#1d2b55;display:flex;align-items:center;justify-content:center;font-size:1.7vh;font-weight:700;overflow:hidden;text-align:center;padding:.5vh}
+html body #favRow .app.focus,html body #homeApps .app.focus,html body #home .row .app.focus{transform:scale(1.12);background:rgba(255,255,255,.08)!important;border-radius:1.6vh!important}

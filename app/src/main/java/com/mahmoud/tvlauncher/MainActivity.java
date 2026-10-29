@@ -366,12 +366,13 @@ public class MainActivity extends Activity {
             // icons are drawn once per app version and kept as files: later starts just point at them (fast cold start)
             long ver = 0; try { ver = pm.getPackageInfo(pkg, 0).lastUpdateTime; } catch (Exception ignored) {}
             File dir = new File(getFilesDir(), "icons"); dir.mkdirs();
-            File f = new File(dir, pkg + "_" + ver + ".png");
+            File f = new File(dir, pkg + "_" + ver + "_i.png");
             if (!f.exists() || f.length() == 0) {
                 File[] old = dir.listFiles((dd, n) -> n.startsWith(pkg + "_")); if (old != null) for (File o : old) o.delete();
                 Drawable d = null;
-                try { d = pm.getApplicationBanner(pkg); } catch (Exception ignored) {}
-                if (d == null) d = ri.loadIcon(pm);
+                // the real app icon (like on a phone); the wide TV banner only if the app has no icon
+                try { d = ri.loadIcon(pm); } catch (Exception ignored) {}
+                if (d == null) try { d = pm.getApplicationBanner(pkg); } catch (Exception ignored) {}
                 int w = Math.max(1, Math.min(d.getIntrinsicWidth() > 0 ? d.getIntrinsicWidth() : 192, 320));
                 int h = Math.max(1, Math.min(d.getIntrinsicHeight() > 0 ? d.getIntrinsicHeight() : 192, 320));
                 Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
