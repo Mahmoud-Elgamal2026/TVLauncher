@@ -92,3 +92,14 @@ layers.unshift({test:()=>!!fMove,ownsEnter:true,key:e=>{
   else if(isBack(k)){ fwEndMove(false); return true } else return true;
   fMove.x=Math.max(0,Math.min(95,fMove.x)); fMove.y=Math.max(0,Math.min(95,fMove.y)); fwSet(fMove.id,{x:+fMove.x.toFixed(1),y:+fMove.y.toFixed(1),s:fMove.s,on:true}); return true }});
 activators.push(el=>{ if(el.id==="fwEditBtn"){ frameWidgetMenu(); return true } return false });
+
+// ================= Professional screensaver layout (default): clock bottom-left, info column top-right, dhikr bottom-right =================
+DEF.frameFree=false;
+const _fwApplyP=fwApply; fwApply=function(){ _fwApplyP.apply(this,arguments);
+  document.body.classList.toggle("fwpro",!S.frameFree&&!fMove);
+  if(!S.frameFree&&!fMove) FWS.forEach(w=>{ const e=$("fw_"+w[0]); e.style.left=e.style.top=e.style.transform="" }) };
+const _fwStartMoveP=fwStartMove; fwStartMove=function(id){ S.frameFree=true; _fwStartMoveP(id) };
+const _frameWidgetMenuP=frameWidgetMenu; frameWidgetMenu=function(){ _frameWidgetMenuP();
+  const box=$("dbox"), items=box._items, g=box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
+  items.push({icon:"✨",label:(S.lang==="ar"?"ترتيب احترافي تلقائي":"Professional auto layout")+(S.frameFree?"":" ✓"),fn:()=>{ S.frameFree=false; fwApply() }});
+  g.innerHTML=items.map((it,i)=>`<button class="btn f${it.pri?" pri":""}" data-di="${i}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };

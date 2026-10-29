@@ -834,3 +834,16 @@ body[data-favsz=s] #favRow .app,body[data-favsz=s] #homeApps .app{width:10.5vw!i
 body[data-favsz=m] #favRow .app,body[data-favsz=m] #homeApps .app{width:12.5vw!important}
 body[data-favsz=l] #favRow .app,body[data-favsz=l] #homeApps .app{width:15vw!important}
 body.simple #home h2.favh{display:block!important;position:static!important}
+/* professional screensaver layout */
+body.fwpro #fwBox .fw{position:fixed;left:auto;right:auto;top:auto;bottom:auto;transform:none!important;background:none;box-shadow:none;padding:0;border-radius:0}
+body.fwpro #fw_clock{left:5vw!important;bottom:7vh!important;text-align:left;direction:ltr}
+body.fwpro #fw_clock .fwt{font-size:15vh!important;font-weight:200;letter-spacing:-.02em;line-height:1;text-shadow:0 .6vh 3vh rgba(0,0,0,.45)}
+body.fwpro #fw_clock .fwd{font-size:3vh!important;opacity:.9;margin-top:1vh;direction:rtl;text-shadow:0 .3vh 1.5vh rgba(0,0,0,.5)}
+body.fwpro #fw_weather,body.fwpro #fw_prayer,body.fwpro #fw_match,body.fwpro #fw_mon{right:4vw!important;width:22vw;padding:1.6vh 1.4vw!important;border-radius:2vh!important;background:rgba(0,0,0,.32)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);font-size:2.2vh;text-align:right;box-sizing:border-box}
+body.fwpro #fw_weather{top:5vh!important}
+body.fwpro #fw_prayer{top:18vh!important}
+body.fwpro #fw_match{top:31vh!important}
+body.fwpro #fw_mon{top:44vh!important;font-size:1.8vh}
+body.fwpro #fw_weather b{font-size:3.6vh}
+body.fwpro #fw_prayer .fwt2{font-size:3.4vh;font-weight:600}
+body.fwpro #fw_azkar{right:4vw!important;bottom:7vh!important;max-width:38vw;font-size:2.4vh;line-height:1.6;text-align:right;opacity:.92;text-shadow:0 .3vh 1.5vh rgba(0,0,0,.6)}
