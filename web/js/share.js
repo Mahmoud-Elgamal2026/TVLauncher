@@ -90,3 +90,19 @@ const _renderSettingsW=renderSettings; renderSettings=function(){ _renderSetting
   const pick=$("wallPick"); if(pick&&!$("wallX")) pick.insertAdjacentHTML("afterend",`<button class="btn f" id="wallX">${esc(L("wallRemove"))}</button>`);
   [].forEach.call(document.querySelectorAll("#setScroll .sec h3"),h=>{ if(/خلفية متحركة|Animated background/.test(h.textContent)&&!$("wallX2")) h.parentNode.insertAdjacentHTML("beforeend",`<div class="inline" style="margin-top:1vh"><button class="btn f" id="wallX2">${esc(L("wallRemove"))}</button><button class="btn f" id="framesX">${esc(L("framesRemove"))}</button></div>`) }) };
 activators.unshift(el=>{ if(el.id==="wallX"||el.id==="wallX2"){ wallReset(); S.anim="off"; applyLook(); renderSettings(); return true } if(el.id==="framesX"){ framesReset(); return true } return false });
+
+// ================= Wallpaper blur + visibility (how strongly the picture shows) =================
+Object.assign(DEF,{wallBlur:0,wallShow:100});
+Object.assign(T.ar,{wBlur:"ضبابية الخلفية",wShow:"ظهور الخلفية",wbOff:"من غير",wbLow:"خفيفة",wbMid:"وسط",wbHigh:"قوية"});
+Object.assign(T.en,{wBlur:"Wallpaper blur",wShow:"Wallpaper visibility",wbOff:"None",wbLow:"Light",wbMid:"Medium",wbHigh:"Strong"});
+function applyWallFx(){ const w=$("wall"); if(!w) return; const b=+S.wallBlur||0, o=Math.max(10,Math.min(100,+S.wallShow||100));
+  w.style.filter=b?`blur(${b}px)`:""; w.style.transform=b?"scale(1.06)":""; // a little zoom hides blurred edges
+  document.body.style.setProperty("--wallShow",o/100); w.style.opacity=document.body.classList.contains("wallimg")?o/100:"" }
+const _applyLookWF=applyLook; applyLook=function(){ _applyLookWF.apply(this,arguments); applyWallFx() };
+AFTER.wallBlur=applyWallFx; AFTER.wallShow=applyWallFx; setTimeout(applyWallFx,0);
+const _renderSettingsWF=renderSettings; renderSettings=function(){ _renderSettingsWF.apply(this,arguments);
+  const x=$("wallX"); if(!x||$("wfBox")) return;
+  x.parentNode.insertAdjacentHTML("afterend",`<div id="wfBox">${field(L("wBlur"),seg("wallBlur",[[0,L("wbOff")],[4,L("wbLow")],[10,L("wbMid")],[20,L("wbHigh")]]))}${field(L("wShow"),seg("wallShow",[[25,"25%"],[50,"50%"],[75,"75%"],[100,"100%"]]))}</div>`);
+  // mark the current choices
+  document.querySelectorAll("#wfBox [data-set]").forEach(b=>{ const [k,v]=b.dataset.set.split(":"); b.classList.toggle("pri",String(S[k])===v) }) };
+window.applyWallFx=applyWallFx;

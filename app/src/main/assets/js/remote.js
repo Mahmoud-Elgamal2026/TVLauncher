@@ -108,7 +108,12 @@ function remoteCmd(m) {
       return { ok: 1 };
     }
     case "set": {
-      const allowed = ["epg", "city", "favTeams", "adhanUrl", "repo", "tgToken", "ytChannel"];
+      const allowed = ["epg", "city", "favTeams", "adhanUrl", "repo", "tgToken", "ytChannel", "wallBlur", "wallShow"];
+      if (m.k === "wallBlur" || m.k === "wallShow") {
+        S[m.k] = +m.v || 0;
+        if (window.applyWallFx) applyWallFx();
+        return { ok: 1 };
+      }
       if (m.k === "ytChannel") {
         if (window.ytAddFromPhone) ytAddFromPhone(String(m.v || "").trim());
         return { ok: 1 };
