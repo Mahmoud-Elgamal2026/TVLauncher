@@ -914,7 +914,7 @@ body[data-page=home] .clock,body[data-page=home] .top .weather{display:none!impo
 .nowc.live{background:rgba(140,20,30,.78)!important}
 /* ================= Luxe night look: deep navy, dark glass cards, one gold accent ================= */
 html body{--sel:#e9c46a;--selText:#111;--glass:rgba(255,255,255,.06);--ring:0 0 0 .35vh #e9c46a}
-html body #shelfBg{background:radial-gradient(120% 90% at 85% 0%,#1b2440 0%,#0c1124 45%,#05070f 100%)!important}
+html body #shelfBg{background:radial-gradient(130% 100% at 80% 0%,#2a4a8c 0%,#163068 35%,#0b1840 70%,#070f2a 100%)!important}
 html body #animBg{display:none!important}
 /* widget cards: dark frosted glass, hairline border, no dashes */
 html body .hw,html body .hw.st-glass,html body .hw.st-solid,html body .hw.st-accent,html body .hw.st-grad{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.025))!important;border:1px solid rgba(255,255,255,.08)!important;color:#fff}
@@ -939,3 +939,4 @@ html body #boostBtn,html body #qBtn,html body #browserBtn{display:none!important
 html body .tabs{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.08)}
 html body .rb{background:rgba(255,255,255,.06)!important}
 html body .rb.on,html body .rb.f.focus{background:#e9c46a!important;color:#111}
+html body #shade{background:linear-gradient(180deg,rgba(0,0,0,0) 0,rgba(0,0,0,.12) 60%,rgba(0,0,0,.3) 100%)!important}
