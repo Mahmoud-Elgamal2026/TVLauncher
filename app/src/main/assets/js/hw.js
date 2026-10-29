@@ -795,3 +795,4 @@ if (!S.homeLookSeeded) {
   S.homeLookSeeded = true;
   if (S.simple) S.tickerOn = false;
 }
+window.applyHomeLook = applyHomeLook;

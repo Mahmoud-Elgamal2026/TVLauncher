@@ -100,6 +100,9 @@ function appMenu(pkg,fromFav,watchKey){
     {label:isLocked(pkg)?L("unlock"):L("lock"),fn:()=>{ if(!S.pin){A.toast(L("needPin"));return} guard(true,()=>{toggleList("locked",pkg);renderHome()}) }},
     {label:L("info"),fn:()=>A.appInfo(pkg)});
   items.push({label:L("cancel"),fn:()=>{}});
+  if(!kid){ const v=["xs","s","m","l"], i=v.indexOf(S.favSize||"m");
+    items.splice(1,0,{icon:"➕",label:S.lang==="ar"?"كبّر كل الأيقونات":"Bigger icons",keep:1,fn:()=>{ S.favSize=v[Math.min(3,v.indexOf(S.favSize||"m")+1)]; if(window.applyHomeLook) applyHomeLook() }},
+      {icon:"➖",label:S.lang==="ar"?"صغّر كل الأيقونات":"Smaller icons",keep:1,fn:()=>{ S.favSize=v[Math.max(0,v.indexOf(S.favSize||"m")-1)]; if(window.applyHomeLook) applyHomeLook() }}) }
   if(!kid&&pkg!=="com.mahmoud.tvlauncher") items.splice(1,0,{icon:"🗑",label:S.lang==="ar"?"مسح التطبيق":"Uninstall",fn:()=>uninstallAny(pkg)});
   dialog(appName(a),items);
 }

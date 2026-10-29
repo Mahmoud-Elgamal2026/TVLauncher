@@ -260,3 +260,4 @@ const _hwToolbarH=hwToolbar; hwToolbar=function(){ _hwToolbarH(); const t=docume
 const _renderHWH=renderHW; renderHW=function(){ _renderHWH.apply(this,arguments); applyHomeLook() };
 // first time on this version: clean simple home — no top bar
 if(!S.homeLookSeeded){ S.homeLookSeeded=true; if(S.simple) S.tickerOn=false }
+window.applyHomeLook=applyHomeLook;
