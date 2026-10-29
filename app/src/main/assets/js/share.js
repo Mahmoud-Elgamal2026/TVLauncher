@@ -245,3 +245,26 @@ wallMenu = function() {
 };
 window.remoteWallReset = wallReset;
 window.remoteFramesReset = framesReset;
+const _renderSettingsW = renderSettings;
+renderSettings = function() {
+  _renderSettingsW.apply(this, arguments);
+  const pick = $("wallPick");
+  if (pick && !$("wallX")) pick.insertAdjacentHTML("afterend", `<button class="btn f" id="wallX">${esc(L("wallRemove"))}</button>`);
+  [].forEach.call(document.querySelectorAll("#setScroll .sec h3"), (h) => {
+    if (/خلفية متحركة|Animated background/.test(h.textContent) && !$("wallX2")) h.parentNode.insertAdjacentHTML("beforeend", `<div class="inline" style="margin-top:1vh"><button class="btn f" id="wallX2">${esc(L("wallRemove"))}</button><button class="btn f" id="framesX">${esc(L("framesRemove"))}</button></div>`);
+  });
+};
+activators.unshift((el) => {
+  if (el.id === "wallX" || el.id === "wallX2") {
+    wallReset();
+    S.anim = "off";
+    applyLook();
+    renderSettings();
+    return true;
+  }
+  if (el.id === "framesX") {
+    framesReset();
+    return true;
+  }
+  return false;
+});
