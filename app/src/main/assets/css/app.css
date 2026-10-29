@@ -886,3 +886,8 @@ body.lite #wall{filter:none!important}
 .addwrb b{font-size:1.6vh}
 body[data-favsz=xxs] #favRow .app,body[data-favsz=xxs] #homeApps .app,body[data-favsz=xxs].clean #home .row .app{width:6vw!important}
 body[data-favsz=xxs] #homeApps .app .nm,body[data-favsz=xxs] #favRow .app .nm{font-size:1.2vh}
+/* header: prayer / match lines removed (they live in the widgets) */
+#ticker,#npMini{display:none!important}
+.sgrp .ssub{font-size:1.9vh;font-weight:700;color:var(--text);opacity:.9;margin:3.2vh 0 1.2vh;padding-top:2.2vh;border-top:1px solid rgba(255,255,255,.08)}
+.sgrp .ssub:first-of-type{border-top:0;padding-top:0;margin-top:1vh}
+.sgrp>.sec{margin:0;padding:0;background:none}
