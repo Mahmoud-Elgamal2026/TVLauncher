@@ -87,7 +87,7 @@ layers.unshift({test:()=>hwEdit.on&&!hwEdit.grab&&!on("dlg"),ownsEnter:true,key:
   dialog(t[1]+" "+L(t[2]),[
     {icon:"🗑",label:L("hwRemove"),pri:1,fn:()=>{ hwSave(hwList().filter(x=>x.id!==id)); setTimeout(()=>{ const e2=document.querySelector("#hwBoard .hw"); if(e2) focus(e2) },60) }},
     {icon:"✋",label:S.lang==="ar"?"امسكها وحرّكها بالأسهم":"Grab and move with arrows",fn:()=>{ hwEdit.grab=id; renderHW(); banner("✋",L("edHold"),"",600000) }},
-    {icon:"➕",label:L("wBigger"),keep:1,fn:()=>hwSet(id,{sz:Math.min(3,(hwGet(id).sz||1)+1)})},
+    {icon:"➕",label:L("wBigger"),keep:1,fn:()=>hwSet(id,{sz:Math.min(4,(hwGet(id).sz||1)+1)})},
     {icon:"➖",label:L("wSmaller"),keep:1,fn:()=>hwSet(id,{sz:Math.max(1,(hwGet(id).sz||1)-1)})},
     {icon:"🎨",label:L("hwStyle"),keep:1,fn:()=>{ const x=hwGet(id); hwSet(id,{st:HW_STYLES[(HW_STYLES.indexOf(x.st||"glass")+1)%HW_STYLES.length]}) }},
     {label:L("done"),fn:()=>{}}],{grid:3});
@@ -200,8 +200,8 @@ setInterval(()=>{ const a=Object.assign({},S.matchAlerts||{}), now=Date.now(); l
 // icon size control right on the Apps page too (+ / −)
 if(!S.iconSizeSeeded){ S.iconSizeSeeded=true; if(!S.favSize||S.favSize==="s"||S.favSize==="m") S.favSize="s" }
 const _applyPageZ=applyPage; applyPage=function(){ _applyPageZ.apply(this,arguments); if(+S.homePage===1){ const g=$("homeApps"); if(g&&!$("zoomBar")) g.insertAdjacentHTML("beforebegin",`<div class="inline" id="zoomBar" style="padding:0 1vw 1vh"><button class="btn f" id="zoomOut">➖ ${S.lang==="ar"?"صغّر الأيقونات":"Smaller"}</button><button class="btn f" id="zoomIn">➕ ${S.lang==="ar"?"كبّر":"Bigger"}</button></div>`) } else { const z=$("zoomBar"); if(z) z.remove() } };
-activators.unshift(el=>{ const v=["xs","s","m","l"], i=v.indexOf(S.favSize||"s");
-  if(el.id==="zoomIn"){ S.favSize=v[Math.min(3,i+1)]; applyHomeLook(); return true } if(el.id==="zoomOut"){ S.favSize=v[Math.max(0,i-1)]; applyHomeLook(); return true } return false });
+activators.unshift(el=>{ const v=["xxs","xs","s","m","l"], i=v.indexOf(S.favSize||"s");
+  if(el.id==="zoomIn"){ S.favSize=v[Math.min(4,i+1)]; applyHomeLook(); return true } if(el.id==="zoomOut"){ S.favSize=v[Math.max(0,i-1)]; applyHomeLook(); return true } return false });
 
 // professional, small signature
 renderCreator=function(){ const e=$("creator"); if(!e) return;

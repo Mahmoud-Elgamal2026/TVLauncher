@@ -196,12 +196,12 @@ function appMenu(pkg, fromFav, watchKey) {
   items.push({ label: L("cancel"), fn: () => {
   } });
   if (!kid) {
-    const v = ["xs", "s", "m", "l"], i = v.indexOf(S.favSize || "m");
+    const v = ["xxs", "xs", "s", "m", "l"], i = v.indexOf(S.favSize || "m");
     items.splice(
       1,
       0,
       { icon: "➕", label: S.lang === "ar" ? "كبّر كل الأيقونات" : "Bigger icons", keep: 1, fn: () => {
-        S.favSize = v[Math.min(3, v.indexOf(S.favSize || "m") + 1)];
+        S.favSize = v[Math.min(4, v.indexOf(S.favSize || "m") + 1)];
         if (window.applyHomeLook) applyHomeLook();
       } },
       { icon: "➖", label: S.lang === "ar" ? "صغّر كل الأيقونات" : "Smaller icons", keep: 1, fn: () => {

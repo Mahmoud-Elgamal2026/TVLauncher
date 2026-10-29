@@ -282,7 +282,7 @@ layers.unshift({ test: () => hwEdit.on && !hwEdit.grab && !on("dlg"), ownsEnter:
       renderHW();
       banner("✋", L("edHold"), "", 6e5);
     } },
-    { icon: "➕", label: L("wBigger"), keep: 1, fn: () => hwSet(id, { sz: Math.min(3, (hwGet(id).sz || 1) + 1) }) },
+    { icon: "➕", label: L("wBigger"), keep: 1, fn: () => hwSet(id, { sz: Math.min(4, (hwGet(id).sz || 1) + 1) }) },
     { icon: "➖", label: L("wSmaller"), keep: 1, fn: () => hwSet(id, { sz: Math.max(1, (hwGet(id).sz || 1) - 1) }) },
     { icon: "🎨", label: L("hwStyle"), keep: 1, fn: () => {
       const x = hwGet(id);
@@ -590,9 +590,9 @@ applyPage = function() {
   }
 };
 activators.unshift((el) => {
-  const v = ["xs", "s", "m", "l"], i = v.indexOf(S.favSize || "s");
+  const v = ["xxs", "xs", "s", "m", "l"], i = v.indexOf(S.favSize || "s");
   if (el.id === "zoomIn") {
-    S.favSize = v[Math.min(3, i + 1)];
+    S.favSize = v[Math.min(4, i + 1)];
     applyHomeLook();
     return true;
   }

@@ -32,6 +32,13 @@ const PDEF={favs:[],hidden:[],locked:[],recent:[],favCh:[],lockedGroups:[],lastC
 const KIDS_DEF={allowedApps:[],allowedGroups:[],limit:0};
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){A.toast("Storage full");return false}}};
+// the layout the user arranges (favorites, widgets, sizes, hidden apps…) is mirrored to the box's own storage,
+// so a WebView restart that loses unsaved localStorage never brings back an old layout
+const KEEP=/^(hw|favSize|homeOrder|iconLook|wall.*|theme|design|simple|p:[^:]+:(favs|hidden|folders|favCh|locked))$/;
+(function(){ try{ if(typeof NA==="undefined"||!NA||!NA.getPref) return; const ks=JSON.parse(NA.getPref("__keys")||"[]");
+  ks.forEach(k=>{ const v=NA.getPref(k); if(v&&localStorage.getItem(k)!==v) localStorage.setItem(k,v) }) }catch(e){} })();
+const _storeSet=store.set; store.set=function(k,v){ const r=_storeSet.call(store,k,v);
+  if(KEEP.test(k)&&typeof NA!=="undefined"&&NA&&NA.putPref){ try{ NA.putPref(k,JSON.stringify(v)); const ks=JSON.parse(NA.getPref("__keys")||"[]"); if(ks.indexOf(k)<0){ ks.push(k); NA.putPref("__keys",JSON.stringify(ks)) } }catch(e){} } return r };
 const pkey=k=>"p:"+store.get("cur",DEF.cur)+":"+k;
 const S=new Proxy({},{
   get:(_,k)=>k in PDEF?store.get(pkey(k),clone(PDEF[k])):store.get(k,clone(DEF[k])),

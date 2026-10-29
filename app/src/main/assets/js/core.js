@@ -161,6 +161,34 @@ const store = {
     }
   }
 };
+const KEEP = /^(hw|favSize|homeOrder|iconLook|wall.*|theme|design|simple|p:[^:]+:(favs|hidden|folders|favCh|locked))$/;
+(function() {
+  try {
+    if (typeof NA === "undefined" || !NA || !NA.getPref) return;
+    const ks = JSON.parse(NA.getPref("__keys") || "[]");
+    ks.forEach((k) => {
+      const v = NA.getPref(k);
+      if (v && localStorage.getItem(k) !== v) localStorage.setItem(k, v);
+    });
+  } catch (e) {
+  }
+})();
+const _storeSet = store.set;
+store.set = function(k, v) {
+  const r = _storeSet.call(store, k, v);
+  if (KEEP.test(k) && typeof NA !== "undefined" && NA && NA.putPref) {
+    try {
+      NA.putPref(k, JSON.stringify(v));
+      const ks = JSON.parse(NA.getPref("__keys") || "[]");
+      if (ks.indexOf(k) < 0) {
+        ks.push(k);
+        NA.putPref("__keys", JSON.stringify(ks));
+      }
+    } catch (e) {
+    }
+  }
+  return r;
+};
 const pkey = (k) => "p:" + store.get("cur", DEF.cur) + ":" + k;
 const S = new Proxy({}, {
   get: (_, k) => k in PDEF ? store.get(pkey(k), clone(PDEF[k])) : store.get(k, clone(DEF[k])),

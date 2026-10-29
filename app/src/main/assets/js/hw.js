@@ -724,7 +724,7 @@ layers.unshift({ test: () => hwEdit.on && !on("dlg"), ownsEnter: true, key: (e) 
       n[j] = w;
       hwSave(n);
     }
-  } else if (k === "ArrowUp") hwSet(w.id, { sz: Math.min(3, (w.sz || 1) + 1) });
+  } else if (k === "ArrowUp") hwSet(w.id, { sz: Math.min(4, (w.sz || 1) + 1) });
   else if (k === "ArrowDown") hwSet(w.id, { sz: Math.max(1, (w.sz || 1) - 1) });
   else if (k === "5") hwSet(w.id, { st: HW_STYLES[(HW_STYLES.indexOf(w.st || "glass") + 1) % HW_STYLES.length] });
   else if (k === "0") {
@@ -734,8 +734,8 @@ layers.unshift({ test: () => hwEdit.on && !on("dlg"), ownsEnter: true, key: (e) 
   return true;
 } });
 Object.assign(DEF, { homeOrder: "fav", favSize: "s" });
-Object.assign(T.ar, { homeLook: "🏠 شكل الرئيسية", hoOrder: "الترتيب", hoFavTop: "المفضلة فوق", hoWTop: "الويدجت فوق", hoSize: "حجم أيقونات المفضلة", szXS: "صغير جداً", hoBar: "شريط الصلاة والماتش فوق", hoShow: "إظهار", hoHide: "إخفاء" });
-Object.assign(T.en, { homeLook: "🏠 Home look", hoOrder: "Order", hoFavTop: "Favorites first", hoWTop: "Widgets first", hoSize: "Favorite icon size", szXS: "Extra small", hoBar: "Prayer/match bar on top", hoShow: "Show", hoHide: "Hide" });
+Object.assign(T.ar, { homeLook: "🏠 شكل الرئيسية", hoOrder: "الترتيب", hoFavTop: "المفضلة فوق", hoWTop: "الويدجت فوق", szXXS: "أصغر حاجة", hoSize: "حجم أيقونات المفضلة", szXS: "صغير جداً", hoBar: "شريط الصلاة والماتش فوق", hoShow: "إظهار", hoHide: "إخفاء" });
+Object.assign(T.en, { homeLook: "🏠 Home look", hoOrder: "Order", hoFavTop: "Favorites first", hoWTop: "Widgets first", szXXS: "Tiny", hoSize: "Favorite icon size", szXS: "Extra small", hoBar: "Prayer/match bar on top", hoShow: "Show", hoHide: "Hide" });
 function applyHomeLook() {
   if (document.body.dataset.favsz !== (S.favSize || "s")) {
     document.body.dataset.favsz = S.favSize || "s";
@@ -775,7 +775,7 @@ function homeLookMenu() {
   const idx = { homeOrder: 0, favSize: 1, tickerOn: 2 };
   dialog(L("homeLook"), [
     { icon: "↕️", label: L("hoOrder") + ": " + L(S.homeOrder === "w" ? "hoWTop" : "hoFavTop"), keep: 1, fn: () => cyc("homeOrder", ["fav", "w"]) },
-    { icon: "📏", label: L("hoSize") + ": " + L({ xs: "szXS", s: "szS", m: "szM", l: "szL" }[S.favSize || "s"]), keep: 1, fn: () => cyc("favSize", ["xs", "s", "m", "l"]) },
+    { icon: "📏", label: L("hoSize") + ": " + L({ xxs: "szXXS", xs: "szXS", s: "szS", m: "szM", l: "szL" }[S.favSize || "s"]), keep: 1, fn: () => cyc("favSize", ["xxs", "xs", "s", "m", "l"]) },
     { icon: "📰", label: L("hoBar") + ": " + L(S.tickerOn ? "hoShow" : "hoHide"), keep: 1, fn: () => cyc("tickerOn", [true, false]) },
     { label: L("done"), fn: () => {
     } }
