@@ -77,6 +77,14 @@ public class MainActivity extends Activity {
     private volatile boolean typingText = false;
     private WebView web;
     private final Map<String, String> iconCache = new HashMap<>();
+    /** App list is built once and rebuilt only when an app is installed, removed or updated (returning Home stays instant). */
+    private volatile String appsCache = null;
+    private final android.content.BroadcastReceiver pkgRx = new android.content.BroadcastReceiver() {
+        @Override public void onReceive(Context c, Intent i) {
+            appsCache = null; String d = i.getData() != null ? i.getData().getSchemeSpecificPart() : null; if (d != null) iconCache.remove(d);
+            if (ui != null) ui.postDelayed(() -> js("window.onAppsChanged&&onAppsChanged(1)"), 800);
+        }
+    };
     private final Handler ui = new Handler(Looper.getMainLooper());
     private String pendingExport = null;
 
@@ -85,6 +93,7 @@ public class MainActivity extends Activity {
         super.onCreate(b);
         instance = this;
         prefs = getSharedPreferences("launcher", MODE_PRIVATE);
+        try { android.content.IntentFilter pf = new android.content.IntentFilter(); pf.addAction(Intent.ACTION_PACKAGE_ADDED); pf.addAction(Intent.ACTION_PACKAGE_REMOVED); pf.addAction(Intent.ACTION_PACKAGE_REPLACED); pf.addAction(Intent.ACTION_PACKAGE_CHANGED); pf.addDataScheme("package"); registerReceiver(pkgRx, pf); } catch (Throwable ignored) {}
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if ((getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0) WebView.setWebContentsDebuggingEnabled(true);
         web = new WebView(this);
@@ -182,7 +191,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        stopRadioMp(); if (tg != null) tg.stop(); if (remote != null) remote.stop(); if (instance == this) instance = null; super.onDestroy(); }
+        try { unregisterReceiver(pkgRx); } catch (Throwable ignored) {} stopRadioMp(); if (tg != null) tg.stop(); if (remote != null) remote.stop(); if (instance == this) instance = null; super.onDestroy(); }
 
     private static boolean isCoreKey(int c) {
         return c == KeyEvent.KEYCODE_DPAD_UP || c == KeyEvent.KEYCODE_DPAD_DOWN || c == KeyEvent.KEYCODE_DPAD_LEFT
@@ -415,6 +424,7 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public String getApps() {
+            String c = appsCache; if (c != null) return c;
             PackageManager pm = getPackageManager();
             JSONArray arr = new JSONArray();
             HashSet<String> seen = new HashSet<>();
@@ -434,7 +444,8 @@ public class MainActivity extends Activity {
                     } catch (Exception ignored) {}
                 }
             }
-            return arr.toString();
+            appsCache = arr.toString();
+            return appsCache;
         }
 
         @JavascriptInterface

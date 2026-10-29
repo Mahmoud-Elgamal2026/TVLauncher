@@ -6,10 +6,11 @@ const QUICK=[["YouTube","com.google.android.youtube.tv","com.google.android.yout
  ["Chrome","com.android.chrome"],["Spotify","com.spotify.tv.android","com.spotify.music"]];
 const SWATCH=["","#e50914","#ff6d00","#ffb300","#2e7d32","#00897b","#0288d1","#3949ab","#8e24aa","#d81b60","#5d4037","#455a64","#111111","#f5f5f5"];
 
-function loadApps(){ try{apps=JSON.parse(A.getApps())}catch(e){apps=[]} apps.sort((a,b)=>appName(a).localeCompare(appName(b))); renderHome() }
+let appsRaw="";
+function loadApps(force){ const raw=A.getApps(); if(!force&&raw===appsRaw&&apps.length) return false; appsRaw=raw; try{apps=JSON.parse(raw)}catch(e){apps=[]} apps.sort((a,b)=>appName(a).localeCompare(appName(b))); renderHome() }
 let lastLoad=0;
-window.onAppsChanged=()=>{ if(Date.now()-lastLoad<3000) return; lastLoad=Date.now();
-  const f=focused&&focused.dataset.pkg; loadApps(); if(f){const e=document.querySelector(`.page.on [data-pkg="${cssq(f)}"]`); if(e) focus(e)} };
+window.onAppsChanged=(pk)=>{ if(!pk&&Date.now()-lastLoad<3000) return; lastLoad=Date.now();
+  const f=focused&&focused.dataset.pkg; if(loadApps()===false) return; if(f){const e=document.querySelector(`.page.on [data-pkg="${cssq(f)}"]`); if(e) focus(e)} };
 const byPkg=p=>apps.find(a=>a.pkg===p);
 const custom=p=>S.custom[p]||{};
 const appName=a=>custom(a.pkg).name||a.name;
@@ -136,7 +137,7 @@ activators.push(el=>{ if(el.dataset.pkg){ launch(el.dataset.pkg); return true } 
 // ================= profiles =================
 function switchProfile(id){
   const p=S.profiles.find(x=>x.id===id); if(!p) return;
-  const go=()=>{ S.cur=id; applyLook(); applyLang(); loadApps(); if(window.renderGroups) renderGroups(); if(window.renderSettings) renderSettings();
+  const go=()=>{ S.cur=id; applyLook(); applyLang(); loadApps(true); if(window.renderGroups) renderGroups(); if(window.renderSettings) renderSettings();
     showPage("home"); shelf(p.emoji+" "+p.name,""); if(window.updateTicker) updateTicker(); if(window.renderMatchRow) renderMatchRow(); focus(document.querySelector('.tab[data-page="home"]')); banner(p.emoji,L("switchedTo")+" "+p.name) };
   // leaving a kids profile needs the PIN
   isKids()&&S.pin?guard(true,go):go();
