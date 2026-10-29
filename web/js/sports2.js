@@ -43,3 +43,8 @@ const _lifeSetSp=window.lifeSettings; window.lifeSettings=function(){
   const grp=(g,t)=>field(L(t),`<div class="inline">${COMPS.filter(c=>c[3]===g).map(c=>`<button class="btn f${(S.comps||[]).includes(c[0])?" pri":""}" data-tog="comps:${c[0]}">${esc(S.lang==="ar"?c[1]:c[2])}</button>`).join("")}</div>`);
   return sec("⚽ "+L("sSports"),field(L("compsHint"),"")+grp("l","cgL")+grp("c","cgC")+grp("n","cgN"))+(_lifeSetSp?_lifeSetSp():"") };
 const _settingsToggle=AFTER.comps; AFTER.comps=()=>{ loadSports() };
+
+if(!S.favTeamsSeeded){ S.favTeamsSeeded=true; if(!String(S.favTeams||"").trim()) S.favTeams="Al Ahly, Egypt, Trabzonspor, الأهلي, مصر" }
+// refresh when Home is opened and the list is older than 10 minutes
+let sportsAt=Date.now(); const _loadSportsT=loadSports; loadSports=async function(){ sportsAt=Date.now(); return _loadSportsT.apply(this,arguments) };
+pageHooks["home:enter"]=(function(prev){ return function(){ if(prev) prev(); if(S.sportsOn&&Date.now()-sportsAt>600000) loadSports() } })(pageHooks["home:enter"]);

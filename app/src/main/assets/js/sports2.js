@@ -138,3 +138,21 @@ const _settingsToggle = AFTER.comps;
 AFTER.comps = () => {
   loadSports();
 };
+if (!S.favTeamsSeeded) {
+  S.favTeamsSeeded = true;
+  if (!String(S.favTeams || "").trim()) S.favTeams = "Al Ahly, Egypt, Trabzonspor, الأهلي, مصر";
+}
+let sportsAt = Date.now();
+const _loadSportsT = loadSports;
+loadSports = function() {
+  return __async(this, arguments, function* () {
+    sportsAt = Date.now();
+    return _loadSportsT.apply(this, arguments);
+  });
+};
+pageHooks["home:enter"] = /* @__PURE__ */ function(prev) {
+  return function() {
+    if (prev) prev();
+    if (S.sportsOn && Date.now() - sportsAt > 6e5) loadSports();
+  };
+}(pageHooks["home:enter"]);
