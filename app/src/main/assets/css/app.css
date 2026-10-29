@@ -867,3 +867,8 @@ body[data-anim=bokeh] #animBg i{opacity:1!important}
 body.wallimg #wall{background-size:cover!important;background-position:center center!important;animation:none!important;transform:none}
 body.wallimg #shade{background:linear-gradient(180deg,rgba(0,0,0,.25) 0,rgba(0,0,0,0) 30%,rgba(0,0,0,0) 60%,rgba(0,0,0,.45) 100%)!important}
 body.wallimg #animBg{display:none!important}
+/* clean home: no floating app-name title over the widgets */
+body.clean #shelf{display:none!important}
+/* picture wallpaper: true colors (no theme tint on top) */
+body.wallimg #wall{opacity:var(--wallShow,1)}
+body.wallimg #shelfBg{background:#000!important}

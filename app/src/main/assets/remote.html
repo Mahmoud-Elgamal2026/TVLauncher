@@ -246,9 +246,12 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
       var cov=Math.max(W/img.width,H/img.height), con=Math.min(W/img.width,H/img.height);
       if(fit==="fill"){ g.drawImage(img,(W-img.width*cov)/2,(H-img.height*cov)/2,img.width*cov,img.height*cov) }
       else { /* whole picture visible: a blurred, darker copy fills the sides */
-        var sm=document.createElement("canvas"); sm.width=96; sm.height=54; sm.getContext("2d").drawImage(img,(96-img.width*cov*96/W)/2,(54-img.height*cov*54/H)/2,img.width*cov*96/W,img.height*cov*54/H);
-        g.imageSmoothingEnabled=true; g.drawImage(sm,0,0,W,H); g.fillStyle="rgba(0,0,0,.35)"; g.fillRect(0,0,W,H);
-        g.drawImage(img,(W-img.width*con)/2,(H-img.height*con)/2,img.width*con,img.height*con) }
+        /* soft, properly blurred copy of the same photo behind it (no blocky stretch) */
+        if("filter" in g){ g.filter="blur(48px) brightness(.6)"; g.drawImage(img,(W-img.width*cov)/2-60,(H-img.height*cov)/2-60,img.width*cov+120,img.height*cov+120); g.filter="none" }
+        else { var sm=document.createElement("canvas"); sm.width=48; sm.height=27; sm.getContext("2d").drawImage(img,(48-img.width*cov*48/W)/2,(27-img.height*cov*27/H)/2,img.width*cov*48/W,img.height*cov*27/H); g.drawImage(sm,0,0,W,H); g.fillStyle="rgba(0,0,0,.4)"; g.fillRect(0,0,W,H) }
+        /* thin shadow so the photo stands out */
+        g.shadowColor="rgba(0,0,0,.6)"; g.shadowBlur=40;
+        g.drawImage(img,(W-img.width*con)/2,(H-img.height*con)/2,img.width*con,img.height*con); g.shadowBlur=0 }
       res(c.toDataURL("image/jpeg",0.84)) }; img.onerror=rej; img.src=r.result }; r.onerror=rej; r.readAsDataURL(file) }) }
   fi.onchange=async function(){ var fs=[].slice.call(fi.files||[]); if(!fs.length) return; var n=0;
     for(var i=0;i<fs.length;i++){ pm.textContent="بيبعت "+(i+1)+" من "+fs.length+"…"; try{ var d=await shrink(fs[i]); var r=await api("photo",{data:d,mode:phMode}); if(r&&r.ok) n++ }catch(e){} }
