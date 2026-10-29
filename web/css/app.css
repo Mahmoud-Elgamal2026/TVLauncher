@@ -671,3 +671,8 @@ body[data-favsz] #homeApps{display:flex!important;flex-wrap:wrap;gap:1.6vh 1.4vw
 body[data-favsz] #homeApps .app .nm{font-size:1.5vh}
 body[data-hpage="1"] #home .scroll > #zoomBar{display:flex!important}
 body[data-favsz] #homeApps .app .nm{opacity:.8!important}
+#creator{font-size:1.4vh!important;opacity:.7!important;gap:.7vw!important;bottom:2vh!important;padding:.5vh 1vw .5vh .6vw;border-radius:3vh;background:rgba(255,255,255,.06);direction:ltr}
+#creator img{width:3.4vh!important;height:3.4vh!important;border-width:1px!important;border-color:rgba(255,255,255,.35)!important}
+#creator .cr{display:flex;flex-direction:column;line-height:1.15;text-align:left}
+#creator .cr small{font-size:.95vh;letter-spacing:.25em;opacity:.6;font-weight:500}
+#creator .cr b{font-size:1.55vh;font-weight:600;color:#fff!important;letter-spacing:.04em}

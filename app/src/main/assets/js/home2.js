@@ -603,3 +603,9 @@ activators.unshift((el) => {
   }
   return false;
 });
+renderCreator = function() {
+  const e = $("creator");
+  if (!e) return;
+  e.innerHTML = `<img src="${CREATOR.img}" onerror="this.remove()" alt=""><div class="cr"><small>DESIGNED BY</small><b>Mahmoud Elgamal</b></div>`;
+};
+renderCreator();
