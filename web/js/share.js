@@ -106,3 +106,7 @@ const _renderSettingsWF=renderSettings; renderSettings=function(){ _renderSettin
   // mark the current choices
   document.querySelectorAll("#wfBox [data-set]").forEach(b=>{ const [k,v]=b.dataset.set.split(":"); b.classList.toggle("pri",String(S[k])===v) }) };
 window.applyWallFx=applyWallFx;
+
+// a picture wallpaper turns the animated background off (and choosing an animation removes the picture)
+const _setWallA=window.setWall; if(_setWallA){ window.setWall=setWall=async function(){ S.anim="off"; S.liveWall=false; return _setWallA.apply(this,arguments) } }
+const _onSetAnim=AFTER.anim; AFTER.anim=function(){ if(S.anim&&S.anim!=="off"&&S.wall==="image"){ S.wall="dynamic"; S.wallImg="" } if(_onSetAnim) _onSetAnim(); applyLook() };

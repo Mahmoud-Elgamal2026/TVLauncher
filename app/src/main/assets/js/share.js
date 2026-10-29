@@ -1,3 +1,23 @@
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
 Object.assign(T.ar, {
   wlTitle: "أهلاً بيك 👋",
   wlLang: "اختار اللغة",
@@ -300,3 +320,22 @@ renderSettings = function() {
   });
 };
 window.applyWallFx = applyWallFx;
+const _setWallA = window.setWall;
+if (_setWallA) {
+  window.setWall = setWall = function() {
+    return __async(this, arguments, function* () {
+      S.anim = "off";
+      S.liveWall = false;
+      return _setWallA.apply(this, arguments);
+    });
+  };
+}
+const _onSetAnim = AFTER.anim;
+AFTER.anim = function() {
+  if (S.anim && S.anim !== "off" && S.wall === "image") {
+    S.wall = "dynamic";
+    S.wallImg = "";
+  }
+  if (_onSetAnim) _onSetAnim();
+  applyLook();
+};

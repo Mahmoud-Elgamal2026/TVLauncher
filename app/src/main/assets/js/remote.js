@@ -196,6 +196,8 @@ function remoteCmd(m) {
       } else {
         S.wallImg = u;
         S.wall = "image";
+        S.anim = "off";
+        S.liveWall = false;
         applyLook();
         banner("🖼", S.lang === "ar" ? "خلفية جديدة من الموبايل" : "New wallpaper from phone", "", 3e3);
       }
