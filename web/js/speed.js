@@ -139,3 +139,13 @@ const _tileSk=tile; tile=function(a){ const h=_tileSk(a); if(!BANNER_SKINS[S.ski
   return h.replace(/<img[^>]*>|<div class="lbl">[\s\S]*?<\/div>/,inner) };
 window.tile=tile;
 const _applySkinT=applySkin; applySkin=function(){ const was=document.body.dataset.skin; _applySkinT(); if(was&&was!==document.body.dataset.skin&&typeof renderHome==="function") renderHome() };
+
+// big card layout: 5 prayers · weather with next days · next match
+hwBody=(function(prev){ return function(w){ if(w.t!=="hero") return prev(w);
+  let h=prev(w); const names=L("prayers"), np=window.nextPrayer&&typeof prayers!=="undefined"&&prayers.length?nextPrayer():null;
+  const pr=(typeof prayers!=="undefined"&&prayers.length)?`<div class="npr">${prayers.map((t,i)=>i===1?"":`<div class="${np&&np.i===i?"on":""}"><span>${esc(names[i])}</span><b>${esc(fmtTime(t).replace(/\s*[صمAPap][Mm]?$/,""))}</b>${np&&np.i===i?`<small>${esc(fmtLeft(np.t-Date.now()))}</small>`:""}</div>`).join("")}</div>`:"";
+  const wn=typeof weatherNow!=="undefined"&&weatherNow, fc=(typeof forecast!=="undefined"&&forecast)||[];
+  const wx=wn?`<div class="nwx"><div class="now"><b>${esc(wn.i)} ${esc(wn.t)}°</b><span>${esc(wn.city||"")}</span></div>${fc.slice(1,4).map(f=>`<div class="day"><span>${esc(f.d.toLocaleDateString(S.lang==="ar"?"ar-EG":"en-GB",{weekday:"short"}))}</span><b>${esc(WMO(f.c))}</b><span>${f.hi}°/${f.lo}°</span></div>`).join("")}</div>`:"";
+  // keep only the match card from the old layout
+  const m=(h.match(/<div class="nowc[^"]*"><div class="nowi">⚽[\s\S]*?<\/div><\/div><\/div>/)||[""])[0];
+  return `<div class="herobox nowbox">${pr}${wx}<div class="nowcards">${m}</div></div>` } })(hwBody);
