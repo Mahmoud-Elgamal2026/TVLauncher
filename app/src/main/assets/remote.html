@@ -244,6 +244,7 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
   document.getElementById("phFrame").onclick=function(){ phMode="frame"; fi.multiple=true; fi.click() };
   function shrink(file){ return new Promise(function(res,rej){ var img=new Image(), r=new FileReader(); r.onload=function(){ img.onload=function(){ var W=1920,H=1080, c=document.createElement("canvas"); c.width=W; c.height=H; var g=c.getContext("2d");
       var fit=document.getElementById("phFit")?document.getElementById("phFit").value:"fit";
+      if(img.height>img.width*0.9) fit="fit"; /* portrait / square photo: always show it whole (filling would cut the head off) */
       var cov=Math.max(W/img.width,H/img.height), con=Math.min(W/img.width,H/img.height);
       if(fit==="fill"){ g.drawImage(img,(W-img.width*cov)/2,(H-img.height*cov)/2,img.width*cov,img.height*cov) }
       else { /* whole picture visible: a blurred, darker copy fills the sides */
