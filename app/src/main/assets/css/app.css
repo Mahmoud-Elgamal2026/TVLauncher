@@ -1133,3 +1133,7 @@ html body .dlist .btn b{min-width:3vh;text-align:center}
 html body .sec h3{font-size:2.8vh;font-weight:700}
 html body .field label{color:rgba(255,255,255,.75)}
 html body .it,html body .btn{border-radius:1.2vh}
+/* old WebView (no CSS grid): theme picker, widget picker, dialog grids fall back to wrapping rows */
+html.nogrid .skgrid,html.nogrid .wgrid,html.nogrid .dgrid{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap}
+html.nogrid .skgrid>*{width:calc(25% - 1.4vw);margin:0 .7vw 1.4vw}
+html.nogrid .wgrid>*,html.nogrid .dgrid>*{width:calc(25% - 1vw);margin:0 .5vw 1.2vh}

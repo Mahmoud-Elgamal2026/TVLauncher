@@ -5,7 +5,7 @@ Object.assign(DEF,{hw:[{id:"clock",t:"clock",sz:2,st:"glass"},{id:"prayer",t:"pr
 const HWT={ar:{hwTitle:"الويدجت",hwAdd:"إضافة ويدجت",hwEdit:"تعديل الويدجت",hwClock:"الساعة",hwWeather:"الطقس",hwPrayer:"مواعيد الصلاة",hwMatches:"الماتشات",hwBoost:"تسريع الجهاز",
     hwMon:"مراقبة الجهاز",hwYt:"يوتيوب — قنواتي",hwAzkar:"ذكر",hwCal:"التقويم",hwNote:"ملاحظة",
     hwLeft:"حرّك يمين",hwRight:"حرّك شمال",hwSize:"الحجم",hwStyle:"الشكل",hwRemove:"شيل الويدجت",hwSettings:"إعدادات الويدجت",
-    szS:"صغير",szM:"وسط",szL:"كبير",stGlass:"زجاجي",stSolid:"مصمت",stAccent:"ملوّن",stClear:"شفاف",stGrad:"متدرج",
+    szS:"صغير",szM:"وسط",szL:"كبير",szF:"عرض الشاشة",stGlass:"زجاجي",stSolid:"مصمت",stAccent:"ملوّن",stClear:"شفاف",stGrad:"متدرج",
     ytAdd:"إضافة قناة يوتيوب",ytAddPh:"لينك القناة أو @الاسم",ytNone:"ضيف قنوات يوتيوب بتتابعها (اضغط مطوّل ← إعدادات الويدجت)",ytBad:"ملقتش القناة",ytRem:"شيل",
     ytLoading:"بيجيب أحدث الفيديوهات…",mNone:"مفيش ماتشات النهارده",mLoad:"بيجيب الماتشات…",pLeft:"باقي",boostOk:"اضغط OK للتسريع",ramUsed:"رامات مستخدمة",
     noteEdit:"اكتب ملاحظتك",noteEmpty:"اضغط مطوّل ← إعدادات لكتابة ملاحظة",icLook:"شكل أيقونات التطبيقات",icTheme:"حسب الثيم",
@@ -13,7 +13,7 @@ const HWT={ar:{hwTitle:"الويدجت",hwAdd:"إضافة ويدجت",hwEdit:"ت
   en:{hwTitle:"Widgets",hwAdd:"Add widget",hwEdit:"Edit widgets",hwClock:"Clock",hwWeather:"Weather",hwPrayer:"Prayer times",hwMatches:"Matches",hwBoost:"Boost",
     hwMon:"Device monitor",hwYt:"YouTube — my channels",hwAzkar:"Dhikr",hwCal:"Calendar",hwNote:"Note",
     hwLeft:"Move left",hwRight:"Move right",hwSize:"Size",hwStyle:"Style",hwRemove:"Remove widget",hwSettings:"Widget settings",
-    szS:"Small",szM:"Medium",szL:"Large",stGlass:"Glass",stSolid:"Solid",stAccent:"Color",stClear:"Clear",stGrad:"Gradient",
+    szS:"Small",szM:"Medium",szL:"Large",szF:"Full width",stGlass:"Glass",stSolid:"Solid",stAccent:"Color",stClear:"Clear",stGrad:"Gradient",
     ytAdd:"Add YouTube channel",ytAddPh:"Channel link or @handle",ytNone:"Add YouTube channels you follow (long-press → widget settings)",ytBad:"Channel not found",ytRem:"Remove",
     ytLoading:"Fetching latest videos…",mNone:"No matches today",mLoad:"Loading matches…",pLeft:"in",boostOk:"Press OK to boost",ramUsed:"RAM used",
     noteEdit:"Write your note",noteEmpty:"Long-press → settings to write a note",icLook:"App icon look",icTheme:"By theme",
@@ -162,7 +162,7 @@ function hwMenu(id){
   const rtl=document.documentElement.dir==="rtl";
   const items=[{icon:"🗑",label:L("hwRemove"),pri:1,fn:()=>{ hwSave(hwList().filter(x=>x.id!==id)); A.toast("🗑 "+L("hwRemove")) }}];
   if(w.t!=="yt") items.push({icon:rtl?"➡️":"⬅️",label:L("hwLeft"),keep:1,fn:()=>swap(-1)},{icon:rtl?"⬅️":"➡️",label:L("hwRight"),keep:1,fn:()=>swap(1)},
-    {icon:"📏",label:L("hwSize")+": "+L(["szS","szM","szL"][(w.sz||1)-1]),keep:1,fn:()=>{ hwSet(id,{sz:(w.sz||1)%3+1}); setTimeout(()=>hwMenu(id),40) }},
+    {icon:"📏",label:L("hwSize")+": "+L(["szS","szM","szL","szF"][(w.sz||1)-1]),keep:1,fn:()=>{ hwSet(id,{sz:(w.sz||1)%4+1}); setTimeout(()=>hwMenu(id),40) }},
     {icon:"🎨",label:L("hwStyle")+": "+L(HW_STNAME[w.st||"glass"]),keep:1,fn:()=>{ const s=HW_STYLES[(HW_STYLES.indexOf(w.st||"glass")+1)%HW_STYLES.length]; hwSet(id,{st:s}); setTimeout(()=>hwMenu(id),40) }});
   if(w.t==="yt"||w.t==="note"||w.t==="matches") items.push({icon:"⚙️",label:L("hwSettings"),fn:()=>setTimeout(()=>hwSettings(w),30)});
   items.push({icon:"＋",label:L("hwAdd"),fn:()=>setTimeout(hwAddMenu,30)},{label:L("done"),fn:()=>{}});

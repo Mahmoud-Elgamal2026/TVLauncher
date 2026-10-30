@@ -225,10 +225,13 @@ function move(dir){
     if(e===focused) continue;
     const b=e.getBoundingClientRect(), dx=b.left+b.width/2-ax, dy=b.top+b.height/2-ay;
     let main,cross;
-    if(dir==="left"){if(b.right>a.left+4&&dx>=-2)continue;main=-dx;cross=Math.abs(dy)}
-    else if(dir==="right"){if(b.left<a.right-4&&dx<=2)continue;main=dx;cross=Math.abs(dy)}
-    else if(dir==="up"){if(b.bottom>a.top+4)continue;main=-dy;cross=Math.abs(dx)}
-    else {if(b.top<a.bottom-4)continue;main=dy;cross=Math.abs(dx)}
+    // cross = how far the target sits beside our line of travel (0 when a wide card like the big widget spans it)
+    const gx=Math.max(0,b.left-a.right,a.left-b.right), gy=Math.max(0,b.top-a.bottom,a.top-b.bottom);
+    if(dir==="left"){if(b.right>a.left+4&&(dx>=-2||gy>0))continue;main=-dx;cross=gy?Math.abs(dy):0}
+    else if(dir==="right"){if(b.left<a.right-4&&(dx<=2||gy>0))continue;main=dx;cross=gy?Math.abs(dy):0}
+    else if(dir==="up"){if(b.bottom>a.top+4)continue;main=a.top-b.bottom+Math.abs(dy)*.1;cross=gx?Math.abs(dx):0}
+    else {if(b.top<a.bottom-4)continue;main=b.top-a.bottom+Math.abs(dy)*.1;cross=gx?Math.abs(dx):0}
+    main=Math.max(main,1);
     if(main<=0) continue;
     const s=main+cross*2.2; if(s<bs){bs=s;best=e}
   }
