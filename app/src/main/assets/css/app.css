@@ -1122,3 +1122,14 @@ html.nofg .w2ch > *{margin-bottom:1vh}
 .hw-album .hwb{padding:0!important}.w2pic{width:100%;height:100%;min-height:18vh;background-size:cover;background-position:center;border-radius:inherit}
 .w2wk{display:flex;flex-direction:column;font-size:1.9vh;padding:.3vh 0}.w2wk small{font-size:1.5vh;opacity:.75}
 body.nightdim::after{content:"";position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.35);pointer-events:none;z-index:9998}
+/* ================= One look everywhere: "selected" is a soft outline, the remote's focus is the solid accent ================= */
+html body .btn.pri:not(.focus),html body .it.sel:not(.focus){background:color-mix(in srgb,var(--sel) 18%,transparent)!important;background:rgba(233,196,106,.16)!important;color:var(--text)!important;box-shadow:inset 0 0 0 .2vh var(--sel)!important}
+html body[data-skin=gtv] .btn.pri:not(.focus),html body[data-skin=atv] .btn.pri:not(.focus),html body[data-skin=gtv] .it.sel:not(.focus),html body[data-skin=atv] .it.sel:not(.focus){background:rgba(255,255,255,.12)!important}
+html body .btn.f.focus,html body .it.f.focus{background:var(--sel)!important;color:var(--selText)!important}
+html body .mbox{background:rgba(14,20,44,.97)!important;border:1px solid rgba(255,255,255,.08);box-shadow:0 3vh 8vh rgba(0,0,0,.6)}
+html body[data-skin=gtv] .mbox,html body[data-skin=netflix] .mbox{background:rgba(32,33,36,.98)!important}
+html body .dlist .btn{justify-content:flex-start;gap:1vw;padding:1.4vh 1.6vw!important;font-size:2.1vh}
+html body .dlist .btn b{min-width:3vh;text-align:center}
+html body .sec h3{font-size:2.8vh;font-weight:700}
+html body .field label{color:rgba(255,255,255,.75)}
+html body .it,html body .btn{border-radius:1.2vh}

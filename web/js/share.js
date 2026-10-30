@@ -15,7 +15,7 @@ function wlCity(){ prompt2(L("wlCity"),S.city||"",v=>{ if(v){ S.city=v; S.loc=nu
 function wlFav(){
   const pick=new Set(S.favs||[]), list=visibleApps().filter(a=>a.pkg!=="com.mahmoud.tvlauncher").slice(0,60);
   const draw=()=>dialog(L("wlFav"),list.map(a=>({icon:pick.has(a.pkg)?"⭐":"▫️",label:appName(a),keep:1,fn:()=>{ pick.has(a.pkg)?pick.delete(a.pkg):pick.add(a.pkg); const f=focused&&focused.dataset.di; draw(); const b=$("dbox").querySelector('[data-di="'+f+'"]'); if(b) focus(b) }}))
-    .concat([{label:L("wlDone"),pri:1,fn:()=>{ S.favs=[...pick]; S.welcomed=true; S.favSeeded=true; renderHome() }}]),{grid:3});
+    .concat([{label:L("wlDone"),pri:1,fn:()=>{ S.favs=[...pick]; S.welcomed=true; S.favSeeded=true; renderHome(); if(window.wlTeam) setTimeout(wlTeam,60) }}]),{grid:3});
   draw();
 }
 setTimeout(()=>{ if(!S.welcomed){ if((S.favs||[]).length&&S.setupSeen){ S.welcomed=true; return } closeDialog(); welcome() } },3500);
