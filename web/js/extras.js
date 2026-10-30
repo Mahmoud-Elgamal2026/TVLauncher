@@ -237,6 +237,7 @@ const ACTION_DEFS=()=>[["tv",L("aTv"),"📺"],["last",L("aLast"),"⏮️"],["sea
 function actionLabel(a){ if(a.startsWith("app:")){ const x=byPkg(a.slice(4)); return "📦 "+(x?appName(x):a.slice(4)) } const d=ACTION_DEFS().find(x=>x[0]===a); return d?d[2]+" "+d[1]:a }
 function runAction(a){
   if(on("frame")) stopFrame(); if(on("blackout")) $("blackout").classList.remove("on");
+  if(a==="update"){ showPage("settings"); return checkUpdates(true) }
   if(a.startsWith("app:")) return launch(a.slice(4));
   if(on("dlg")) closeDialog();
   switch(a){
