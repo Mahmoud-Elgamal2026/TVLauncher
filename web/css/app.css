@@ -948,3 +948,9 @@ html body .hw.hw.hw-hero,html body[data-skin] .hw.hw.hw-hero{background:transpar
 html body .herobox.herobox.nowbox,html body[data-skin] .herobox.herobox.nowbox{background:none!important}
 html body .npr div,html body .nwx{background:rgba(255,255,255,.1)!important;backdrop-filter:none}
 html body .npr div.on{background:var(--sel)!important;color:var(--selText)!important}
+/* widget styles really differ again ("glass" = the theme's own look; the others override it) */
+html body .hw.hw.st-solid{background:#1b2236!important;border:0!important}
+html body .hw.hw.st-accent{background:linear-gradient(135deg,var(--sel),color-mix(in srgb,var(--sel) 60%,#000))!important;background:var(--sel)!important;color:var(--selText)!important;border:0!important}
+html body .hw.hw.st-accent *{color:inherit}
+html body .hw.hw.st-grad{background:linear-gradient(135deg,#4b2bd6,#c2257e)!important;border:0!important;color:#fff}
+html body .hw.hw.st-clear{background:transparent!important;border:1px solid rgba(255,255,255,.18)!important}
