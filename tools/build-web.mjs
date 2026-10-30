@@ -93,4 +93,14 @@ for (const f of readdirSync(join(OUT, "css"))) {
   if (left) { console.error(`✗ ${f}: logical properties remain: ${left.join(", ")}`); process.exit(1); }
   writeFileSync(p, out); cssCount++;
 }
+// ---------- one bundle: every <script src> in index.html (in order) becomes js/app.js — one file to read and parse at boot ----------
+{
+  const ip = join(OUT, "index.html"); let html = readFileSync(ip, "utf8"); const parts = []; const used = [];
+  html = html.replace(/<script src="js\/([^"]+)"><\/script>\n?/g, (m, f) => { parts.push(`/* ${f} */\n` + readFileSync(join(OUT, "js", f), "utf8")); used.push(f); return used.length === 1 ? '<script src="js/app.js"></script>\n' : ""; });
+  const bundle = parts.join("\n;\n");
+  try { acorn.parse(bundle, { ecmaVersion: 2016, sourceType: "script" }); } catch (e) { console.error("✗ bundle: " + e.message); process.exit(1); }
+  writeFileSync(join(OUT, "js", "app.js"), bundle); writeFileSync(ip, html);
+  for (const f of used) rmSync(join(OUT, "js", f));
+  console.log(`✓ bundled ${used.length} scripts → js/app.js (${Math.round(bundle.length / 1024)} KB)`);
+}
 console.log(`✓ web → assets: ${jsCount} JS files lowered to ${TARGET} (checked as ES2016), ${cssCount} CSS files converted`);
