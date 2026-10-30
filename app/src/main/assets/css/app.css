@@ -1137,3 +1137,8 @@ html body .it,html body .btn{border-radius:1.2vh}
 html.nogrid .skgrid,html.nogrid .wgrid,html.nogrid .dgrid{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap}
 html.nogrid .skgrid>*{width:calc(25% - 1.4vw);margin:0 .7vw 1.4vw}
 html.nogrid .wgrid>*,html.nogrid .dgrid>*{width:calc(25% - 1vw);margin:0 .5vw 1.2vh}
+/* all widget text white (every theme, every widget style) */
+html body .hw.hw,html body .hw.hw *,html body .hw.hw.st-accent,html body .hw.hw.st-accent *{color:#fff!important}
+html body .hw .hwsub.dim,html body .hw .hwt,html body .hw small,html body .hw .nows,html body .hw .nowt{color:rgba(255,255,255,.85)!important;opacity:1!important}
+html body .hw.hw.st-accent{text-shadow:0 .1vh .4vh rgba(0,0,0,.35)}
+html body .npr div.on,html body .npr div.on *{color:#111!important}
