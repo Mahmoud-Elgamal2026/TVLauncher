@@ -914,8 +914,7 @@ body[data-page=home] .clock,body[data-page=home] .top .weather{display:none!impo
 .nowc.live{background:rgba(140,20,30,.78)!important}
 /* ================= Luxe night look: deep navy, dark glass cards, one gold accent ================= */
 html body{--sel:#e9c46a;--selText:#111;--glass:rgba(255,255,255,.06);--ring:0 0 0 .35vh #e9c46a}
-html body #shelfBg{background:radial-gradient(130% 100% at 80% 0%,#2a4a8c 0%,#163068 35%,#0b1840 70%,#070f2a 100%)!important}
-html body #animBg{display:none!important}
+html body.luxbg #shelfBg{background:radial-gradient(130% 100% at 80% 0%,#2a4a8c 0%,#163068 35%,#0b1840 70%,#070f2a 100%)!important}
 /* widget cards: dark frosted glass, hairline border, no dashes */
 html body .hw,html body .hw.st-glass,html body .hw.st-solid,html body .hw.st-accent,html body .hw.st-grad{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.025))!important;border:1px solid rgba(255,255,255,.08)!important;color:#fff}
 html body .hw.st-clear,html body .hw.hw-hero{border:1px solid rgba(255,255,255,.08)!important}

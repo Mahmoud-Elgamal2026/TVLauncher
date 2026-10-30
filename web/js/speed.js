@@ -103,3 +103,6 @@ setInterval(()=>{ /* autoSleep */ const h=new Date().getHours(), day=new Date().
 // 5) back on Home: the remote stands on the app you just left
 const _onBgL=window.onBg; window.onBg=function(b){ _onBgL(b); if(b) return; const p=lastPkg(); if(!p) return;
   setTimeout(()=>{ if(window.__bg||!document.querySelector("#home.on")||on("dlg")) return; const e=document.querySelector(`#home [data-pkg="${cssq(p)}"]`); if(e) focus(e) },350) };
+// the navy "luxe" background only on the default theme — any theme / wallpaper / animation you pick shows as is
+const _applyLookLx=applyLook; applyLook=function(){ _applyLookLx.apply(this,arguments); document.body.classList.toggle("luxbg",(S.theme||"apple")==="apple"&&S.wall!=="daily"&&!S.wallImg) };
+setTimeout(()=>applyLook(),0);
