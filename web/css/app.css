@@ -943,3 +943,8 @@ html body .hw.hw-hero{height:auto!important;min-height:17vh}
 .nwx .now{display:flex;flex-direction:column;align-items:center}.nwx .now b{font-size:3.4vh}.nwx .now span{font-size:1.5vh;opacity:.8}
 .nwx .day{display:flex;flex-direction:column;align-items:center;font-size:1.5vh;opacity:.9}.nwx .day b{font-size:2.4vh;margin:.2vh 0}
 .herobox .nowcards{flex:1 1 auto;justify-content:flex-end}
+/* big card: transparent (only its inner tiles keep a light glass) */
+html body .hw.hw.hw-hero,html body[data-skin] .hw.hw.hw-hero{background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important}
+html body .herobox.herobox.nowbox,html body[data-skin] .herobox.herobox.nowbox{background:none!important}
+html body .npr div,html body .nwx{background:rgba(255,255,255,.1)!important;backdrop-filter:none}
+html body .npr div.on{background:var(--sel)!important;color:var(--selText)!important}
