@@ -45,7 +45,7 @@
         </receiver>
         <service android:name=".RecService" android:exported="false" android:foregroundServiceType="dataSync" />
         <service android:name=".NotifService" android:exported="true"
-            android:label="TV Launcher notifications"
+            android:label="Elgamal TV notifications"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter><action android:name="android.service.notification.NotificationListenerService" /></intent-filter>
         </service>

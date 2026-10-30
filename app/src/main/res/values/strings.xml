@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TV Launcher</string>
-    <string name="guard_name">TV Launcher — Home helper</string>
-    <string name="guard_desc">Keeps TV Launcher as the home screen, runs your mapped remote buttons inside other apps, and lets the sleep timer turn the screen off. It does not read screen content.</string>
+    <string name="app_name">Elgamal TV</string>
+    <string name="guard_name">Elgamal TV — Home helper</string>
+    <string name="guard_desc">Keeps Elgamal TV as the home screen, runs your mapped remote buttons inside other apps, and lets the sleep timer turn the screen off. It does not read screen content.</string>
 </resources>
