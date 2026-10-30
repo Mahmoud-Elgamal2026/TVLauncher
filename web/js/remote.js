@@ -34,6 +34,7 @@ const KID_SAFE=new Set(["state","key","text","launch","play","action","volume","
 function remoteCmd(m){
   if(isKids()&&!KID_SAFE.has(m.cmd)&&m.pin!==S.pin) return {error:"kids"};
   switch(m.cmd){
+    case "power": tvOff(); return {ok:1};
     case "state": return remoteState();
     case "key": pressKey(String(m.k)); return {ok:1};
     case "text": return {ok:1,to:remoteText(String(m.t||""),!!m.submit)};

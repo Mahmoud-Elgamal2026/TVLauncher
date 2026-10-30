@@ -69,7 +69,7 @@ textarea{min-height:90px;resize:vertical}
       <button class="ok" data-k="ok">OK</button>
     </div>
     <div class="row"><button class="btn" data-k="back"><b>↩</b><span data-t="back"></span></button><button class="btn" data-k="home"><b>⌂</b><span data-t="home"></span></button><button class="btn" data-k="menu"><b>☰</b><span data-t="options"></span></button></div>
-    <div class="row"><button class="btn pri" data-a="update"><b>⬇️</b><span>حدّث اللانشر على الشاشة</span></button></div>
+    <div class="row"><button class="btn" id="tvOffBtn" style="background:#8b1a1a"><b>📴</b><span>اقفل التليفزيون</span></button><button class="btn pri" data-a="update"><b>⬇️</b><span>حدّث اللانشر على الشاشة</span></button></div>
     <div class="row"><button class="btn" data-v="down"><b>🔉</b></button><button class="btn" data-v="mute"><b>🔇</b></button><button class="btn" data-v="up"><b>🔊</b></button></div>
     <div class="row"><button class="btn" data-a="tv"><b>📺</b><span data-t="iptv"></span></button><button class="btn" data-a="last"><b>⏮</b><span data-t="last"></span></button><button class="btn" data-a="frame"><b>🖼</b><span data-t="frame"></span></button><button class="btn" data-a="sleep"><b>😴</b><span data-t="sleep"></span></button></div>
     <h2 data-t="numbers"></h2>
@@ -175,6 +175,7 @@ document.addEventListener("click",async e=>{
   if(d.tab){ document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b)); document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.id==="t-"+d.tab)); if(d.tab!=="remote"&&d.tab!=="type") refresh(); return }
   if(d.num){ buzz(); api("key",{k:d.num}); return }
   if(d.v){ buzz(); api("volume",{d:d.v}); return }
+  if(b.id==="tvOffBtn"){ buzz(); if(confirm("تقفل التليفزيون؟")) api("power",{}); return }
   if(d.a){ buzz(); api("action",{a:d.a}); return }
   if(d.launch){ buzz(); if(await api("launch",{pkg:d.launch})) toast(t("sent")); return }
   if(d.play){ buzz(); if(await api("play",{url:d.play})) toast(t("sent")); setTimeout(refresh,800); return }

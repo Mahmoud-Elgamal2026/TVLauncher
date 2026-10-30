@@ -1572,7 +1572,7 @@ public class MainActivity extends Activity {
             new Thread(() -> {
                 try {
                     String c = cmd == null ? "" : cmd.trim();
-                    boolean anim = c.matches("settings put global (window_animation_scale|transition_animation_scale|animator_duration_scale) [0-9.]+");
+                    boolean anim = c.matches("settings put global (window_animation_scale|transition_animation_scale|animator_duration_scale) [0-9.]+") || c.matches("input keyevent (223|26)");
                     if (!(c.startsWith("pm ") || c.startsWith("cmd package ") || c.startsWith("am ") || anim) || c.matches(".*[;&|`$><\\n].*"))
                         throw new Exception("command not allowed");
                     java.lang.reflect.Method m = rikka.shizuku.Shizuku.class.getDeclaredMethod("newProcess", String[].class, String[].class, String.class);

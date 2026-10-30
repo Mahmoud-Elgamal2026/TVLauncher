@@ -101,3 +101,50 @@ setInterval(()=>{ /* alarms */ const l=S.alarms||[]; if(!l.length) return; const
   if(due.length){ due.forEach(a=>{ banner("⏰",a.n,fmtTime(new Date(a.t)),30000); if(typeof chime==="function") chime() }); S.alarms=l.filter(a=>a.t>now) } },30000);
 const _hwMenuW2=hwMenu; hwMenu=function(id){ _hwMenuW2(id); const w=hwGet(id); if(!w||w.t!=="tas") return; const box=$("dbox"), items=box&&box._items, g=box&&box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
   items.unshift({icon:"↺",label:L("w_reset"),fn:()=>{ S.tasbih=0; renderHW() }}); g.innerHTML=items.map((it,k)=>`<button class="btn f${it.pri?" pri":""}" data-di="${k}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) };
+
+// ================= Turn the TV off from the phone (home Wi-Fi) or from anywhere (Telegram: "اقفل التليفزيون" / "/off") =================
+async function tvOff(){ try{ if(on("player")) stopPlayer(); if(window.stopRadio) stopRadio() }catch(e){}
+  banner("📴",S.lang==="ar"?"التليفزيون هيقفل…":"Turning off…","",2000);
+  await new Promise(r=>setTimeout(r,1500));
+  // real standby (TV follows over HDMI-CEC) when Shizuku is running; otherwise the screen goes black
+  if(typeof shz==="function"&&shz()==="ok"){ try{ await runShell("input keyevent 223"); return "ok" }catch(e){} }
+  if(nat("sleepNow")) return "ok";
+  $("blackout").classList.add("on"); return "black" }
+window.tvOff=tvOff;
+const _tgCmdOff=tgCmd; tgCmd=function(t){ if(/^\/?(off|اقفل التليفزيون|اقفل التلفزيون|اقفل الشاشة|قفل التليفزيون)$/i.test(String(t).trim())){ tvOff(); return "📴 ✅" } return _tgCmdOff.apply(this,arguments) };
+
+// ================= ⚽ Match mode: your team's live match — score on Home, a pop-up on every goal even inside another app =================
+const goalWatch={};
+setInterval(()=>{ /* goalWatch */ if(typeof matches==="undefined"||!S.matchMode) return;
+  const live=matches.filter(e=>teamFav(e)&&(evState(e)==="live"||(evState(e)==="ns"&&Math.abs(evTime(e)-Date.now())<10*60000)));
+  live.forEach(async e=>{ if(!e._lg) return; try{
+    const r=await A.fetchJSON(`https://site.api.espn.com/apis/site/v2/sports/soccer/${e._lg}/scoreboard`), ev=(r.events||[]).find(x=>"e"+x.id===e.idEvent); if(!ev) return;
+    const c=(ev.competitions||[])[0]||{}, tm=c.competitors||[], h=tm.find(x=>x.homeAway==="home")||tm[0]||{}, a=tm.find(x=>x.homeAway==="away")||tm[1]||{}, st=((c.status||ev.status||{}).type)||{};
+    const hs=+h.score||0, as=+a.score||0, key=hs+"-"+as, prev=goalWatch[e.idEvent];
+    e.intHomeScore=hs; e.intAwayScore=as; e.strStatus=st.state==="post"?"FT":st.state==="pre"?"NS":"LIVE "+(st.shortDetail||"");
+    const line=`${e.strHomeTeam} ${hs} - ${as} ${e.strAwayTeam}`;
+    if(prev==null&&st.state==="in"&&!goalWatch["k"+e.idEvent]){ goalWatch["k"+e.idEvent]=1; notifyMatch("⚽ "+(S.lang==="ar"?"الماتش بدأ":"Kick-off"),line) }
+    if(prev!=null&&prev!==key){ const who=hs>+prev.split("-")[0]?e.strHomeTeam:e.strAwayTeam; notifyMatch("⚽ "+(S.lang==="ar"?"جوووون! ":"GOAL! ")+who,line) }
+    if(st.state==="post"&&!goalWatch["f"+e.idEvent]){ goalWatch["f"+e.idEvent]=1; notifyMatch("🏁 "+(S.lang==="ar"?"الماتش خلص":"Full time"),line) }
+    goalWatch[e.idEvent]=key; if(!window.__bg) renderHW() }catch(_){} }) },60000);
+function notifyMatch(title,line){ if(window.__bg){ nat("toast",title+"\n"+line); setTimeout(()=>nat("toast",title+"\n"+line),3500) } else { banner("⚽",title,line,12000); if(typeof chime==="function") chime() } }
+Object.assign(DEF,{matchMode:true});
+
+// ================= ⏰ Automatic day schedule =================
+Object.assign(DEF,{schMorningRadio:false,schNightDim:true});
+Object.assign(T.ar,{schTitle:"⏰ جدول تلقائي",schMorning:"🌅 الصبح: شغّل إذاعة القرآن أول مرة تفتح الرئيسية (من 6 لـ 10)",schNight:"🌙 بالليل الشاشة أهدى (من 11 بالليل لـ 6 الصبح)",schMatch:"⚽ وضع الماتش: تنبيه بكل جون لفرقك حتى وانت جوه تطبيق تاني"});
+Object.assign(T.en,{schTitle:"⏰ Auto schedule",schMorning:"🌅 Morning: play Quran radio the first time Home opens (6–10)",schNight:"🌙 Night: dimmer screen (11 PM – 6 AM)",schMatch:"⚽ Match mode: a pop-up on every goal for your teams, even inside another app"});
+let morningDone="";
+function schedTick(){ const h=new Date().getHours(), day=new Date().toDateString();
+  document.body.classList.toggle("nightdim",!!S.schNightDim&&(h>=23||h<6));
+  if(S.schMorningRadio&&h>=6&&h<10&&morningDone!==day&&!window.__bg&&!on("player")&&document.querySelector("#home.on")){ morningDone=day;
+    A.fetchJSON("https://mp3quran.net/api/v3/radios?language=ar").then(r=>{ const x=(r.radios||[]).find(s=>/الكريم|القرآن الكريم/.test(s.name))||(r.radios||[])[0]; if(x) play({name:"📻 "+x.name,url:x.url,logo:""}) },()=>{}) } }
+setInterval(schedTick,60000); setTimeout(schedTick,4000);
+const _onBgSch=window.onBg; window.onBg=function(b){ _onBgSch(b); if(!b) setTimeout(schedTick,500) };
+// settings: the 3 switches live in the "Frame & sleep" group
+const onoff2=(k)=>`<div class="inline"><button class="btn f${S[k]?" pri":""}" data-sch="${k}:1">${esc(L("on"))}</button><button class="btn f${!S[k]?" pri":""}" data-sch="${k}:0">${esc(L("off"))}</button></div>`;
+groupSettings=(function(prev){ return function(){ const box=$("setScroll"); if(box&&!box.querySelector(".sgrp")&&!isKids()&&!$("schSec"))
+    box.insertAdjacentHTML("beforeend",`<div class="sec" id="schSec"><h3>${esc(L("schTitle"))}</h3><div class="field"><label>${esc(L("schMatch"))}</label>${onoff2("matchMode")}</div><div class="field"><label>${esc(L("schMorning"))}</label>${onoff2("schMorningRadio")}</div><div class="field"><label>${esc(L("schNight"))}</label>${onoff2("schNightDim")}</div></div>`);
+  return prev() } })(groupSettings);
+SET_GROUPS[4][2].push("جدول تلقائي","Auto schedule");
+activators.unshift(el=>{ if(!el.dataset||!el.dataset.sch) return false; const [k,v]=el.dataset.sch.split(":"); S[k]=v==="1"; schedTick(); renderSettings(); const e=document.querySelector(`[data-sch="${k}:${v}"]`); if(e) focus(e); return true });
