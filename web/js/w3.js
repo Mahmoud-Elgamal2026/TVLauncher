@@ -34,10 +34,10 @@ setInterval(()=>{ /* tgBackup weekly report */ if(!S.tgChat||Date.now()-(S.repor
 
 // ---- side rail: stats + report live in the speed settings group
 groupSettings=(function(prev){ return function(){ const box=$("setScroll"); if(box&&!box.querySelector(".sgrp")&&!isKids()&&!$("statSec"))
-    box.insertAdjacentHTML("afterbegin",`<div class="sec" id="statSec"><h3>⚡ ${S.lang==="ar"?"تقارير":"Reports"}</h3><div class="inline"><button class="btn f" id="stBtn">${esc(L("stTitle"))}</button><button class="btn f" id="rpBtn">${esc(L("rpTitle"))}</button></div></div>`);
+    box.insertAdjacentHTML("afterbegin",`<div class="sec" id="statSec"><h3>⚡ ${S.lang==="ar"?"تقارير":"Reports"}</h3><div class="inline"><button class="btn f" id="stBtn">${esc(L("stTitle"))}</button><button class="btn f" id="rpBtn">${esc(L("rpTitle"))}</button><button class="btn f" id="sysClnBtn">🧹 ${S.lang==="ar"?"خفّف تطبيقات النظام":"Slim system apps"}</button><button class="btn f" id="ramBtn">🧠 ${S.lang==="ar"?"مين واكل الرامات":"RAM users"}</button></div></div>`);
   return prev() } })(groupSettings);
 SET_GROUPS[0][2].push("تقارير","Reports");
-activators.unshift(el=>{ if(el.id==="stBtn"){ showStats(); return true } if(el.id==="rpBtn"){ showReport(); return true } return false });
+activators.unshift(el=>{ if(el.id==="sysClnBtn"||el.id==="ramBtn"){ showPage("store"); storeCat=el.id==="ramBtn"?"ram":"sys"; renderStore(); setTimeout(()=>{ const f=document.querySelector("#storeMain .f"); if(f) focus(f) },100); return true } if(el.id==="stBtn"){ showStats(); return true } if(el.id==="rpBtn"){ showReport(); return true } return false });
 
 // ---- each family member keeps their own theme
 const _skinAct=el=>el.dataset&&el.dataset.skin;
