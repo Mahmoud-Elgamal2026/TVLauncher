@@ -132,12 +132,7 @@ groupSettings=(function(prev){ return function(){ const box=$("setScroll"); if(b
   return prev() } })(groupSettings);
 SET_GROUPS[1][2].push("الثيم","Theme");
 
-// TV-style skins show each app the way that platform does: its real wide TV banner, or the icon on a card made from its own colors
-const BANNER_SKINS={};
-const _tileSk=tile; tile=function(a){ const h=_tileSk(a); if(!BANNER_SKINS[S.skin]||custom(a.pkg).img||custom(a.pkg).color) return h;
-  const inner=a.banner?`<img class="tvbn" src="${a.banner}" alt="">`:(a.icon?`<div class="tvic"><i style="background-image:url('${a.icon}')"></i><img src="${a.icon}" alt=""></div>`:`<div class="lbl">${esc(appName(a))}</div>`);
-  return h.replace(/<img[^>]*>|<div class="lbl">[\s\S]*?<\/div>/,inner) };
-window.tile=tile;
+
 const _applySkinT=applySkin; applySkin=function(){ const was=document.body.dataset.skin; _applySkinT(); if(was&&was!==document.body.dataset.skin&&typeof renderHome==="function") renderHome() };
 
 // big card layout: 5 prayers · weather with next days · next match

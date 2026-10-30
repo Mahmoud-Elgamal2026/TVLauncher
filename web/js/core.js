@@ -40,9 +40,15 @@ const KEEP=/^(hw|favSize|homeOrder|iconLook|wall.*|theme|design|simple|p:[^:]+:(
 const _storeSet=store.set; store.set=function(k,v){ const r=_storeSet.call(store,k,v);
   if(KEEP.test(k)&&typeof NA!=="undefined"&&NA&&NA.putPref){ try{ NA.putPref(k,JSON.stringify(v)); const ks=JSON.parse(NA.getPref("__keys")||"[]"); if(ks.indexOf(k)<0){ ks.push(k); NA.putPref("__keys",JSON.stringify(ks)) } }catch(e){} } return r };
 const pkey=k=>"p:"+store.get("cur",DEF.cur)+":"+k;
+// settings are read hundreds of times per screen: plain values come from memory, objects are re-parsed from the cached text (callers may mutate them)
+const SC=new Map();
 const S=new Proxy({},{
-  get:(_,k)=>k in PDEF?store.get(pkey(k),clone(PDEF[k])):store.get(k,clone(DEF[k])),
-  set:(_,k,v)=>{ store.set(k in PDEF?pkey(k):k,v); return true }});
+  get:(_,k)=>{ const sk=k in PDEF?pkey(k):k; let c=SC.get(sk); if(!c){ let raw=null; try{ raw=localStorage.getItem(sk) }catch(e){} let v; try{ v=raw==null?undefined:JSON.parse(raw) }catch(e){ v=undefined } c={raw,v}; SC.set(sk,c) }
+    if(c.raw==null){ const d=k in PDEF?PDEF[k]:DEF[k]; return clone(d) }
+    return c.v!==null&&typeof c.v==="object"?JSON.parse(c.raw):c.v },
+  set:(_,k,v)=>{ const sk=k in PDEF?pkey(k):k; SC.delete(sk); store.set(sk,v); return true }});
+try{ const sp=Storage.prototype, si=sp.setItem, ri=sp.removeItem, cl=sp.clear; sp.setItem=function(k,v){ SC.delete(k); return si.call(this,k,v) }; sp.removeItem=function(k){ SC.delete(k); return ri.call(this,k) }; sp.clear=function(){ SC.clear(); return cl.call(this) } }catch(e){}
+const _storeSetSC=store.set; store.set=function(k,v){ SC.delete(k); return _storeSetSC.call(store,k,v) };
 function clone(v){ return v&&typeof v==="object"?JSON.parse(JSON.stringify(v)):v }
 // migrate single M3U from the first version
 (function(){ const old=store.get("m3u",""); if(old&&!store.get("lists",null)){ store.set("lists",[{name:"IPTV",url:old}]); localStorage.removeItem("m3u") }

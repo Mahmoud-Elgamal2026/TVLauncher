@@ -12,9 +12,10 @@ Object.assign(T.en,{hpMain:"🏠 Home",hpApps:"📱 My apps",hpMine:"⭐ My libr
 const HP=["hpMain","hpApps","hpMine"];
 function renderPager(){ const d=$("homePager"); if(!d) return;
   d.innerHTML=HP.map((k,i)=>`<button class="btn sm f${i===(+S.homePage||0)?" on":""}" data-hpage="${i}">${esc(L(k))}</button>`).join("") }
-function applyPage(){ const p=+S.homePage||0, sc=$("home").querySelector(".scroll"); document.body.dataset.hpage=p;
+let lastHPage=-1;
+function applyPage(){ const p=+S.homePage||0, sc=$("home").querySelector(".scroll"), changed=p!==lastHPage; lastHPage=p; if(document.body.dataset.hpage!==String(p)) document.body.dataset.hpage=p;
   if(p===1){ $("homeApps").innerHTML=visibleApps().sort((a,b)=>appName(a).localeCompare(appName(b))).map(tile).join("") } else $("homeApps").innerHTML="";
-  $("homeMineEmpty").textContent=p===2&&!(S.libFav||[]).length?L("mineEmpty"):""; if(sc) sc.scrollTop=0 }
+  $("homeMineEmpty").textContent=p===2&&!(S.libFav||[]).length?L("mineEmpty"):""; if(sc&&changed&&sc.scrollTop) sc.scrollTop=0 }
 activators.unshift(el=>{ if(el.dataset&&el.dataset.hpage!=null){ S.homePage=+el.dataset.hpage; renderPager(); applyPage(); focus(document.querySelector(`[data-hpage="${S.homePage}"]`)); return true } return false });
 // moving left/right across the page buttons switches page right away
 focusHooks.push(el=>{ if(el.dataset&&el.dataset.hpage!=null&&+el.dataset.hpage!==(+S.homePage||0)){ S.homePage=+el.dataset.hpage; renderPager(); applyPage(); focus(document.querySelector(`[data-hpage="${S.homePage}"]`)) } });
@@ -34,14 +35,7 @@ const _hwCardH=hwCard; hwCard=function(w){ let h=_hwCardH(w); if(w.t==="hero"){ 
 // ---- 3) folders show on the simple home too (made from an app's long-press → "add to folder")
 document.body.classList.add("showfolders");
 
-// ---- 4) time-aware order (display only; your saved order stays)
-const _hwListT=hwList;
-function smartOrder(l){ return l; if(!S.smartHome||hwEdit.on) return l; const h=new Date().getHours(), live=typeof matches!=="undefined"&&matches.some(e=>evState(e)==="live");
-  const pri=t=>t==="hero"?-10:live&&t==="matches"?-5:(h>=4&&h<11)&&(t==="azkarA"||t==="wird"||t==="weather")?-3:(h>=20||h<2)&&(t==="live"||t==="cont")?-3:(h>=15&&h<19)&&t==="azkarA"?-2:0;
-  return l.map((w,i)=>({w,i})).sort((a,b)=>(pri(a.w.t)-pri(b.w.t))||(a.i-b.i)).map(x=>live&&x.w.t==="matches"?Object.assign({},x.w,{sz:3}):x.w) }
-const _renderHWT=renderHW; renderHW=function(){ const real=S.hw; const tmp=smartOrder(_hwListT()); const b=$("hwBoard");
-  // draw the smart order without saving it
-  hwList=()=>tmp; try{ _renderHWT.apply(this,arguments) }finally{ hwList=_hwListT } };
+// (time-aware reordering removed: widgets keep your order)
 
 // ---- 5) wall-clock screensaver: the frame shows big clock, prayer, weather and dhikr by default
 if(!S.frameLaySeeded){ S.frameLaySeeded=true; S.frameLay=Object.assign({clock:{s:1.8,x:4,y:58},prayer:{s:1.4},weather:{s:1.4},azkar:{on:true,s:1.2}},S.frameLay||{}) }
@@ -72,9 +66,7 @@ function renderCreator(){ const e=$("creator"); if(!e) return; const ar=S.lang==
   e.innerHTML=`<img src="${CREATOR.img}" onerror="this.remove()" alt=""><span>${ar?"صُنع بواسطة":"Made by"} <b>${esc(ar?CREATOR.ar:CREATOR.en)}</b></span>` }
 renderCreator(); const _applyLangC=applyLang; applyLang=function(){ _applyLangC.apply(this,arguments); renderCreator() };
 // a short signed splash on start
-(function(){ return; const s=document.createElement("div"); s.id="splashSig"; const ar=S.lang==="ar";
-  s.innerHTML=`<img src="${CREATOR.img}" onerror="this.remove()" alt=""><div class="t1">TV Launcher</div><div class="t2">${ar?"من تصميم وتطوير":"Designed & built by"}</div><div class="t3">${esc(ar?CREATOR.ar:CREATOR.en)}</div>`;
-  document.body.appendChild(s); setTimeout(()=>s.classList.add("out"),1600); setTimeout(()=>s.remove(),2300) })();
+/* name/photo splash removed */
 
 // ================= Easier widget removal + always-closable player =================
 // in arrange mode OK opens a clear action sheet for that widget (remove is first)
