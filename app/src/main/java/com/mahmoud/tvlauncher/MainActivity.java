@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
     private volatile String appsCache = null;
     private final android.content.BroadcastReceiver pkgRx = new android.content.BroadcastReceiver() {
         @Override public void onReceive(Context c, Intent i) {
-            appsCache = null; String d = i.getData() != null ? i.getData().getSchemeSpecificPart() : null; if (d != null) iconCache.remove(d);
+            appsCache = null; String d = i.getData() != null ? i.getData().getSchemeSpecificPart() : null; if (d != null) { iconCache.remove(d); bannerCache.remove(d); }
             if (ui != null) ui.postDelayed(() -> js("window.onAppsChanged&&onAppsChanged(1)"), 800);
         }
     };
@@ -358,6 +358,35 @@ public class MainActivity extends Activity {
         return Bitmap.createScaledBitmap(bmp, Math.round(bmp.getWidth() * k), Math.round(bmp.getHeight() * k), true);
     }
 
+    private final Map<String, String> bannerCache = new HashMap<>();
+    /** The app's own wide TV banner (what Google TV / Apple TV-style rows show), cached as a file; "" when the app has none. */
+    private String bannerFor(ResolveInfo ri, PackageManager pm) {
+        String pkg = ri.activityInfo.packageName;
+        if (bannerCache.containsKey(pkg)) return bannerCache.get(pkg);
+        String out = "";
+        try {
+            long ver = 0; try { ver = pm.getPackageInfo(pkg, 0).lastUpdateTime; } catch (Exception ignored) {}
+            File dir = new File(getFilesDir(), "banners"); dir.mkdirs();
+            File f = new File(dir, pkg + "_" + ver + ".png"), none = new File(dir, pkg + "_" + ver + ".none");
+            if (none.exists()) { bannerCache.put(pkg, ""); return ""; }
+            if (!f.exists() || f.length() == 0) {
+                File[] old = dir.listFiles((dd, n) -> n.startsWith(pkg + "_")); if (old != null) for (File o : old) o.delete();
+                Drawable d = null;
+                try { d = ri.activityInfo.loadBanner(pm); } catch (Exception ignored) {}
+                if (d == null) try { d = pm.getApplicationBanner(pkg); } catch (Exception ignored) {}
+                if (d == null) { none.createNewFile(); bannerCache.put(pkg, ""); return ""; }
+                int w = 320, h = 180;
+                Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+                Canvas c = new Canvas(bmp); d.setBounds(0, 0, w, h); d.draw(c);
+                try (OutputStream o = new java.io.FileOutputStream(f)) { bmp.compress(Bitmap.CompressFormat.PNG, 90, o); }
+                bmp.recycle();
+            }
+            out = Uri.fromFile(f).toString();
+        } catch (Exception ignored) {}
+        bannerCache.put(pkg, out);
+        return out;
+    }
+
     private String iconFor(ResolveInfo ri, PackageManager pm) {
         String pkg = ri.activityInfo.packageName;
         if (iconCache.containsKey(pkg)) return iconCache.get(pkg);
@@ -441,6 +470,7 @@ public class MainActivity extends Activity {
                         o.put("pkg", pkg);
                         o.put("name", ri.loadLabel(pm).toString());
                         o.put("icon", iconFor(ri, pm));
+                        o.put("banner", bannerFor(ri, pm));
                         arr.put(o);
                     } catch (Exception ignored) {}
                 }

@@ -111,13 +111,12 @@ if(!S.finalHome2){ setTimeout(()=>{ S.finalHome2=true; const l=hwList().filter(w
 // ================= Real themes ("skins"): each one changes colors, cards, corners, focus effect and font — not just the background =================
 Object.assign(DEF,{skin:"lux"});
 const SKINS=[
-  ["lux","🌙","ليلي فخم","Luxe night","linear-gradient(135deg,#2a4a8c,#070f2a)","#e9c46a"],
-  ["gtv","🔵","جوجل TV","Google TV","linear-gradient(135deg,#303134,#202124)","#8ab4f8"],
-  ["atv","🍎","أبل TV","Apple TV","linear-gradient(135deg,#5b6b8a,#1c1f2a)","#ffffff"],
-  ["neon","⚡","نيون","Neon","linear-gradient(135deg,#0a0014,#000)","#00f0ff"],
-  ["light","☀️","فاتح","Light","linear-gradient(135deg,#f4f6fb,#dfe4ee)","#1a73e8"],
-  ["islam","🕌","إسلامي","Islamic","linear-gradient(135deg,#0f3d2e,#06180f)","#d4af37"],
-  ["cinema","🎬","سينما","Cinema","linear-gradient(135deg,#141414,#000)","#e50914"]];
+  ["lux","⭐","ثيمي","My theme","linear-gradient(135deg,#2a4a8c,#070f2a)","#e9c46a"],
+  ["atv","🍎","أبل TV","Apple TV","linear-gradient(135deg,#3a3a3c,#0b0b0c)","#ffffff"],
+  ["gtv","🔵","جوجل TV","Google TV","linear-gradient(135deg,#2d2e31,#1f1f1f)","#8ab4f8"],
+  ["fire","🔥","فاير TV","Fire TV","linear-gradient(135deg,#232f3e,#0f1111)","#ff9900"],
+  ["netflix","🎬","نتفليكس","Netflix","linear-gradient(135deg,#221f1f,#000)","#e50914"]];
+if(["neon","light","islam","cinema"].indexOf(S.skin)>=0) S.skin=S.skin==="cinema"?"netflix":"lux";
 function applySkin(){ document.body.dataset.skin=S.skin||"lux"; document.body.classList.toggle("luxbg",(S.skin||"lux")==="lux"&&!S.wallImg) }
 applyLook=(function(prev){ return function(){ prev.apply(this,arguments); applySkin() } })(applyLook); setTimeout(applySkin,0);
 function skinPicker(){ const ar=S.lang==="ar";
@@ -132,3 +131,11 @@ groupSettings=(function(prev){ return function(){ const box=$("setScroll"); if(b
     if(look) look.insertAdjacentHTML("beforebegin",skinPicker()); }
   return prev() } })(groupSettings);
 SET_GROUPS[1][2].push("الثيم","Theme");
+
+// TV-style skins show each app the way that platform does: its real wide TV banner, or the icon on a card made from its own colors
+const BANNER_SKINS={atv:1,gtv:1,fire:1,netflix:1};
+const _tileSk=tile; tile=function(a){ const h=_tileSk(a); if(!BANNER_SKINS[S.skin]||custom(a.pkg).img||custom(a.pkg).color) return h;
+  const inner=a.banner?`<img class="tvbn" src="${a.banner}" alt="">`:(a.icon?`<div class="tvic"><i style="background-image:url('${a.icon}')"></i><img src="${a.icon}" alt=""></div>`:`<div class="lbl">${esc(appName(a))}</div>`);
+  return h.replace(/<img[^>]*>|<div class="lbl">[\s\S]*?<\/div>/,inner) };
+window.tile=tile;
+const _applySkinT=applySkin; applySkin=function(){ const was=document.body.dataset.skin; _applySkinT(); if(was&&was!==document.body.dataset.skin&&typeof renderHome==="function") renderHome() };

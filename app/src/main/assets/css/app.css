@@ -1027,3 +1027,83 @@ html body[data-skin=cinema] .app.focus{transform:scale(1.15)!important;box-shado
 html body[data-skin=cinema] .hw.focus{box-shadow:0 0 0 .3vh #e50914!important}
 html body[data-skin=cinema] .rb.on,html body[data-skin=cinema] .rb.f.focus,html body[data-skin=cinema] .tab.on{background:#e50914!important;color:#fff!important}
 html body[data-skin] .nowc.nowc.live{background:#b3141f!important;color:#fff!important;border-color:transparent}html body[data-skin=neon] .nowc.nowc.live{background:rgba(255,0,170,.3)!important;border:1px solid #ff00aa!important}
+/* ================= TV-platform skins: Apple TV, Google TV, Fire TV, Netflix ================= */
+html body[data-skin=atv],html body[data-skin=gtv],html body[data-skin=fire],html body[data-skin=netflix]{--bw:calc(var(--icz,5.5vw)*2.3)}
+/* banner tiles: 16:9 cards, no names until focused */
+html body[data-skin=atv] #home .app.app.app,html body[data-skin=gtv] #home .app.app.app,html body[data-skin=fire] #home .app.app.app,html body[data-skin=netflix] #home .app.app.app{width:var(--bw)!important;padding:0!important}
+html body[data-skin] #home .app img.tvbn,html body[data-skin] #home .app .tvic{width:var(--bw)!important;height:calc(var(--bw)*.5625)!important;aspect-ratio:auto!important;border-radius:var(--tr,1.2vh)!important;object-fit:cover!important;display:block;overflow:hidden;position:relative}
+html body[data-skin] #home .app .tvic i{position:absolute;top:-20%;right:-20%;bottom:-20%;left:-20%;background-size:cover;background-position:center;filter:blur(2.4vh) saturate(1.6) brightness(.8)}
+html body[data-skin] #home .app .tvic img{position:absolute!important;top:50%;left:50%;width:auto!important;height:58%!important;transform:translate(-50%,-50%);border-radius:0!important}
+html body[data-skin=atv] #home .app .nm,html body[data-skin=gtv] #home .app .nm,html body[data-skin=fire] #home .app .nm{opacity:0!important}
+html body[data-skin=atv] #home .app.focus .nm,html body[data-skin=gtv] #home .app.focus .nm,html body[data-skin=fire] #home .app.focus .nm{opacity:1!important}
+html body[data-skin] #home .app.focus{background:transparent!important}
+/* the top bar clock comes back (these platforms show a small clock top corner), the big hero clock goes */
+html body[data-skin=atv][data-page=home] .clock,html body[data-skin=gtv][data-page=home] .clock,html body[data-skin=fire][data-page=home] .clock{display:block!important}
+html body[data-skin=atv] .nowclk,html body[data-skin=gtv] .nowclk,html body[data-skin=fire] .nowclk{display:none}
+html body[data-skin] .clock #date{display:none}
+
+/* ---- Apple TV (tvOS): black, top shelf, rounded banners that lift on focus, thin clock ---- */
+html body[data-skin=atv] #shelfBg{background:linear-gradient(180deg,#2c2c2e 0%,#111 45%,#000 100%)!important}
+html body[data-skin=atv]{--tr:1.4vh;--sel:#fff;--selText:#000;font-family:-apple-system,"SF Pro Display","Helvetica Neue","Noto Sans Arabic",sans-serif}
+html body[data-skin=atv] .clock #time{font-weight:300;font-size:3.2vh;letter-spacing:.05vw}
+html body[data-skin=atv] .hw.hw-hero{height:24vh!important;background:linear-gradient(135deg,#3a3a3c,#1c1c1e)!important;border:0!important;border-radius:2vh!important}
+html body[data-skin=atv] .herobox.nowbox{justify-content:center!important;background:none!important}
+html body[data-skin=atv] .nowc{background:rgba(255,255,255,.12)!important;border:0!important;border-radius:1.6vh;padding:1.8vh 1.8vw!important;max-width:30vw}
+html body[data-skin=atv] .nowm{font-size:2.6vh!important}
+html body[data-skin=atv] .hw{background:rgba(255,255,255,.08)!important;border:0!important;border-radius:2vh!important}
+html body[data-skin=atv] #home .app.focus{transform:scale(1.14) translateY(-1vh)!important;box-shadow:none!important}
+html body[data-skin=atv] #home .app.focus img.tvbn,html body[data-skin=atv] #home .app.focus .tvic{box-shadow:0 2.6vh 4vh rgba(0,0,0,.7)}
+html body[data-skin=atv] .hw.focus{transform:scale(1.03);box-shadow:0 2vh 4vh rgba(0,0,0,.6)!important}
+html body[data-skin=atv] .tabs{background:rgba(255,255,255,.1)!important;border:0}
+html body[data-skin=atv] .rb.on,html body[data-skin=atv] .rb.f.focus,html body[data-skin=atv] .tab.on{background:#fff!important;color:#000!important}
+html body[data-skin=atv] h2{font-weight:600;color:rgba(255,255,255,.6)!important}
+
+/* ---- Google TV: graphite, highlight billboard, banner row with white ring ---- */
+html body[data-skin=gtv] #shelfBg{background:#1f1f1f!important}html body[data-skin=gtv] #shade{display:none!important}
+html body[data-skin=gtv]{--tr:1.4vh;--sel:#e8eaed;--selText:#202124;font-family:"Google Sans",Roboto,"Noto Sans Arabic",sans-serif}
+html body[data-skin=gtv] .clock #time{font-size:3vh;font-weight:500}
+html body[data-skin=gtv] .hw.hw-hero{height:30vh!important;border:0!important;border-radius:2vh!important;background:radial-gradient(90% 120% at 100% 0%,#3d5a8a 0%,#26324a 45%,#1f1f1f 85%)!important}
+html body[data-skin=gtv] .herobox.nowbox{align-items:flex-end!important;justify-content:flex-start!important;background:linear-gradient(90deg,rgba(31,31,31,.85),rgba(31,31,31,0))!important;padding:3vh 3vw!important}
+html body[data-skin=gtv] .nowc{background:rgba(255,255,255,.1)!important;border:0!important;border-radius:1.2vh}
+html body[data-skin=gtv] .hw{background:#2d2e31!important;border:0!important;border-radius:1.6vh!important}
+html body[data-skin=gtv] #home .app.focus{transform:scale(1.06)!important}
+html body[data-skin=gtv] #home .app.focus img.tvbn,html body[data-skin=gtv] #home .app.focus .tvic{box-shadow:0 0 0 .45vh #fff!important}
+html body[data-skin=gtv] .hw.focus{box-shadow:0 0 0 .45vh #fff!important}
+html body[data-skin=gtv] .tabs{background:transparent!important;border:0}
+html body[data-skin=gtv] .tab{font-weight:500}
+html body[data-skin=gtv] .tab.on{background:#e8eaed!important;color:#202124!important}
+html body[data-skin=gtv] .rb.on,html body[data-skin=gtv] .rb.f.focus{background:#e8eaed!important;color:#202124!important}
+html body[data-skin=gtv] h2{color:#e8eaed!important;font-weight:500}
+
+/* ---- Fire TV: deep navy, small sharp rectangles, white frame, orange accent ---- */
+html body[data-skin=fire] #shelfBg{background:linear-gradient(180deg,#232f3e 0%,#131a22 50%,#0f1111 100%)!important}
+html body[data-skin=fire]{--tr:.5vh;--sel:#ff9900;--selText:#111;--icz:4.6vw;font-family:"Amazon Ember",Roboto,"Noto Sans Arabic",sans-serif}
+html body[data-skin=fire] .clock #time{font-size:3vh;font-weight:700}
+html body[data-skin=fire] .hw,html body[data-skin=fire] .hw.hw-hero{background:#1b2533!important;border:0!important;border-radius:.6vh!important}
+html body[data-skin=fire] .hw.hw-hero{height:22vh!important;border-bottom:.4vh solid #ff9900!important}
+html body[data-skin=fire] .herobox.nowbox{background:none!important;justify-content:center!important}
+html body[data-skin=fire] .nowc{background:#232f3e!important;border:0!important;border-radius:.5vh}
+html body[data-skin=fire] #home .app.focus{transform:scale(1.08)!important}
+html body[data-skin=fire] #home .app.focus img.tvbn,html body[data-skin=fire] #home .app.focus .tvic{box-shadow:0 0 0 .35vh #fff!important}
+html body[data-skin=fire] .hw.focus{box-shadow:0 0 0 .35vh #fff!important}
+html body[data-skin=fire] .tabs{background:transparent!important;border:0}
+html body[data-skin=fire] .tab.on{background:transparent!important;color:#fff!important;border-bottom:.4vh solid #ff9900;border-radius:0!important}
+html body[data-skin=fire] .rb.on,html body[data-skin=fire] .rb.f.focus{background:#ff9900!important;color:#111!important}
+
+/* ---- Netflix: pure black, huge billboard with the clock, posters zoom on focus, red ---- */
+html body[data-skin=netflix] #shelfBg{background:#000!important}html body[data-skin=netflix] #shade{display:none!important}
+html body[data-skin=netflix]{--tr:.4vh;--sel:#e50914;--selText:#fff;font-family:"Netflix Sans","Helvetica Neue","Noto Sans Arabic",sans-serif}
+html body[data-skin=netflix] .hw.hw-hero{height:34vh!important;border:0!important;border-radius:0!important;background:radial-gradient(70% 120% at 85% 30%,#5a0b10 0%,#1a0204 55%,#000 90%)!important}
+html body[data-skin=netflix] .herobox.nowbox{background:linear-gradient(0deg,#000 0,transparent 40%)!important;align-items:flex-end!important}
+html body[data-skin=netflix] .nowclk .hbig{font-size:9vh!important;font-weight:900;letter-spacing:-.2vw}
+html body[data-skin=netflix] .nowc{background:rgba(255,255,255,.08)!important;border:0!important;border-radius:.4vh}
+html body[data-skin=netflix] .hw{background:#141414!important;border:0!important;border-radius:.4vh!important}
+html body[data-skin=netflix] #home .app.focus{transform:scale(1.22)!important;z-index:2}
+html body[data-skin=netflix] #home .app .nm{font-weight:700}
+html body[data-skin=netflix] .tabs{background:transparent!important;border:0}
+html body[data-skin=netflix] .tab.on{background:transparent!important;color:#fff!important;font-weight:800}
+html body[data-skin=netflix] .rb.on,html body[data-skin=netflix] .rb.f.focus{background:#e50914!important;color:#fff!important}
+html body[data-skin=netflix] h2{color:#e5e5e5!important;font-weight:800}
+html body[data-skin=atv] #home #favRow .app.app.app,html body[data-skin=gtv] #home #favRow .app.app.app,html body[data-skin=fire] #home #favRow .app.app.app,html body[data-skin=netflix] #home #favRow .app.app.app,
+html body[data-skin=atv] #home #homeApps .app.app.app,html body[data-skin=gtv] #home #homeApps .app.app.app,html body[data-skin=fire] #home #homeApps .app.app.app,html body[data-skin=netflix] #home #homeApps .app.app.app{width:var(--bw)!important;padding:0!important;margin:0!important}
+html body[data-skin] #home #favRow,html body[data-skin] #home #homeApps{gap:2.2vh 1.4vw!important}
