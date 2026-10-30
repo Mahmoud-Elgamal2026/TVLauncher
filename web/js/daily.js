@@ -12,7 +12,7 @@ function greet(){ const d=new Date(), key=d.toDateString(); if(S.greetDay===key|
   const np=S.prayerOn&&window.nextPrayer&&typeof prayers!=="undefined"&&prayers.length?nextPrayer():null; if(np) lines.push(`🕌 ${L("gmPrayer")}: ${L("prayers")[np.i]} ${fmtTime(np.t)}`);
   const ms=(typeof matches!=="undefined"?matches:[]).filter(e=>evState(e)!=="ft"); if(ms.length) lines.push(`⚽ ${L("gmMatches")}: `+ms.slice(0,3).map(e=>`${e.strHomeTeam}×${e.strAwayTeam} ${fmtTime(evTime(e))}`).join(" · "));
   const nw=(S.shows||[]).filter(sh=>typeof behind==="function"&&behind(sh)); lines.push(`🎬 ${L("gmNew")}: `+(nw.length?nw.map(x=>x.name||x.q).join("، "):L("gmNone")));
-  dialog(d.getHours()<15?L("gmTitle"):L("gmEve"),[{label:"👍",pri:1,fn:()=>{}}],{sub:lines.join("\n")}) }
+  dialog(d.getHours()<15?L("gmTitle"):L("gmEve"),[{label:"👍",pri:1,fn:()=>{}}],{sub:lines.join("\n")}); const box=$("dbox"); setTimeout(()=>{ if(on("dlg")&&$("dbox")===box&&box.textContent.indexOf(L(d.getHours()<15?"gmTitle":"gmEve"))>=0) closeDialog() },7000) }
 document.addEventListener("keydown",()=>{ if(document.querySelector("#home.on")) setTimeout(greet,300) },true);
 setTimeout(greet,15000);
 
