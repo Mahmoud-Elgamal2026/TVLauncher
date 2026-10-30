@@ -1,6 +1,6 @@
 // ---- idle while another app is in front: only alarms (adhan, match alerts, schedules, sleep timer, updates) keep running
 window.__bg=false; window.onBg=function(b){ window.__bg=!!b };
-(function(){ const si=window.setInterval, keep=/adhan|matchAlerts|schedOn|autoSleep|isRamadan|autoUpdate|bedLock|ping|tgBackup|frameMin/;
+(function(){ const si=window.setInterval, keep=/adhan|alarms|matchAlerts|schedOn|autoSleep|isRamadan|autoUpdate|bedLock|ping|tgBackup|frameMin/;
   window.setInterval=function(fn,ms){ if(typeof fn!=="function") return si.apply(window,arguments); const k=keep.test(String(fn));
     return si.call(window,function(){ if(window.__bg&&!k) return; return fn.apply(this,arguments) },ms) } })();
 // Runs first. Fills gaps of old Android TV WebViews (Android 7.x ships Chrome ~51–64).
