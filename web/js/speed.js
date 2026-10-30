@@ -133,7 +133,7 @@ groupSettings=(function(prev){ return function(){ const box=$("setScroll"); if(b
 SET_GROUPS[1][2].push("الثيم","Theme");
 
 // TV-style skins show each app the way that platform does: its real wide TV banner, or the icon on a card made from its own colors
-const BANNER_SKINS={atv:1,gtv:1,fire:1,netflix:1};
+const BANNER_SKINS={};
 const _tileSk=tile; tile=function(a){ const h=_tileSk(a); if(!BANNER_SKINS[S.skin]||custom(a.pkg).img||custom(a.pkg).color) return h;
   const inner=a.banner?`<img class="tvbn" src="${a.banner}" alt="">`:(a.icon?`<div class="tvic"><i style="background-image:url('${a.icon}')"></i><img src="${a.icon}" alt=""></div>`:`<div class="lbl">${esc(appName(a))}</div>`);
   return h.replace(/<img[^>]*>|<div class="lbl">[\s\S]*?<\/div>/,inner) };
