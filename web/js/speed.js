@@ -104,6 +104,31 @@ setInterval(()=>{ /* autoSleep */ const h=new Date().getHours(), day=new Date().
 const _onBgL=window.onBg; window.onBg=function(b){ _onBgL(b); if(b) return; const p=lastPkg(); if(!p) return;
   setTimeout(()=>{ if(window.__bg||!document.querySelector("#home.on")||on("dlg")) return; const e=document.querySelector(`#home [data-pkg="${cssq(p)}"]`); if(e) focus(e) },350) };
 // the navy "luxe" background only on the default theme — any theme / wallpaper / animation you pick shows as is
-const _applyLookLx=applyLook; applyLook=function(){ _applyLookLx.apply(this,arguments); document.body.classList.toggle("luxbg",(S.theme||"apple")==="apple"&&S.wall!=="daily"&&!S.wallImg) };
+const _applyLookLx=applyLook; applyLook=function(){ _applyLookLx.apply(this,arguments); };
 setTimeout(()=>applyLook(),0);
 if(!S.finalHome2){ setTimeout(()=>{ S.finalHome2=true; const l=hwList().filter(w=>w.t!=="prayer"&&w.t!=="mon"); if(l.length!==hwList().length) hwSave(l) },5000) }
+
+// ================= Real themes ("skins"): each one changes colors, cards, corners, focus effect and font — not just the background =================
+Object.assign(DEF,{skin:"lux"});
+const SKINS=[
+  ["lux","🌙","ليلي فخم","Luxe night","linear-gradient(135deg,#2a4a8c,#070f2a)","#e9c46a"],
+  ["gtv","🔵","جوجل TV","Google TV","linear-gradient(135deg,#303134,#202124)","#8ab4f8"],
+  ["atv","🍎","أبل TV","Apple TV","linear-gradient(135deg,#5b6b8a,#1c1f2a)","#ffffff"],
+  ["neon","⚡","نيون","Neon","linear-gradient(135deg,#0a0014,#000)","#00f0ff"],
+  ["light","☀️","فاتح","Light","linear-gradient(135deg,#f4f6fb,#dfe4ee)","#1a73e8"],
+  ["islam","🕌","إسلامي","Islamic","linear-gradient(135deg,#0f3d2e,#06180f)","#d4af37"],
+  ["cinema","🎬","سينما","Cinema","linear-gradient(135deg,#141414,#000)","#e50914"]];
+function applySkin(){ document.body.dataset.skin=S.skin||"lux"; document.body.classList.toggle("luxbg",(S.skin||"lux")==="lux"&&!S.wallImg) }
+applyLook=(function(prev){ return function(){ prev.apply(this,arguments); applySkin() } })(applyLook); setTimeout(applySkin,0);
+function skinPicker(){ const ar=S.lang==="ar";
+  return `<div class="sec" id="skinSec"><h3>🎨 ${ar?"الثيم":"Theme"}</h3><div class="skgrid">${SKINS.map(k=>`<button class="skin f${(S.skin||"lux")===k[0]?" pri":""}" data-skin="${k[0]}"><i style="background:${k[4]}"><em style="background:${k[5]}"></em></i><span>${k[1]} ${esc(ar?k[2]:k[3])}</span></button>`).join("")}</div></div>` }
+activators.unshift(el=>{ if(el.dataset&&el.dataset.skin){ S.skin=el.dataset.skin; S.theme="apple"; S.wall="dynamic"; S.wallImg=""; applyLook(); renderSettings(); const e=document.querySelector(`[data-skin="${S.skin}"]`); if(e) focus(e); return true } return false });
+// Look group: theme picker on top, the old overlapping options (designs, colors, clock styles…) removed
+const DROP=/^(🧩 التصميم|🎨 الألوان|حجم الكروت|شكل الساعة|الأداء|تجهيز الجهاز|متصفح النظام|شكل أيقونات التطبيقات|حركة التحديد|اختار جزء|🧩 Design|🎨 Colors|Card size|Clock style|Performance|App icon look|Focus effect|Pick a part)/;
+groupSettings=(function(prev){ return function(){ const box=$("setScroll"); if(box&&!box.querySelector(".sgrp")&&!isKids()){
+    [].slice.call(box.querySelectorAll(".field")).forEach(f=>{ const l=f.querySelector("label"); if(l&&DROP.test(l.textContent.trim())) f.parentNode.removeChild(f) });
+    [].slice.call(box.querySelectorAll(".sec")).forEach(s=>{ const h=s.querySelector("h3"); if(h&&/مواسم|Seasonal|ترتيب الرئيسية|Arrange home|شكل أيقونات|App icon look/.test(h.textContent)) s.parentNode.removeChild(s) });
+    const look=[].slice.call(box.querySelectorAll(".sec")).find(s=>{ const h=s.querySelector("h3"); return h&&/^(الشكل|Look)$/.test(h.textContent.trim()) });
+    if(look) look.insertAdjacentHTML("beforebegin",skinPicker()); }
+  return prev() } })(groupSettings);
+SET_GROUPS[1][2].push("الثيم","Theme");

@@ -959,3 +959,71 @@ html body .hrail .rb.f.focus b,html body .hrail .rb.on b{color:#111}
 /* on a photo wallpaper: cards turn solid-dark so text stays readable */
 html body.wallimg .hw,html body.wallimg .hw.st-glass,html body.wallimg .hw.st-clear{background:rgba(8,12,30,.78)!important}
 html body.wallimg .app .nm,html body.wallimg h2{text-shadow:0 .2vh .8vh #000,0 0 .4vh #000!important;color:#fff!important;opacity:1!important}
+/* ---- theme picker ---- */
+.skgrid{display:grid;grid-template-columns:repeat(4,1fr);grid-gap:1.4vw;gap:1.4vw}
+.skin{display:flex;flex-direction:column;align-items:center;gap:1vh;padding:1.2vh!important;border-radius:1.6vh!important;background:rgba(255,255,255,.05)!important}
+html.nofg .skin > * + *{margin-top:1vh}
+.skin i{display:block;width:100%;height:9vh;border-radius:1.2vh;position:relative}
+.skin i em{position:absolute;bottom:1vh;width:3vh;height:3vh;border-radius:50%}
+html[dir=ltr] .skin i em{left:1vw}
+html[dir=rtl] .skin i em{right:1vw}
+.skin span{font-size:1.9vh}
+.skin.pri{outline:.3vh solid var(--sel)}
+/* ---- skins ---- */
+html body[data-skin]{--txt2:rgba(255,255,255,.7)}
+/* Google TV: flat graphite, blue accent, soft corners, white focus ring */
+html body[data-skin=gtv] #shelfBg{background:#202124!important}
+html body[data-skin=gtv]{--sel:#8ab4f8;--selText:#202124;font-family:Roboto,"Noto Sans Arabic",sans-serif}
+html body[data-skin=gtv] .hw{background:#2b2c30!important;border:0!important;border-radius:1.2vh!important}
+html body[data-skin=gtv] .herobox.nowbox{background:none!important}html body[data-skin=gtv] .hw.hw-hero{background:#2b2c30!important}
+html body[data-skin=gtv] .nowc{background:#3c4043!important;border:0}
+html body[data-skin=gtv] .app.focus,html body[data-skin=gtv] .hw.focus{box-shadow:0 0 0 .4vh #fff!important;transform:scale(1.06)}
+html body[data-skin=gtv] .rb.on,html body[data-skin=gtv] .rb.f.focus,html body[data-skin=gtv] .tab.on{background:#8ab4f8!important;color:#202124!important}
+/* Apple TV: frosted light glass, big lift on focus, white selection */
+html body[data-skin=atv] #shelfBg{background:radial-gradient(120% 100% at 50% 0%,#6d7fa3,#2a3145 60%,#141722)!important}
+html body[data-skin=atv]{--sel:#fff;--selText:#000}
+html body[data-skin=atv] .hw{background:rgba(255,255,255,.14)!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:2.4vh!important}
+html body[data-skin=atv] .hw.hw-hero{background:rgba(255,255,255,.12)!important}html body[data-skin=atv] .herobox.nowbox{background:none!important}
+html body[data-skin=atv] .nowc{background:rgba(255,255,255,.16)!important}
+html body[data-skin=atv] .app.focus{transform:scale(1.2) translateY(-1vh)!important;filter:drop-shadow(0 2vh 2vh rgba(0,0,0,.5))}
+html body[data-skin=atv] .hw.focus{transform:scale(1.04);box-shadow:0 2vh 4vh rgba(0,0,0,.45)!important}
+html body[data-skin=atv] .rb.on,html body[data-skin=atv] .rb.f.focus,html body[data-skin=atv] .tab.on{background:#fff!important;color:#000!important}
+/* Neon: black, glowing cyan edges, magenta live */
+html body[data-skin=neon] #shelfBg{background:radial-gradient(80% 60% at 20% 10%,#2a0040,transparent),radial-gradient(70% 60% at 90% 90%,#003a4a,transparent),#000!important}
+html body[data-skin=neon]{--sel:#00f0ff;--selText:#000}
+html body[data-skin=neon] .hw{background:rgba(0,0,0,.6)!important;border:1px solid #00f0ff66!important;box-shadow:0 0 1.2vh #00f0ff33,inset 0 0 1.2vh #00f0ff22!important;border-radius:1vh!important}
+html body[data-skin=neon] .herobox .hbig{color:#00f0ff;text-shadow:0 0 2vh #00f0ff}
+html body[data-skin=neon] .nowc{background:rgba(0,240,255,.08)!important;border:1px solid #00f0ff55}
+html body[data-skin=neon] .nowc.live{background:rgba(255,0,170,.25)!important;border-color:#ff00aa}
+html body[data-skin=neon] .app.focus,html body[data-skin=neon] .hw.focus{box-shadow:0 0 0 .3vh #00f0ff,0 0 3vh #00f0ff!important}
+html body[data-skin=neon] .rb.on,html body[data-skin=neon] .rb.f.focus,html body[data-skin=neon] .tab.on{background:#00f0ff!important;color:#000!important;box-shadow:0 0 2vh #00f0ff!important}
+/* Light: white cards, dark text */
+html body[data-skin=light] #shelfBg{background:linear-gradient(180deg,#f4f6fb,#dfe4ee)!important}
+html body[data-skin=light] #shade{display:none!important}
+html body[data-skin=light]{--text:#111;--mute:#555;--sel:#1a73e8;--selText:#fff;color:#111}
+html body[data-skin=light] .hw,html body[data-skin=light] .hw.hw-hero{background:#fff!important;border:1px solid #e3e6ee!important;color:#111!important;box-shadow:0 .6vh 2vh rgba(0,0,0,.06)}
+html body[data-skin=light] .herobox.nowbox{background:none!important;color:#111}
+html body[data-skin=light] .nowc{background:#f1f3f8!important;border:0;color:#111}
+html body[data-skin=light] .nowc.live{background:#d93025!important;color:#fff}
+html body[data-skin=light] .app .nm,html body[data-skin=light] h2,html body[data-skin=light] .tab{color:#222!important;text-shadow:none!important}
+html body[data-skin=light] .rb,html body[data-skin=light] .qbtn,html body[data-skin=light] .tabs{background:#fff!important;color:#222}
+html body[data-skin=light] .rb.on,html body[data-skin=light] .rb.f.focus,html body[data-skin=light] .tab.on{background:#1a73e8!important;color:#fff!important}
+html body[data-skin=light] .app.focus{background:#e8f0fe!important}
+/* Islamic: deep green, gold, geometric pattern */
+html body[data-skin=islam] #shelfBg{background:repeating-conic-gradient(from 45deg,rgba(212,175,55,.06) 0 25%,transparent 0 50%) 0 0/6vh 6vh,radial-gradient(120% 100% at 50% 0%,#145a43,#0a2a1e 60%,#04120c)!important}
+html body[data-skin=islam]{--sel:#d4af37;--selText:#04120c;font-family:"Noto Naskh Arabic","Amiri","Noto Sans Arabic",serif}
+html body[data-skin=islam] .hw{background:rgba(4,30,20,.7)!important;border:1px solid #d4af3755!important;border-radius:2vh!important}
+html body[data-skin=islam] .herobox .hbig{color:#f3dc8a}
+html body[data-skin=islam] .nowc{background:rgba(212,175,55,.1)!important;border:1px solid #d4af3744}
+html body[data-skin=islam] .app.focus,html body[data-skin=islam] .hw.focus{box-shadow:0 0 0 .35vh #d4af37!important}
+html body[data-skin=islam] .rb.on,html body[data-skin=islam] .rb.f.focus,html body[data-skin=islam] .tab.on{background:#d4af37!important;color:#04120c!important}
+/* Cinema: pure black, red accent, no card plates, big poster-like focus */
+html body[data-skin=cinema] #shelfBg{background:#000!important}html body[data-skin=cinema] #shade{display:none!important}
+html body[data-skin=cinema]{--sel:#e50914;--selText:#fff}
+html body[data-skin=cinema] .hw{background:#0e0e0e!important;border:0!important;border-radius:.6vh!important}
+html body[data-skin=cinema] .hw.hw-hero{background:#0e0e0e!important}html body[data-skin=cinema] .herobox.nowbox{background:none!important}
+html body[data-skin=cinema] .nowc{background:#1a1a1a!important;border:0;border-radius:.6vh}
+html body[data-skin=cinema] .app.focus{transform:scale(1.15)!important;box-shadow:0 0 0 .3vh #e50914!important}
+html body[data-skin=cinema] .hw.focus{box-shadow:0 0 0 .3vh #e50914!important}
+html body[data-skin=cinema] .rb.on,html body[data-skin=cinema] .rb.f.focus,html body[data-skin=cinema] .tab.on{background:#e50914!important;color:#fff!important}
+html body[data-skin] .nowc.nowc.live{background:#b3141f!important;color:#fff!important;border-color:transparent}html body[data-skin=neon] .nowc.nowc.live{background:rgba(255,0,170,.3)!important;border:1px solid #ff00aa!important}
