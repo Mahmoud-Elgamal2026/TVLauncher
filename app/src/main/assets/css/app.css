@@ -956,3 +956,6 @@ html body #home #favRow .app.app.app,html body #home #homeApps .app.app.app,html
 /* side rail label: always readable (white text on solid dark pill with gold edge) */
 html body .hrail .rb span{color:#fff!important;background:#101a3a!important;border:1px solid #e9c46a;font-size:2vh!important;font-weight:600;padding:.6vh 1vw!important;box-shadow:0 .4vh 1.4vh rgba(0,0,0,.5)}
 html body .hrail .rb.f.focus b,html body .hrail .rb.on b{color:#111}
+/* on a photo wallpaper: cards turn solid-dark so text stays readable */
+html body.wallimg .hw,html body.wallimg .hw.st-glass,html body.wallimg .hw.st-clear{background:rgba(8,12,30,.78)!important}
+html body.wallimg .app .nm,html body.wallimg h2{text-shadow:0 .2vh .8vh #000,0 0 .4vh #000!important;color:#fff!important;opacity:1!important}

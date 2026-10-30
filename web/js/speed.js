@@ -106,3 +106,4 @@ const _onBgL=window.onBg; window.onBg=function(b){ _onBgL(b); if(b) return; cons
 // the navy "luxe" background only on the default theme — any theme / wallpaper / animation you pick shows as is
 const _applyLookLx=applyLook; applyLook=function(){ _applyLookLx.apply(this,arguments); document.body.classList.toggle("luxbg",(S.theme||"apple")==="apple"&&S.wall!=="daily"&&!S.wallImg) };
 setTimeout(()=>applyLook(),0);
+if(!S.finalHome2){ setTimeout(()=>{ S.finalHome2=true; const l=hwList().filter(w=>w.t!=="prayer"&&w.t!=="mon"); if(l.length!==hwList().length) hwSave(l) },5000) }
