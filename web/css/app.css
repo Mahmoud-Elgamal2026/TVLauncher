@@ -803,3 +803,6 @@ html body #favRow,html body #homeApps{gap:1.2vw!important}
 body[data-favsz=xxs]{--icz:3.6vw}body[data-favsz=xs]{--icz:4.4vw}body[data-favsz=s]{--icz:5.5vw}body[data-favsz=m]{--icz:7vw}body[data-favsz=l]{--icz:9vw}
 html body #favRow,html body #homeApps{display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;grid-template-columns:none!important}
 html body #home #favRow .app.app.app,html body #home #homeApps .app.app.app,html body #home .row .app.app.app{width:calc(var(--icz,5.5vw) + 3vw)!important}
+/* side rail label: always readable (white text on solid dark pill with gold edge) */
+html body .hrail .rb span{color:#fff!important;background:#101a3a!important;border:1px solid #e9c46a;font-size:2vh!important;font-weight:600;padding:.6vh 1vw!important;box-shadow:0 .4vh 1.4vh rgba(0,0,0,.5)}
+html body .hrail .rb.f.focus b,html body .hrail .rb.on b{color:#111}
