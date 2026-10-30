@@ -796,3 +796,10 @@ html body #favRow .app .nm,html body #homeApps .app .nm,html body #home .row .ap
 html body #favRow .app .lbl,html body #homeApps .app .lbl{width:62%;aspect-ratio:1;border-radius:22%;background:#1d2b55;display:flex;align-items:center;justify-content:center;font-size:1.7vh;font-weight:700;overflow:hidden;text-align:center;padding:.5vh}
 html body #favRow .app.focus,html body #homeApps .app.focus,html body #home .row .app.focus{transform:scale(1.12);background:rgba(255,255,255,.08)!important;border-radius:1.6vh!important}
 #splashSig{display:none!important}
+/* icon size follows the size setting (the icon itself grows/shrinks, spacing stays even) */
+html body #favRow .app img,html body #homeApps .app img,html body #home .row .app img,html body #favRow .app .lbl,html body #homeApps .app .lbl{width:var(--icz,5.5vw)!important;height:var(--icz,5.5vw)!important;max-width:none!important;max-height:none!important}
+html body #favRow .app,html body #homeApps .app,html body #home .row .app{width:calc(var(--icz,5.5vw) + 3vw)!important}
+html body #favRow,html body #homeApps{gap:1.2vw!important}
+body[data-favsz=xxs]{--icz:3.6vw}body[data-favsz=xs]{--icz:4.4vw}body[data-favsz=s]{--icz:5.5vw}body[data-favsz=m]{--icz:7vw}body[data-favsz=l]{--icz:9vw}
+html body #favRow,html body #homeApps{display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;grid-template-columns:none!important}
+html body #home #favRow .app.app.app,html body #home #homeApps .app.app.app,html body #home .row .app.app.app{width:calc(var(--icz,5.5vw) + 3vw)!important}
