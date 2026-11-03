@@ -66,7 +66,7 @@ hwBody=(function(prev){ return function(w){ if(w.t!=="hero") return prev(w);
   const d=new Date(), np=S.prayerOn&&window.nextPrayer&&typeof prayers!=="undefined"&&prayers.length?nextPrayer():null, m=heroMatch(), wn=typeof weatherNow!=="undefined"&&weatherNow;
   const card=(cls,ic,top,main,sub)=>`<div class="nowc ${cls}"><div class="nowi">${ic}</div><div><div class="nowt">${top}</div><div class="nowm">${main}</div>${sub?`<div class="nows">${sub}</div>`:""}</div></div>`;
   let cards="";
-  if(m){ const e=m.e; cards+=m.live
+  if(m&&!(typeof hwHas==="function"&&hwHas("matches"))){ const e=m.e; cards+=m.live
       ? card("live","⚽",`● ${esc(L("live"))}`,`${esc(e.strHomeTeam)} <b>${esc(String(e.intHomeScore||0))} - ${esc(String(e.intAwayScore||0))}</b> ${esc(e.strAwayTeam)}`,"")
       : card("","⚽",esc(L("nowNext")),`${esc(e.strHomeTeam)} × ${esc(e.strAwayTeam)}`,esc(fmtTime(new Date(evTime(e))))+" · "+esc(L("nowLeft"))+" "+esc(fmtLeft(evTime(e)-Date.now()))) }
   if(np) cards+=card("","🕌",esc(L("prayers")[np.i]),esc(fmtTime(np.t)),esc(L("nowLeft"))+" "+esc(fmtLeft(np.t-Date.now())));

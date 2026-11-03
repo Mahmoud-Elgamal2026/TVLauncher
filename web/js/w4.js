@@ -54,11 +54,12 @@ hwBody=(function(prev){ return function(w){ if(w.t!=="matches") return prev(w); 
   if(!list.length) return `<div class="hwico">⚽</div><div class="hwsub">${esc(L(typeof sportsTried!=="undefined"&&sportsTried?"mNone":"mLoad"))}</div>`;
   const rank={live:0,ns:1,ft:2}, tm=e=>+evTime(e)||0;
   const sorted=list.slice().sort((a,b)=>(rank[evState(a)]-rank[evState(b)])||(evState(a)==="ft"?tm(b)-tm(a):tm(a)-tm(b)));
-  const max=w.sz>2?9:w.sz>1?6:3, order=(S.comps||[]), groups={}, keys=[]; let n=0;
+  const max=w.sz>2?7:w.sz>1?5:3, order=(S.comps||[]), groups={}, keys=[]; let n=0;
   sorted.forEach(e=>{ if(n>=max) return; const k=e._lg||"?"; if(!groups[k]){ groups[k]=[]; keys.push(k) } groups[k].push(e); n++ });
   keys.sort((a,b)=>{ const fa=Math.min(...groups[a].map(e=>rank[evState(e)])), fb=Math.min(...groups[b].map(e=>rank[evState(e)])); return fa-fb||order.indexOf(a)-order.indexOf(b) });
-  return `<div class="mcl">${keys.map(k=>`<div class="mch">${w.comp?"":`<div class="mct">${esc(compName(k))}</div>`}${groups[k].map(e=>{ const st=evState(e);
-    return `<div class="mcr"><span class="mtn">${esc(e.strHomeTeam)} <i>×</i> ${esc(e.strAwayTeam)}</span><b class="${st==="live"?"live":""}">${st==="ns"?esc(fmtTime(evTime(e))):(e.intHomeScore||0)+" - "+(e.intAwayScore||0)}</b><small>${st==="live"?"● "+esc(L("live")):esc(dayLbl(e))}</small></div>` }).join("")}</div>`).join("")}</div>` } })(hwBody);
+  const more=sorted.length-n;
+  return `<div class="mcl">${keys.map(k=>`<div class="mch">${w.comp?"":`<div class="mct${groups[k].length===1?" one":""}">${esc(compName(k))}</div>`}${groups[k].map(e=>{ const st=evState(e);
+    return `<div class="mcr"><span class="mtn">${esc(e.strHomeTeam)} <i>×</i> ${esc(e.strAwayTeam)}</span><b class="${st==="live"?"live":""}">${st==="ns"?esc(fmtTime(evTime(e))):(e.intHomeScore||0)+" - "+(e.intAwayScore||0)}</b><small>${st==="live"?"● "+esc(L("live")):esc(dayLbl(e))}</small></div>` }).join("")}</div>`).join("")}${more>0?`<div class="mmore">＋ ${more} ${S.lang==="ar"?"ماتشات تانية":"more"}</div>`:""}</div>` } })(hwBody);
 
 // ================= Matches widget extras: badges, channel, your teams, OK opens the match app, countdown, live minute, league position =================
 Object.assign(T.ar,{mIn:"بعد",mPickApp:"بتتفرج على الماتشات منين؟"});Object.assign(T.en,{mIn:"in",mPickApp:"Which app do you watch matches on?"});
@@ -76,11 +77,31 @@ hwBody=(function(prev){ return function(w){ let h=prev(w); if(w.t!=="matches"||h
     const e=list.find(x=>esc(x.strHomeTeam)===hn&&esc(x.strAwayTeam)===an); if(!e) return all; const st=evState(e), fav=teamFav(e);
     const logo=u=>u?`<img class="mlg" src="${esc(u)}" loading="lazy" alt="">`:"";
     const t=+evTime(e)||0, left=t-Date.now();
-    const badge=st==="live"?`● ${esc(liveMin(e)||L("live"))}`:(st==="ns"&&left>0&&left<3*3600000)?`${esc(L("mIn"))} ${esc(fmtLeft(left))}`:day;
-    return `<div class="mcr${fav?" mfav":""}"><span class="mtn">${fav?"⭐ ":""}${logo(e.strHomeTeamBadge)}${hn}${teamRank(e._lg,e.strHomeTeam)} <i>×</i> ${logo(e.strAwayTeamBadge)}${an}${teamRank(e._lg,e.strAwayTeam)}</span>${e._tv?`<span class="mtv">📺 ${esc(e._tv)}</span>`:""}<b class="${cls}">${mid}</b><small class="${st==="live"?"mlive":""}">${badge}</small></div>` }) } })(hwBody);
+    const mins=Math.round(left/60000);
+    const badge=st==="live"?`● <span dir="ltr">${esc(liveMin(e)||L("live"))}</span>`:(st==="ns"&&left>0&&mins<60)?`${esc(L("mIn"))} ${mins} ${S.lang==="ar"?"د":"min"}`:day;
+    const rk=n=>w.sz>2?teamRank(e._lg,n):"", nm=n=>esc(teamAr(n));
+    return `<div class="mcr${fav?" mfav":""}"><span class="mtn">${fav?"⭐ ":""}${logo(e.strHomeTeamBadge)}${nm(e.strHomeTeam)}${rk(e.strHomeTeam)} <i>×</i> ${logo(e.strAwayTeamBadge)}${nm(e.strAwayTeam)}${rk(e.strAwayTeam)}${e._tv?`<span class="mtv">📺 ${esc(e._tv)}</span>`:""}</span><b class="${cls}">${mid}</b><small class="${st==="live"?"mlive":""}">${badge}</small></div>` }) } })(hwBody);
 // OK on the matches widget opens your match app (asked once)
 activators.unshift(el=>{ if(!el.dataset||!el.dataset.hw) return false; const w=hwGet(el.dataset.hw); if(!w||w.t!=="matches") return false;
   const go=()=>{ if(S.matchApp&&byPkg(S.matchApp)) launch(S.matchApp) };
   if(S.matchApp&&byPkg(S.matchApp)){ go(); return true }
   const l=visibleApps().slice().sort((a,b)=>(/yacine|koora|yalla|ssc|bein|shahid|live|tv/i.test(b.pkg+appName(b))?1:0)-(/yacine|koora|yalla|ssc|bein|shahid|live|tv/i.test(a.pkg+appName(a))?1:0));
   dialog("⚽ "+L("mPickApp"),l.slice(0,30).map(a=>({label:appName(a),fn:()=>{ S.matchApp=a.pkg; go() }})),{grid:3}); return true });
+
+// ---- team names in Arabic (the sources send English)
+const TEAM_AR={"al ahly":"الأهلي","zamalek":"الزمالك","pyramids":"بيراميدز","al masry":"المصري","ismaily":"الإسماعيلي","smouha":"سموحة","future":"فيوتشر","modern sport":"مودرن سبورت","modern future":"مودرن سبورت",
+ "el gouna":"الجونة","ceramica cleopatra":"سيراميكا كليوباترا","enppi":"إنبي","petrojet":"بتروجت","national bank of egypt":"البنك الأهلي","al ittihad alexandria":"الاتحاد السكندري","al ittihad":"الاتحاد","ittihad alexandria":"الاتحاد السكندري",
+ "ghazl el mahalla":"غزل المحلة","el gaish":"طلائع الجيش","tala'ea el gaish":"طلائع الجيش","zed":"زد","pharco":"فاركو","haras el hodoud":"حرس الحدود","el mokawloon":"المقاولون العرب","arab contractors":"المقاولون العرب","wadi degla":"وادي دجلة",
+ "petrol asyut":"بترول أسيوط","el qanah":"القناة","abu qir fertilizers":"أبوقير للأسمدة","kahrabaa ismailia":"كهرباء الإسماعيلية","sharkia":"الشرقية","el sharkia":"الشرقية",
+ "al hilal":"الهلال","al nassr":"النصر","al ittihad jeddah":"الاتحاد","al ahli":"الأهلي السعودي","al ahli saudi":"الأهلي السعودي","al shabab":"الشباب","al qadsiah":"القادسية","al taawoun":"التعاون","al fateh":"الفتح","al ettifaq":"الاتفاق","al khaleej":"الخليج","al riyadh":"الرياض","al hazem":"الحزم","al kholood":"الخلود","neom":"نيوم","al diriyah":"الدرعية",
+ "shabab al ahli":"شباب الأهلي","al ain":"العين","al wahda":"الوحدة","al jazira":"الجزيرة","sharjah":"الشارقة","al sadd":"السد","al duhail":"الدحيل","al gharafa":"الغرافة","al rayyan":"الريان","al shamal":"الشمال","esteghlal":"الاستقلال","persepolis":"برسبوليس",
+ "wydad":"الوداد","raja casablanca":"الرجاء","esperance":"الترجي","esperance de tunis":"الترجي","mamelodi sundowns":"صن داونز",
+ "real madrid":"ريال مدريد","barcelona":"برشلونة","atletico madrid":"أتلتيكو مدريد","villarreal":"فياريال","sevilla":"إشبيلية","real betis":"ريال بيتيس","athletic club":"أتلتيك بلباو",
+ "manchester city":"مانشستر سيتي","manchester united":"مانشستر يونايتد","liverpool":"ليفربول","arsenal":"آرسنال","chelsea":"تشيلسي","tottenham hotspur":"توتنهام","aston villa":"أستون فيلا","newcastle united":"نيوكاسل",
+ "bayern munich":"بايرن ميونخ","borussia dortmund":"دورتموند","bayer leverkusen":"ليفركوزن","rb leipzig":"لايبزيج","vfb stuttgart":"شتوتجارت","stuttgart":"شتوتجارت",
+ "paris saint-germain":"باريس سان جيرمان","psg":"باريس سان جيرمان","marseille":"مارسيليا","monaco":"موناكو","lille":"ليل","lyon":"ليون",
+ "inter milan":"إنتر ميلان","internazionale":"إنتر ميلان","ac milan":"ميلان","juventus":"يوفنتوس","napoli":"نابولي","as roma":"روما","roma":"روما","lazio":"لاتسيو","atalanta":"أتالانتا",
+ "galatasaray":"جالاتا سراي","fenerbahce":"فنربخشة","besiktas":"بشكتاش","trabzonspor":"طرابزون سبور","benfica":"بنفيكا","porto":"بورتو","sporting cp":"سبورتينج","ajax":"أياكس","psv eindhoven":"آيندهوفن","feyenoord":"فيينورد","shakhtar donetsk":"شاختار دونيتسك","bodo/glimt":"بودو جليمت","slovan bratislava":"سلوفان براتيسلافا",
+ "egypt":"مصر","saudi arabia":"السعودية","morocco":"المغرب","algeria":"الجزائر","tunisia":"تونس","qatar":"قطر","jordan":"الأردن","iraq":"العراق","uae":"الإمارات","united arab emirates":"الإمارات"};
+function teamAr(n){ if(S.lang!=="ar") return n; const k=String(n||"").toLowerCase().replace(/\s+fc$|^fc\s+/,"").trim(); return TEAM_AR[k]||n }
+window.teamAr=teamAr;

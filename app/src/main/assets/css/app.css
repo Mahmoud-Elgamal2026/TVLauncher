@@ -1165,3 +1165,7 @@ html[dir=rtl] .mrk{margin-right:.2vw}
 .mtv{font-size:1.25vh;opacity:.75;white-space:nowrap;max-width:9vw;overflow:hidden;text-overflow:ellipsis}
 html body .mcr.mfav .mtn,html body .mcr.mfav b{color:#e9c46a!important;font-weight:700}
 html body .mcr small.mlive{background:#b3141f!important}
+html body .mcr .mtn{display:flex;flex-wrap:wrap;align-items:center;column-gap:.3vw;white-space:normal}
+html body .mcr .mtv{flex-basis:100%;font-size:1.2vh!important;opacity:.7!important;max-width:none;margin-top:.1vh}
+html body .mct.one{font-size:1.6vh!important;border-bottom:0!important;opacity:.85!important}
+.mmore{font-size:1.5vh;opacity:.8;text-align:center;margin-top:.4vh}
