@@ -1156,3 +1156,12 @@ html body .mcr{font-size:1.55vh!important}
 html body .mcr b{font-size:1.75vh!important}
 html body .mct{font-size:2vh!important;font-weight:800!important;opacity:1!important;color:#fff!important;border-bottom:1px solid rgba(233,196,106,.45)!important}
 html body .mcr small{font-size:1.6vh!important;font-weight:700;opacity:1!important;color:#fff!important;background:rgba(255,255,255,.12);border-radius:.8vh;padding:.15vh .6vw;min-width:auto!important}
+.mlg{width:2.2vh;height:2.2vh;object-fit:contain;vertical-align:middle}
+html[dir=ltr] .mlg{margin-right:.3vw}
+html[dir=rtl] .mlg{margin-left:.3vw}
+.mrk{font-style:normal;font-size:1.2vh;opacity:.7}
+html[dir=ltr] .mrk{margin-left:.2vw}
+html[dir=rtl] .mrk{margin-right:.2vw}
+.mtv{font-size:1.25vh;opacity:.75;white-space:nowrap;max-width:9vw;overflow:hidden;text-overflow:ellipsis}
+html body .mcr.mfav .mtn,html body .mcr.mfav b{color:#e9c46a!important;font-weight:700}
+html body .mcr small.mlive{background:#b3141f!important}

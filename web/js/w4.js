@@ -59,3 +59,28 @@ hwBody=(function(prev){ return function(w){ if(w.t!=="matches") return prev(w); 
   keys.sort((a,b)=>{ const fa=Math.min(...groups[a].map(e=>rank[evState(e)])), fb=Math.min(...groups[b].map(e=>rank[evState(e)])); return fa-fb||order.indexOf(a)-order.indexOf(b) });
   return `<div class="mcl">${keys.map(k=>`<div class="mch">${w.comp?"":`<div class="mct">${esc(compName(k))}</div>`}${groups[k].map(e=>{ const st=evState(e);
     return `<div class="mcr"><span class="mtn">${esc(e.strHomeTeam)} <i>×</i> ${esc(e.strAwayTeam)}</span><b class="${st==="live"?"live":""}">${st==="ns"?esc(fmtTime(evTime(e))):(e.intHomeScore||0)+" - "+(e.intAwayScore||0)}</b><small>${st==="live"?"● "+esc(L("live")):esc(dayLbl(e))}</small></div>` }).join("")}</div>`).join("")}</div>` } })(hwBody);
+
+// ================= Matches widget extras: badges, channel, your teams, OK opens the match app, countdown, live minute, league position =================
+Object.assign(T.ar,{mIn:"بعد",mPickApp:"بتتفرج على الماتشات منين؟"});Object.assign(T.en,{mIn:"in",mPickApp:"Which app do you watch matches on?"});
+const rankCache={};
+function teamRank(lg,name){ const c=COMPS.find(x=>x[0]===lg); if(!c||c[3]!=="l"||!/\.\d$/.test(lg)) return "";
+  const k="rank:"+lg; const d=w2get(k,6*3600000,async()=>{ const r=await A.fetchJSON(`https://site.api.espn.com/apis/v2/sports/soccer/${lg}/standings`);
+    const m={}; ((((r.children||[])[0]||{}).standings||{}).entries||[]).forEach(e=>{ const rk=((e.stats||[]).find(s=>s.name==="rank")||{}).value; const t=e.team||{}; [t.displayName,t.shortDisplayName,t.name].filter(Boolean).forEach(n=>m[n.toLowerCase()]=rk) }); return m });
+  const v=d&&d[String(name).toLowerCase()]; return v?` <em class="mrk">${v}</em>`:"" }
+function liveMin(e){ const m=String(e.strStatus||"").replace(/^LIVE\s*/,""); const n=m.match(/\d+\+?\d*'?/); return /HT|half/i.test(m)?"HT":n?n[0].replace(/'?$/,"'"):"" }
+hwBody=(function(prev){ return function(w){ let h=prev(w); if(w.t!=="matches"||h.indexOf('class="mcr"')<0) return h;
+  // rebuild rows with the extras (same order and grouping as the base layout)
+  const a0=new Date(); a0.setHours(0,0,0,0); const list=matches.filter(e=>(!w.comp||e._lg===w.comp)&&!e._yday&&(+evTime(e)||0)>=a0.getTime());
+  const byKey={}; list.forEach(e=>byKey[e.strHomeTeam+"|"+e.strAwayTeam]=e);
+  return h.replace(/<div class="mcr"><span class="mtn">([\s\S]*?) <i>×<\/i> ([\s\S]*?)<\/span><b class="([^"]*)">([\s\S]*?)<\/b><small>([\s\S]*?)<\/small><\/div>/g,(all,hn,an,cls,mid,day)=>{
+    const e=list.find(x=>esc(x.strHomeTeam)===hn&&esc(x.strAwayTeam)===an); if(!e) return all; const st=evState(e), fav=teamFav(e);
+    const logo=u=>u?`<img class="mlg" src="${esc(u)}" loading="lazy" alt="">`:"";
+    const t=+evTime(e)||0, left=t-Date.now();
+    const badge=st==="live"?`● ${esc(liveMin(e)||L("live"))}`:(st==="ns"&&left>0&&left<3*3600000)?`${esc(L("mIn"))} ${esc(fmtLeft(left))}`:day;
+    return `<div class="mcr${fav?" mfav":""}"><span class="mtn">${fav?"⭐ ":""}${logo(e.strHomeTeamBadge)}${hn}${teamRank(e._lg,e.strHomeTeam)} <i>×</i> ${logo(e.strAwayTeamBadge)}${an}${teamRank(e._lg,e.strAwayTeam)}</span>${e._tv?`<span class="mtv">📺 ${esc(e._tv)}</span>`:""}<b class="${cls}">${mid}</b><small class="${st==="live"?"mlive":""}">${badge}</small></div>` }) } })(hwBody);
+// OK on the matches widget opens your match app (asked once)
+activators.unshift(el=>{ if(!el.dataset||!el.dataset.hw) return false; const w=hwGet(el.dataset.hw); if(!w||w.t!=="matches") return false;
+  const go=()=>{ if(S.matchApp&&byPkg(S.matchApp)) launch(S.matchApp) };
+  if(S.matchApp&&byPkg(S.matchApp)){ go(); return true }
+  const l=visibleApps().slice().sort((a,b)=>(/yacine|koora|yalla|ssc|bein|shahid|live|tv/i.test(b.pkg+appName(b))?1:0)-(/yacine|koora|yalla|ssc|bein|shahid|live|tv/i.test(a.pkg+appName(a))?1:0));
+  dialog("⚽ "+L("mPickApp"),l.slice(0,30).map(a=>({label:appName(a),fn:()=>{ S.matchApp=a.pkg; go() }})),{grid:3}); return true });

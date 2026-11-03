@@ -18,6 +18,8 @@ Object.assign(T.en,{cgL:"🏟 Leagues",cgC:"🏆 Continental cups",cgN:"🌍 Nat
 COMPS.forEach(c=>{ if(!LEAGUES.find(l=>l[0]===c[0])) LEAGUES.push([c[0],c[1],c[2]]) });
 const ymd=d=>`${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
 let ydCache=null, tmCache=null;
+// only channels people in the region actually watch (beIN, ON Sport, SSC, Alkass, Shahid, AD Sports…)
+const tvOf=l=>{ const x=(l||[]).map(n=>String(n||"").trim()).filter(n=>/bein|on ?sport|ssc|alkass|al kass|shahid|ad sport|abu dhabi|dubai sport|time sport|mbc|thmanyah|ثمانية/i.test(n)); return x.length?x[0].replace(/sports?/i,"Sports"):"" };
 // TheSportsDB league names for each competition (used only when ESPN has nothing for it that day)
 const TSDB_RX={"egy.1":/egypt/i,"egy.cup":/egypt.*cup|capital cup|league cup.*egypt/i,"ksa.1":/saudi/i,"eng.1":/english premier|^premier league$/i,"esp.1":/la ?liga/i,"ita.1":/serie a\b/i,"ger.1":/bundesliga/i,"fra.1":/ligue 1/i,
   "tur.1":/turk|s[uü]per lig/i,"por.1":/portug|primeira/i,"ned.1":/eredivisie/i,"uae.1":/uae|emirat|arabian gulf/i,"qat.1":/qatar/i,"mar.1":/morocc|botola/i,"usa.1":/major league soccer|\bmls\b/i,
@@ -39,7 +41,7 @@ async function espnDay(day){ const out=[];
     (r.events||[]).forEach(ev=>{ const c=(ev.competitions||[])[0]||{}, tm=c.competitors||[], h=tm.find(x=>x.homeAway==="home")||tm[0]||{}, a=tm.find(x=>x.homeAway==="away")||tm[1]||{}, st=((c.status||ev.status||{}).type)||{};
       out.push({idEvent:"e"+ev.id,_lg:slug,strTimestamp:ev.date,strHomeTeam:(h.team||{}).displayName||"",strAwayTeam:(a.team||{}).displayName||"",
         strHomeTeamBadge:(h.team||{}).logo||"",strAwayTeamBadge:(a.team||{}).logo||"",intHomeScore:st.state==="pre"?null:h.score,intAwayScore:st.state==="pre"?null:a.score,
-        strStatus:st.state==="post"?"FT":st.state==="pre"?"NS":"LIVE "+(st.shortDetail||"")}) }) }catch(e){} }));
+        strStatus:st.state==="post"?"FT":st.state==="pre"?"NS":"LIVE "+(st.shortDetail||""),_tv:tvOf([].concat(...(c.broadcasts||[]).map(b=>b.names||[]),(c.geoBroadcasts||[]).map(g=>((g.media||{}).shortName)||"")))}) }) }catch(e){} }));
   // second source: any followed competition ESPN returned nothing for gets TheSportsDB's list for that day (matched by league name)
   const missing=(S.comps||[]).filter(sl=>TSDB_RX[sl]&&!out.some(e=>e._lg===sl));
   if(missing.length){ try{ const d=`${day.slice(0,4)}-${day.slice(4,6)}-${day.slice(6,8)}`, evs=await tsdbDay(d,missing), seen={};
@@ -49,7 +51,7 @@ async function espnDay(day){ const out=[];
       const st=String(ev.strStatus||""), fin=/finish|^FT|AET|PEN|AP/i.test(st), pre=!st||/^NS$|Not Started|TBD|Postp/i.test(st);
       const ts=ev.strTimestamp?(/Z|[+-]\d\d:?\d\d$/.test(ev.strTimestamp)?ev.strTimestamp:ev.strTimestamp+"Z"):(ev.dateEvent+"T"+(ev.strTime||"00:00:00")+"Z");
       out.push({idEvent:"t"+ev.idEvent,_lg:sl,_src:"tsdb",strTimestamp:ts,strHomeTeam:ev.strHomeTeam||"",strAwayTeam:ev.strAwayTeam||"",strHomeTeamBadge:ev.strHomeTeamBadge||"",strAwayTeamBadge:ev.strAwayTeamBadge||"",
-        intHomeScore:pre?null:ev.intHomeScore,intAwayScore:pre?null:ev.intAwayScore,strStatus:fin?"FT":pre?"NS":"LIVE "+st}) }) }catch(e){} }
+        intHomeScore:pre?null:ev.intHomeScore,intAwayScore:pre?null:ev.intAwayScore,strStatus:fin?"FT":pre?"NS":"LIVE "+(ev.strProgress?ev.strProgress+"'":st),_tv:tvOf(String(ev.strTVStation||"").split(/[,;\/]/))}) }) }catch(e){} }
   return out.filter(e=>evTime(e)).sort((x,y)=>evTime(x)-evTime(y)) }
 // ESPN times are "2026-10-28T19:00Z" — already absolute
 loadSports=async function(){
