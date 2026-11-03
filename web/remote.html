@@ -76,27 +76,38 @@ h2{color:var(--mute)!important}
 .ib{background:var(--card2)!important}
 #toast{background:var(--card2)!important;backdrop-filter:blur(14px);border:1px solid var(--line)}
 #pair{background:radial-gradient(120% 70% at 80% 0%,var(--bg2),var(--bg) 70%)!important}
-#tvOffBtn{background:#8b1a1a!important;border-color:transparent!important}
+
+/* pro look: line icons, quiet main screen, power in the corner */
+.btn svg,nav svg,.mlist svg,.pwr svg{display:block}
+.btn{gap:6px!important}.btn span{font-size:13px}
+.row.vol .btn{padding:14px 8px}
+.pwr{width:40px;height:40px;border-radius:50%;border:0;background:#8b1a1a!important;color:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.pwr:active{transform:scale(.94)}
+header h1{text-align:center}
+nav button svg{width:23px;height:23px;margin-bottom:2px}
+nav button span{font-size:11px}
+.mlist{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.mlist button{display:flex;align-items:center;gap:14px;background:var(--card)!important;border:1px solid var(--line)!important;color:var(--text);border-radius:14px;padding:15px 16px;font-size:15px;text-align:start}
+.mlist button:active{background:var(--card2)!important}
+.mlist button svg{color:var(--acc);flex:0 0 auto}
 </style>
 </head>
 <body><script>try{document.documentElement.dataset.skin=localStorage.getItem("skin")||"lux"}catch(e){}</script>
-<header><h1>📺 Elgamal TV</h1><button id="prof">…</button></header>
+<header><button id="tvOffBtn" class="pwr" aria-label="power"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 11-12.8 0"/></svg></button><h1>Elgamal TV</h1><button id="prof">…</button></header>
 <div id="now"></div>
 <main>
   <section class="tab on" id="t-remote">
     <div id="alerts"></div>
     <div class="pad">
-      <button class="u" data-k="up">▲</button><button class="d" data-k="down">▼</button>
-      <button class="l" data-k="left">◀</button><button class="r" data-k="right">▶</button>
+      <button class="u" data-k="up"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button class="d" data-k="down"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <button class="l" data-k="left"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><button class="r" data-k="right"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="ok" data-k="ok">OK</button>
     </div>
-    <div class="row"><button class="btn" data-k="back"><b>↩</b><span data-t="back"></span></button><button class="btn" data-k="home"><b>⌂</b><span data-t="home"></span></button><button class="btn" data-k="menu"><b>☰</b><span data-t="options"></span></button></div>
-    <div class="row"><button class="btn" id="tvOffBtn" style="background:#8b1a1a"><b>📴</b><span>اقفل التليفزيون</span></button><button class="btn pri" data-a="update"><b>⬇️</b><span>حدّث اللانشر على الشاشة</span></button></div>
-    <div class="row"><button class="btn" data-v="down"><b>🔉</b></button><button class="btn" data-v="mute"><b>🔇</b></button><button class="btn" data-v="up"><b>🔊</b></button></div>
-    <div class="row"><button class="btn" data-a="tv"><b>📺</b><span data-t="iptv"></span></button><button class="btn" data-a="last"><b>⏮</b><span data-t="last"></span></button><button class="btn" data-a="frame"><b>🖼</b><span data-t="frame"></span></button><button class="btn" data-a="sleep"><b>😴</b><span data-t="sleep"></span></button></div>
-    <h2 data-t="numbers"></h2>
-    <div class="keys">${KEYS}</div>
+    <div class="row"><button class="btn" data-k="back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 010 10h-3"/></svg><span data-t="back"></span></button><button class="btn" data-k="home"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span data-t="home"></span></button><button class="btn" data-k="menu"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span data-t="options"></span></button></div>
+    <div class="row vol"><button class="btn" data-v="down"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 12h5"/></svg></button><button class="btn" data-v="mute"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg></button><button class="btn" data-v="up"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 12h6M19 9v6"/></svg></button></div>
+    <div class="row"><button class="btn" data-a="tv"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M17 2l-5 5-5-5"/></svg><span data-t="iptv"></span></button><button class="btn" data-a="last"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 20L9 12l10-8z"/><path d="M5 19V5"/></svg><span data-t="last"></span></button><button class="btn" data-a="sleep"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg><span data-t="sleep"></span></button></div>
   </section>
+  <section class="tab" id="t-nums"><h2 data-t="numbers"></h2><div class="keys">${KEYS}</div></section>
   <section class="tab" id="t-type">
     <h2 data-t="typeTitle"></h2>
     <textarea id="txt"></textarea>
@@ -122,17 +133,21 @@ h2{color:var(--mute)!important}
     <h2>Telegram bot token / توكن بوت تيليجرام</h2><div class="search"><input id="tgToken" dir="ltr" placeholder="123456789:AA..."><button class="ib" data-save="tgToken">💾</button></div>
     <h2 data-t="adhan"></h2><div class="search"><input id="adhanUrl" dir="ltr" placeholder="https://.../adhan.mp3"><button class="ib" data-save="adhanUrl">💾</button></div>
   </section>
-  <section class="tab" id="t-favs"><h2 data-t="favOrder"></h2><div id="favs"></div><h2 data-t="favCh"></h2><div id="favCh"></div></section>
-  <section class="tab" id="t-apps"><div class="search"><input id="appQ" data-ph="findApp"></div><div id="apps" style="margin-top:10px"></div></section>
+  <section class="tab" id="t-apps"><h2 data-t="favOrder"></h2><div id="favs"></div><h2 data-t="favCh"></h2><div id="favCh"></div><h2 data-t="apps"></h2><div class="search"><input id="appQ" data-ph="findApp"></div><div id="apps" style="margin-top:10px"></div></section>
   <section class="tab" id="t-watch"><h2 data-t="watch"></h2><div id="watch"></div></section>
+  <section class="tab" id="t-more"><div class="mlist">
+    <button data-tab="watch"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z"/></svg><span data-t="watchS"></span></button>
+    <button data-tab="links"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>صور وروابط وإعدادات</span></button>
+    <button data-tab="nums"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/></svg><span data-t="numbers"></span></button>
+    <button data-a="frame"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/></svg><span data-t="frame"></span></button>
+    <button data-a="update"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><span>حدّث اللانشر على الشاشة</span></button>
+  </div></section>
 </main>
 <nav>
-  <button class="on" data-tab="remote"><b>🎮</b><span data-t="remote"></span></button>
-  <button data-tab="type"><b>⌨️</b><span>كتابة وتاتش</span></button>
-  <button data-tab="watch"><b>▶️</b><span data-t="watchS"></span></button>
-  <button data-tab="favs"><b>⭐</b><span data-t="favs"></span></button>
-  <button data-tab="apps"><b>📦</b><span data-t="apps"></span></button>
-  <button data-tab="links"><b>🖼</b><span>صور وروابط</span></button>
+  <button class="on" data-tab="remote"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2"/><path d="M10 14h.01M14 14h.01M10 17h.01M14 17h.01"/></svg><span data-t="remote"></span></button>
+  <button data-tab="type"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span>كتابة وتاتش</span></button>
+  <button data-tab="apps"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span data-t="apps"></span></button>
+  <button data-tab="more"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span>المزيد</span></button>
 </nav>
 <div id="pair"><div style="font-size:48px">📺</div><h1 data-t="pairTitle" style="font-size:20px"></h1><p class="note" data-t="pairNote"></p>
   <input id="pairCode" inputmode="numeric" maxlength="4"><button class="btn pri" id="pairGo" style="max-width:220px;width:100%"><span data-t="connect"></span></button></div>
@@ -191,10 +206,10 @@ document.querySelectorAll("[data-k]").forEach(b=>{
   b.addEventListener("pointerdown",e=>{ e.preventDefault(); startHold(b.dataset.k) });
   ["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,stopHold));
 });
-$("t-remote").querySelector(".keys").innerHTML=["1","2","3","4","5","6","7","8","9","","0",""].map(n=>n?`<button data-num="${n}">${n}</button>`:"<span></span>").join("");
+document.querySelector("#t-nums .keys").innerHTML=["1","2","3","4","5","6","7","8","9","","0",""].map(n=>n?`<button data-num="${n}">${n}</button>`:"<span></span>").join("");
 document.addEventListener("click",async e=>{
   const b=e.target.closest("button"); if(!b) return; const d=b.dataset;
-  if(d.tab){ document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b)); document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.id==="t-"+d.tab)); if(d.tab!=="remote"&&d.tab!=="type") refresh(); return }
+  if(d.tab){ const nb=b.closest("nav")?b:document.querySelector('nav [data-tab="more"]'); document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===nb)); document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.id==="t-"+d.tab)); if(d.tab!=="remote"&&d.tab!=="type"&&d.tab!=="more"&&d.tab!=="nums") refresh(); return }
   if(d.num){ buzz(); api("key",{k:d.num}); return }
   if(d.v){ buzz(); api("volume",{d:d.v}); return }
   if(b.id==="tvOffBtn"){ buzz(); if(confirm("تقفل التليفزيون؟")) api("power",{}); return }
