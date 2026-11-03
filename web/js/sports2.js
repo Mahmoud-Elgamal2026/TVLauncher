@@ -1,7 +1,7 @@
 // ================= Matches from every league, continental cup and national team (ESPN public scoreboard) =================
 // [slug, Arabic, English, group]
 const COMPS=[
- ["egy.1","الدوري المصري","Egyptian Premier League","l"],["ksa.1","الدوري السعودي","Saudi Pro League","l"],["eng.1","الدوري الإنجليزي","Premier League","l"],["esp.1","الدوري الإسباني","La Liga","l"],
+ ["egy.1","الدوري المصري","Egyptian Premier League","l"],["egy.cup","كأس مصر وكأس الرابطة (العاصمة)","Egypt Cup & League Cup","l"],["ksa.1","الدوري السعودي","Saudi Pro League","l"],["eng.1","الدوري الإنجليزي","Premier League","l"],["esp.1","الدوري الإسباني","La Liga","l"],
  ["ita.1","الدوري الإيطالي","Serie A","l"],["ger.1","الدوري الألماني","Bundesliga","l"],["fra.1","الدوري الفرنسي","Ligue 1","l"],["tur.1","الدوري التركي","Turkish Süper Lig","l"],
  ["por.1","الدوري البرتغالي","Primeira Liga","l"],["ned.1","الدوري الهولندي","Eredivisie","l"],["uae.1","الدوري الإماراتي","UAE Pro League","l"],["qat.1","الدوري القطري","Qatar Stars League","l"],
  ["mar.1","الدوري المغربي","Botola Pro","l"],["usa.1","الدوري الأمريكي","MLS","l"],["eng.2","التشامبيونشيب","Championship","l"],["eng.fa","كأس إنجلترا","FA Cup","l"],["esp.copa_del_rey","كأس ملك إسبانيا","Copa del Rey","l"],
@@ -12,21 +12,21 @@ const COMPS=[
  ["fifa.worldq.uefa","تصفيات كأس العالم - أوروبا","WC Qualifiers - Europe","n"],["caf.nations","كأس الأمم الأفريقية","Africa Cup of Nations","n"],["caf.nations_qual","تصفيات أمم أفريقيا","AFCON Qualifiers","n"],
  ["afc.asian.cup","كأس آسيا","Asian Cup","n"],["uefa.euro","كأس أمم أوروبا","EURO","n"],["uefa.nations","دوري الأمم الأوروبية","Nations League","n"],["fifa.friendly","مباريات ودية دولية","International friendlies","n"],
  ["fifa.arab","كأس العرب","Arab Cup","n"]];
-Object.assign(DEF,{comps:["egy.1","ksa.1","eng.1","esp.1","tur.1","uefa.champions","caf.champions","afc.champions","fifa.worldq.caf","caf.nations","fifa.friendly","fifa.world","fifa.arab"]});
+Object.assign(DEF,{comps:["egy.1","egy.cup","ksa.1","eng.1","esp.1","tur.1","uefa.champions","caf.champions","afc.champions","fifa.worldq.caf","caf.nations","fifa.friendly","fifa.world","fifa.arab"]});
 Object.assign(T.ar,{cgL:"🏟 الدوريات",cgC:"🏆 بطولات قارية",cgN:"🌍 المنتخبات",compsHint:"اختار اللي تتابعه — المختار لونه مختلف"});
 Object.assign(T.en,{cgL:"🏟 Leagues",cgC:"🏆 Continental cups",cgN:"🌍 National teams",compsHint:"Pick what you follow — selected ones are highlighted"});
 COMPS.forEach(c=>{ if(!LEAGUES.find(l=>l[0]===c[0])) LEAGUES.push([c[0],c[1],c[2]]) });
 const ymd=d=>`${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
 let ydCache=null;
 // TheSportsDB league names for each competition (used only when ESPN has nothing for it that day)
-const TSDB_RX={"egy.1":/egypt/i,"ksa.1":/saudi/i,"eng.1":/english premier|^premier league$/i,"esp.1":/la ?liga/i,"ita.1":/serie a\b/i,"ger.1":/bundesliga/i,"fra.1":/ligue 1/i,
+const TSDB_RX={"egy.1":/egypt/i,"egy.cup":/egypt.*cup|capital cup|league cup.*egypt/i,"ksa.1":/saudi/i,"eng.1":/english premier|^premier league$/i,"esp.1":/la ?liga/i,"ita.1":/serie a\b/i,"ger.1":/bundesliga/i,"fra.1":/ligue 1/i,
   "tur.1":/turk|s[uü]per lig/i,"por.1":/portug|primeira/i,"ned.1":/eredivisie/i,"uae.1":/uae|emirat|arabian gulf/i,"qat.1":/qatar/i,"mar.1":/morocc|botola/i,"usa.1":/major league soccer|\bmls\b/i,
   "eng.2":/championship/i,"eng.fa":/fa cup/i,"esp.copa_del_rey":/copa del rey/i,"uefa.champions":/uefa champions/i,"uefa.europa":/europa league/i,"uefa.europa.conf":/conference league/i,
   "caf.champions":/caf champions|african champions/i,"caf.confed":/confederation cup/i,"afc.champions":/afc champions|asian champions/i,"conmebol.libertadores":/libertadores/i,"fifa.cwc":/club world cup/i,
   "fifa.world":/^fifa world cup$|^world cup$/i,"fifa.worldq.caf":/world cup.*qualif.*(africa|caf)|(africa|caf).*world cup.*qualif/i,"fifa.worldq.afc":/world cup.*qualif.*(asia|afc)|(asia|afc).*world cup.*qualif/i,"fifa.worldq.uefa":/world cup.*qualif.*(europe|uefa)|(europe|uefa).*world cup.*qualif/i,
   "caf.nations":/africa(n)? cup of nations|afcon/i,"caf.nations_qual":/africa(n)? cup of nations.*qualif|afcon.*qualif/i,"afc.asian.cup":/asian cup/i,"uefa.euro":/european championship|uefa euro(\s|$|\d)/i,
   "uefa.nations":/nations league/i,"fifa.friendly":/friendl/i,"fifa.arab":/arab cup/i};
-const TSDB_NOT={"eng.2":/europ|women|scottish/i,"ger.1":/2\.|2 bundesliga|women|frauen/i,"eng.1":/women/i,"uefa.europa":/conference/i,"caf.nations":/qualif/i,"fifa.world":/qualif|club|women/i,"esp.1":/women|f\b/i};
+const TSDB_NOT={"egy.1":/cup/i,"eng.2":/europ|women|scottish/i,"ger.1":/2\.|2 bundesliga|women|frauen/i,"eng.1":/women/i,"uefa.europa":/conference/i,"caf.nations":/qualif/i,"fifa.world":/qualif|club|women/i,"esp.1":/women|f\b/i};
 const TSDB_ID={"egy.1":4829,"ksa.1":4668,"eng.1":4328,"esp.1":4335,"uefa.champions":4480};
 const tsdbCache={};
 async function tsdbDay(d,missing){ const c=tsdbCache[d]; if(c&&Date.now()-c.at<20*60000&&missing.every(m=>c.asked[m])) return c.l;
@@ -77,3 +77,6 @@ if(!S.favTeamsSeeded){ S.favTeamsSeeded=true; if(!String(S.favTeams||"").trim())
 // refresh when Home is opened and the list is older than 10 minutes
 let sportsAt=Date.now(); const _loadSportsT=loadSports; loadSports=async function(){ sportsAt=Date.now(); return _loadSportsT.apply(this,arguments) };
 pageHooks["home:enter"]=(function(prev){ return function(){ if(prev) prev(); if(S.sportsOn&&Date.now()-sportsAt>600000) loadSports() } })(pageHooks["home:enter"]);
+
+// followed by default for everyone (Egypt Cup / League Cup — "كأس عاصمة مصر")
+if(!S.egyCupAdded){ S.egyCupAdded=true; const c=S.comps||[]; if(c.indexOf("egy.cup")<0){ S.comps=c.concat(["egy.cup"]) } }
