@@ -31,3 +31,18 @@ window.wlTeam=function(){ const T0=[["Al Ahly, الأهلي","🔴 الأهلي"
 function wlTheme(){ if(typeof SKINS==="undefined") return wlPhone();
   dialog(L("wlTheme"),SKINS.map(k=>({icon:k[1],label:S.lang==="ar"?k[2]:k[3],fn:()=>{ S.skin=k[0]; applyLook(); setTimeout(wlPhone,60) }})),{grid:3}) }
 function wlPhone(){ dialog(L("wlPhone"),[{label:L("wlPhoneYes"),pri:1,fn:()=>setTimeout(()=>{ try{ phoneDialog() }catch(e){} },60)},{label:L("wlNo"),fn:()=>{}}],{grid:2}) }
+
+// ================= Matches widget per competition: each matches widget can show one tournament only =================
+Object.assign(T.ar,{mcComp:"البطولة",mcAll:"كل البطولات اللي بتابعها",mcAddOther:"＋ ويدجت ماتشات لبطولة تانية",mcPick:"اختار البطولة"});
+Object.assign(T.en,{mcComp:"Competition",mcAll:"All competitions I follow",mcAddOther:"＋ Matches widget for another competition",mcPick:"Pick a competition"});
+const compName=sl=>{ const c=(typeof COMPS!=="undefined"?COMPS:[]).find(x=>x[0]===sl); return c?(S.lang==="ar"?c[1]:c[2]):sl };
+function followComp(sl){ const c=S.comps||[]; if(sl&&c.indexOf(sl)<0){ S.comps=c.concat([sl]); try{ loadSports() }catch(e){} } }
+hwBody=(function(prev){ return function(w){ if(w.t!=="matches"||!w.comp||typeof matches==="undefined") return prev(w);
+  const all=matches; try{ matches=all.filter(e=>e._lg===w.comp); return prev(w) }finally{ matches=all } } })(hwBody);
+hwCard=(function(prev){ return function(w){ let h=prev(w); if(w.t==="matches"&&w.comp) h=h.replace(/(<div class="hwt">)([^<]*)(<\/div>)/,(m,a,b,c)=>a+"⚽ "+esc(compName(w.comp))+c); return h } })(hwCard);
+function pickComp(cb,withAll){ const l=(withAll?[{label:"🌍 "+L("mcAll"),fn:()=>cb("")}]:[]).concat(COMPS.map(c=>({label:(S.lang==="ar"?c[1]:c[2]),fn:()=>cb(c[0])})));
+  dialog("🏆 "+L("mcPick"),l,{grid:3}) }
+hwMenu=(function(prev){ return function(id){ prev(id); const w=hwGet(id); if(!w||w.t!=="matches") return; const box=$("dbox"), items=box&&box._items, g=box&&box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
+  items.splice(0,0,{icon:"🏆",label:L("mcComp")+": "+(w.comp?compName(w.comp):L("mcAll")),pri:1,fn:()=>setTimeout(()=>pickComp(sl=>{ followComp(sl); hwSet(id,{comp:sl}) },true),30)},
+    {icon:"＋",label:L("mcAddOther"),fn:()=>setTimeout(()=>pickComp(sl=>{ if(!sl) return; followComp(sl); const nid="m_"+sl.replace(/\W/g,"_"); if(hwGet(nid)) return; hwSave(hwList().concat([{id:nid,t:"matches",sz:2,st:"glass",comp:sl}])) },false),30)});
+  g.innerHTML=items.map((it,k)=>`<button class="btn f${it.pri?" pri":""}" data-di="${k}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) } })(hwMenu);
