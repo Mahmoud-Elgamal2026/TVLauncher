@@ -17,7 +17,7 @@ Object.assign(T.ar,{cgL:"🏟 الدوريات",cgC:"🏆 بطولات قاري�
 Object.assign(T.en,{cgL:"🏟 Leagues",cgC:"🏆 Continental cups",cgN:"🌍 National teams",compsHint:"Pick what you follow — selected ones are highlighted"});
 COMPS.forEach(c=>{ if(!LEAGUES.find(l=>l[0]===c[0])) LEAGUES.push([c[0],c[1],c[2]]) });
 const ymd=d=>`${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
-let ydCache=null;
+let ydCache=null, tmCache=null;
 // TheSportsDB league names for each competition (used only when ESPN has nothing for it that day)
 const TSDB_RX={"egy.1":/egypt/i,"egy.cup":/egypt.*cup|capital cup|league cup.*egypt/i,"ksa.1":/saudi/i,"eng.1":/english premier|^premier league$/i,"esp.1":/la ?liga/i,"ita.1":/serie a\b/i,"ger.1":/bundesliga/i,"fra.1":/ligue 1/i,
   "tur.1":/turk|s[uü]per lig/i,"por.1":/portug|primeira/i,"ned.1":/eredivisie/i,"uae.1":/uae|emirat|arabian gulf/i,"qat.1":/qatar/i,"mar.1":/morocc|botola/i,"usa.1":/major league soccer|\bmls\b/i,
@@ -59,6 +59,9 @@ loadSports=async function(){
   // yesterday's results stay visible (finished games, cached 3 h) so a late or missed match still shows
   try{ const yk=ymd(new Date(Date.now()-86400000)); if(!ydCache||ydCache.k!==yk||Date.now()-ydCache.at>3*3600000) ydCache={k:yk,at:Date.now(),l:(await espnDay(yk)).filter(e=>evState(e)==="ft").map(e=>Object.assign(e,{_yday:true}))};
     const seen={}; list.forEach(e=>seen[e.strHomeTeam+e.strAwayTeam]=1); list=list.concat(ydCache.l.filter(e=>!seen[e.strHomeTeam+e.strAwayTeam])) }catch(e){}
+  // tomorrow's fixtures too (cached 3 h)
+  try{ const tk=ymd(new Date(Date.now()+86400000)); if(!tmCache||tmCache.k!==tk||Date.now()-tmCache.at>3*3600000) tmCache={k:tk,at:Date.now(),l:(await espnDay(tk)).filter(e=>evState(e)==="ns").map(e=>Object.assign(e,{_tmrw:true}))};
+    const seen={}; list.forEach(e=>seen[e.strHomeTeam+e.strAwayTeam]=1); list=list.concat(tmCache.l.filter(e=>!seen[e.strHomeTeam+e.strAwayTeam])) }catch(e){}
   matches=list; renderMatchRow(); updateTicker(); if(typeof renderHW==="function") renderHW();
   sportsT=setTimeout(loadSports,(matches.some(e=>evState(e)==="live")?2:15)*60000);
 };

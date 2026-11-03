@@ -1142,3 +1142,12 @@ html body .hw.hw,html body .hw.hw *,html body .hw.hw.st-accent,html body .hw.hw.
 html body .hw .hwsub.dim,html body .hw .hwt,html body .hw small,html body .hw .nows,html body .hw .nowt{color:rgba(255,255,255,.85)!important;opacity:1!important}
 html body .hw.hw.st-accent{text-shadow:0 .1vh .4vh rgba(0,0,0,.35)}
 html body .npr div.on,html body .npr div.on *{color:#111!important}
+.mcl{display:flex;flex-direction:column;gap:1vh;width:100%;overflow:hidden}
+html.nofg .mcl > * + *{margin-top:1vh}
+.mct{font-size:1.6vh;font-weight:700;opacity:.75!important;margin-bottom:.3vh;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:.3vh}
+.mcr{display:flex;align-items:center;gap:.8vw;font-size:1.9vh;padding:.25vh 0}
+html[dir=ltr].nofg .mcr > * + *{margin-left:.8vw}
+html[dir=rtl].nofg .mcr > * + *{margin-right:.8vw}
+.mcr .mtn{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mcr .mtn i{font-style:normal;opacity:.6}
+.mcr b{font-size:2vh;min-width:5vw;text-align:center}.mcr small{font-size:1.4vh;opacity:.75!important;min-width:4.5vw;text-align:end}
+html body .hw.hw-matches{height:auto!important;min-height:22vh;max-height:none!important}html body .hw.hw-matches .hwb{overflow:visible!important;max-height:none!important}

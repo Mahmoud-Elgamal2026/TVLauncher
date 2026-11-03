@@ -46,3 +46,16 @@ hwMenu=(function(prev){ return function(id){ prev(id); const w=hwGet(id); if(!w|
   items.splice(0,0,{icon:"🏆",label:L("mcComp")+": "+(w.comp?compName(w.comp):L("mcAll")),pri:1,fn:()=>setTimeout(()=>pickComp(sl=>{ followComp(sl); hwSet(id,{comp:sl}) },true),30)},
     {icon:"＋",label:L("mcAddOther"),fn:()=>setTimeout(()=>pickComp(sl=>{ if(!sl) return; followComp(sl); const nid="m_"+sl.replace(/\W/g,"_"); if(hwGet(nid)) return; hwSave(hwList().concat([{id:nid,t:"matches",sz:2,st:"glass",comp:sl}])) },false),30)});
   g.innerHTML=items.map((it,k)=>`<button class="btn f${it.pri?" pri":""}" data-di="${k}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) } })(hwMenu);
+
+// ================= Matches widget layout: competition name, its matches under it, and the day (yesterday / today / tomorrow) =================
+Object.assign(T.ar,{dYday:"امبارح",dToday:"النهارده",dTmrw:"بكره"});Object.assign(T.en,{dYday:"Yesterday",dToday:"Today",dTmrw:"Tomorrow"});
+function dayLbl(e){ const t=evTime(e); if(!t) return ""; const a=new Date(); a.setHours(0,0,0,0); const d=Math.floor((t-a)/86400000); return L(d<0?"dYday":d>0?"dTmrw":"dToday") }
+hwBody=(function(prev){ return function(w){ if(w.t!=="matches") return prev(w); const list=(typeof matches!=="undefined"?matches:[]).filter(e=>!w.comp||e._lg===w.comp);
+  if(!list.length) return prev(w);
+  const rank={live:0,ns:1,ft:2}, tm=e=>+evTime(e)||0;
+  const sorted=list.slice().sort((a,b)=>(rank[evState(a)]-rank[evState(b)])||(evState(a)==="ft"?tm(b)-tm(a):tm(a)-tm(b)));
+  const max=w.sz>2?9:w.sz>1?6:3, order=(S.comps||[]), groups={}, keys=[]; let n=0;
+  sorted.forEach(e=>{ if(n>=max) return; const k=e._lg||"?"; if(!groups[k]){ groups[k]=[]; keys.push(k) } groups[k].push(e); n++ });
+  keys.sort((a,b)=>{ const fa=Math.min(...groups[a].map(e=>rank[evState(e)])), fb=Math.min(...groups[b].map(e=>rank[evState(e)])); return fa-fb||order.indexOf(a)-order.indexOf(b) });
+  return `<div class="mcl">${keys.map(k=>`<div class="mch">${w.comp?"":`<div class="mct">${esc(compName(k))}</div>`}${groups[k].map(e=>{ const st=evState(e);
+    return `<div class="mcr"><span class="mtn">${esc(e.strHomeTeam)} <i>×</i> ${esc(e.strAwayTeam)}</span><b class="${st==="live"?"live":""}">${st==="ns"?esc(fmtTime(evTime(e))):(e.intHomeScore||0)+" - "+(e.intAwayScore||0)}</b><small>${st==="live"?"● "+esc(L("live")):esc(dayLbl(e))}</small></div>` }).join("")}</div>`).join("")}</div>` } })(hwBody);
