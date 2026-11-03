@@ -17,6 +17,7 @@ Object.assign(T.ar,{cgL:"🏟 الدوريات",cgC:"🏆 بطولات قاري�
 Object.assign(T.en,{cgL:"🏟 Leagues",cgC:"🏆 Continental cups",cgN:"🌍 National teams",compsHint:"Pick what you follow — selected ones are highlighted"});
 COMPS.forEach(c=>{ if(!LEAGUES.find(l=>l[0]===c[0])) LEAGUES.push([c[0],c[1],c[2]]) });
 const ymd=d=>`${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+let ydCache=null;
 async function espnDay(day){ const out=[];
   await Promise.all((S.comps||[]).map(async slug=>{ try{
     const r=await A.fetchJSON(`https://site.api.espn.com/apis/site/v2/sports/soccer/${slug}/scoreboard?dates=${day}`);
@@ -24,12 +25,21 @@ async function espnDay(day){ const out=[];
       out.push({idEvent:"e"+ev.id,_lg:slug,strTimestamp:ev.date,strHomeTeam:(h.team||{}).displayName||"",strAwayTeam:(a.team||{}).displayName||"",
         strHomeTeamBadge:(h.team||{}).logo||"",strAwayTeamBadge:(a.team||{}).logo||"",intHomeScore:st.state==="pre"?null:h.score,intAwayScore:st.state==="pre"?null:a.score,
         strStatus:st.state==="post"?"FT":st.state==="pre"?"NS":"LIVE "+(st.shortDetail||"")}) }) }catch(e){} }));
+  if((S.comps||[]).includes("egy.1")&&!out.some(e=>e._lg==="egy.1")){ try{
+    const d=`${day.slice(0,4)}-${day.slice(4,6)}-${day.slice(6,8)}`, r=await A.fetchJSON("https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d="+d+"&l=4829");
+    (r.events||[]).forEach(ev=>{ const st=String(ev.strStatus||""), fin=/finish|FT|AET|PEN/i.test(st), pre=!st||/NS|Not Started|TBD/i.test(st);
+      const ts=ev.strTimestamp?(/Z|[+-]\d\d:?\d\d$/.test(ev.strTimestamp)?ev.strTimestamp:ev.strTimestamp+"Z"):(ev.dateEvent+"T"+(ev.strTime||"00:00:00")+"Z");
+      out.push({idEvent:"t"+ev.idEvent,_lg:"egy.1",_src:"tsdb",strTimestamp:ts,strHomeTeam:ev.strHomeTeam||"",strAwayTeam:ev.strAwayTeam||"",strHomeTeamBadge:ev.strHomeTeamBadge||"",strAwayTeamBadge:ev.strAwayTeamBadge||"",
+        intHomeScore:pre?null:ev.intHomeScore,intAwayScore:pre?null:ev.intAwayScore,strStatus:fin?"FT":pre?"NS":"LIVE "+st}) }) }catch(e){} }
   return out.filter(e=>evTime(e)).sort((x,y)=>evTime(x)-evTime(y)) }
 // ESPN times are "2026-10-28T19:00Z" — already absolute
 loadSports=async function(){
   clearTimeout(sportsT);
   if(!S.sportsOn){ matches=[]; renderMatchRow(); updateTicker(); return }
   let list=[]; try{ list=await espnDay(ymd(new Date())) }catch(e){}
+  // yesterday's results stay visible (finished games, cached 3 h) so a late or missed match still shows
+  try{ const yk=ymd(new Date(Date.now()-86400000)); if(!ydCache||ydCache.k!==yk||Date.now()-ydCache.at>3*3600000) ydCache={k:yk,at:Date.now(),l:(await espnDay(yk)).filter(e=>evState(e)==="ft").map(e=>Object.assign(e,{_yday:true}))};
+    const seen={}; list.forEach(e=>seen[e.strHomeTeam+e.strAwayTeam]=1); list=list.concat(ydCache.l.filter(e=>!seen[e.strHomeTeam+e.strAwayTeam])) }catch(e){}
   matches=list; renderMatchRow(); updateTicker(); if(typeof renderHW==="function") renderHW();
   sportsT=setTimeout(loadSports,(matches.some(e=>evState(e)==="live")?2:15)*60000);
 };
