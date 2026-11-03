@@ -30,8 +30,8 @@ const TSDB_NOT={"eng.2":/europ|women|scottish/i,"ger.1":/2\.|2 bundesliga|women|
 const TSDB_ID={"egy.1":4829,"ksa.1":4668,"eng.1":4328,"esp.1":4335,"uefa.champions":4480};
 const tsdbCache={};
 async function tsdbDay(d,missing){ const c=tsdbCache[d]; if(c&&Date.now()-c.at<20*60000&&missing.every(m=>c.asked[m])) return c.l;
-  const reqs=["https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d="+d+"&s=Soccer"].concat(missing.filter(m=>TSDB_ID[m]).map(m=>"https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d="+d+"&l="+TSDB_ID[m]));
-  const all=[], ids={}; for(const u of reqs){ try{ const r=await A.fetchJSON(u); (r.events||[]).forEach(e=>{ if(!ids[e.idEvent]){ ids[e.idEvent]=1; all.push(e) } }) }catch(e){} }
+  const reqs=[[null,"https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d="+d+"&s=Soccer"]].concat(missing.filter(m=>TSDB_ID[m]).map(m=>[m,"https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d="+d+"&l="+TSDB_ID[m]]));
+  const all=[], ids={}; for(const [hint,u] of reqs){ try{ const r=await A.fetchJSON(u); (r.events||[]).forEach(e=>{ if(hint) e._hint=hint; if(!ids[e.idEvent]){ ids[e.idEvent]=1; all.push(e) } else if(hint){ const o=all.find(x=>x.idEvent===e.idEvent); if(o) o._hint=hint } }) }catch(e){} }
   const asked={}; missing.forEach(m=>asked[m]=1); tsdbCache[d]={at:Date.now(),l:all,asked}; return all }
 async function espnDay(day){ const out=[];
   await Promise.all((S.comps||[]).map(async slug=>{ try{
@@ -44,7 +44,7 @@ async function espnDay(day){ const out=[];
   const missing=(S.comps||[]).filter(sl=>TSDB_RX[sl]&&!out.some(e=>e._lg===sl));
   if(missing.length){ try{ const d=`${day.slice(0,4)}-${day.slice(4,6)}-${day.slice(6,8)}`, evs=await tsdbDay(d,missing), seen={};
     out.forEach(e=>seen[(e.strHomeTeam+e.strAwayTeam).toLowerCase()]=1);
-    evs.forEach(ev=>{ const sl=missing.find(m=>TSDB_RX[m].test(ev.strLeague||"")&&!(TSDB_NOT[m]&&TSDB_NOT[m].test(ev.strLeague||""))); if(!sl) return;
+    evs.forEach(ev=>{ const sl=(ev._hint&&missing.indexOf(ev._hint)>=0)?ev._hint:missing.find(m=>TSDB_RX[m].test(ev.strLeague||"")&&!(TSDB_NOT[m]&&TSDB_NOT[m].test(ev.strLeague||""))); if(!sl) return;
       const k=(String(ev.strHomeTeam)+ev.strAwayTeam).toLowerCase(); if(seen[k]) return; seen[k]=1;
       const st=String(ev.strStatus||""), fin=/finish|^FT|AET|PEN|AP/i.test(st), pre=!st||/^NS$|Not Started|TBD|Postp/i.test(st);
       const ts=ev.strTimestamp?(/Z|[+-]\d\d:?\d\d$/.test(ev.strTimestamp)?ev.strTimestamp:ev.strTimestamp+"Z"):(ev.dateEvent+"T"+(ev.strTime||"00:00:00")+"Z");
