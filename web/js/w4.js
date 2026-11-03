@@ -126,3 +126,8 @@ const TV_USUAL={"egy.1":"أون سبورت","egy.cup":"أون سبورت","ksa.1
   "fifa.world":"بي إن سبورتس","fifa.worldq.caf":"بي إن سبورتس","fifa.worldq.afc":"بي إن سبورتس","fifa.cwc":"بي إن سبورتس"};
 function tvAr(n){ if(S.lang!=="ar") return n; return String(n).replace(/bein\s*sports?\s*(max\s*)?/i,(m,x)=>"بي إن سبورتس "+(x?"ماكس ":"")).replace(/on\s*sports?\s*(max|plus|\+)?/i,(m,x)=>"أون سبورت"+(x?(/max/i.test(x)?" ماكس":" بلس"):"")).replace(/\bssc\b/i,"SSC").replace(/thmanyah/i,"ثمانية").replace(/shahid/i,"شاهد").replace(/ad sports?/i,"أبوظبي الرياضية").replace(/alkass|al kass/i,"الكاس").replace(/\s+/g," ").trim() }
 function tvName(e){ if(e._tv) return tvAr(e._tv); const u=TV_USUAL[e._lg]; return u?(S.lang==="ar"?u:u)+" ~":"" }
+
+// a visible ⚙️ button on the matches widget: OK on it opens the widget menu (no long-press needed)
+hwCard=(function(prev){ return function(w){ let h=prev(w); if(w.t!=="matches") return h;
+  return h.replace(/(<div class="hwt">)([\s\S]*?)(<\/div>)/,(m,a,b,c)=>`${a}${b}<button class="hwgear f" tabindex="0" data-hwgear="${esc(w.id)}">⚙️ ${S.lang==="ar"?"تحكم":"Edit"}</button>${c}`) } })(hwCard);
+activators.unshift(el=>{ if(el.dataset&&el.dataset.hwgear){ hwMenu(el.dataset.hwgear); return true } return false });

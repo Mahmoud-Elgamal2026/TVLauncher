@@ -1006,3 +1006,6 @@ html body .mcr.f.focus{background:var(--sel)!important;transform:none!important;
 html body .mcr.f.focus,html body .mcr.f.focus *{color:var(--selText)!important}
 html body .mcr.f.focus small{background:rgba(0,0,0,.15)!important}
 html body .mcr .mtv{font-size:1.45vh!important;opacity:.85!important}
+html body .hw-matches .hwt{display:flex!important;align-items:center;justify-content:space-between;gap:1vw}
+html body .hwgear{background:rgba(255,255,255,.1);border:0;color:#fff;border-radius:99px;padding:.4vh 1vw;font-size:1.5vh;font-family:inherit}
+html body .hwgear.focus{background:var(--sel)!important;color:var(--selText)!important;transform:scale(1.08)}
