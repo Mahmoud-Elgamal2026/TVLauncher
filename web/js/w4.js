@@ -50,8 +50,8 @@ hwMenu=(function(prev){ return function(id){ prev(id); const w=hwGet(id); if(!w|
 // ================= Matches widget layout: competition name, its matches under it, and the day (yesterday / today / tomorrow) =================
 Object.assign(T.ar,{dYday:"امبارح",dToday:"النهارده",dTmrw:"بكره"});Object.assign(T.en,{dYday:"Yesterday",dToday:"Today",dTmrw:"Tomorrow"});
 function dayLbl(e){ const t=evTime(e); if(!t) return ""; const a=new Date(); a.setHours(0,0,0,0); const d=Math.floor((t-a)/86400000); return L(d<0?"dYday":d>0?"dTmrw":"dToday") }
-hwBody=(function(prev){ return function(w){ if(w.t!=="matches") return prev(w); const list=(typeof matches!=="undefined"?matches:[]).filter(e=>!w.comp||e._lg===w.comp);
-  if(!list.length) return prev(w);
+hwBody=(function(prev){ return function(w){ if(w.t!=="matches") return prev(w); const a0=new Date(); a0.setHours(0,0,0,0); const list=(typeof matches!=="undefined"?matches:[]).filter(e=>(!w.comp||e._lg===w.comp)&&!e._yday&&(+evTime(e)||0)>=a0.getTime());
+  if(!list.length) return `<div class="hwico">⚽</div><div class="hwsub">${esc(L(typeof sportsTried!=="undefined"&&sportsTried?"mNone":"mLoad"))}</div>`;
   const rank={live:0,ns:1,ft:2}, tm=e=>+evTime(e)||0;
   const sorted=list.slice().sort((a,b)=>(rank[evState(a)]-rank[evState(b)])||(evState(a)==="ft"?tm(b)-tm(a):tm(a)-tm(b)));
   const max=w.sz>2?9:w.sz>1?6:3, order=(S.comps||[]), groups={}, keys=[]; let n=0;
