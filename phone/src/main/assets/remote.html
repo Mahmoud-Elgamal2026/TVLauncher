@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b0b10">
+<title>Elgamal TV · Remote</title>
+<style>
+:root{--bg:#0b0b10;--card:#17171f;--card2:#22222c;--text:#f3f3f7;--mute:#8d8da0;--acc:#4f7cff;--ok:#2ecc71;--bad:#ff5a5f}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,"SF Pro Text","Segoe UI",Roboto,"Noto Sans Arabic",Tahoma,sans-serif;height:100%}
+body{display:flex;flex-direction:column;padding-bottom:calc(68px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:10px;padding:14px 16px 6px}
+header h1{font-size:18px;font-weight:700;flex:1}
+#prof{background:var(--card);border:0;color:var(--text);border-radius:99px;padding:7px 12px;font-size:14px;font-family:inherit}
+#now{font-size:13px;color:var(--mute);padding:0 16px 8px;min-height:20px}
+main{flex:1;overflow-y:auto;padding:4px 16px 20px}
+.tab{display:none}.tab.on{display:block}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(18,18,24,.96);backdrop-filter:blur(20px);border-top:1px solid #23232d;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;border:0;color:var(--mute);font-family:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0}
+nav button b{font-size:20px;font-weight:400}
+nav button.on{color:var(--text)}
+button{font-family:inherit;cursor:pointer}
+.pad{position:relative;width:min(78vw,300px);aspect-ratio:1;margin:18px auto 10px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#2a2a36,#16161d);box-shadow:0 14px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06)}
+.pad button{position:absolute;background:none;border:0;color:var(--text);font-size:26px;width:34%;height:34%;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.pad button:active{background:rgba(255,255,255,.08)}
+.pad .u{top:0;left:33%}.pad .d{bottom:0;left:33%}.pad .l{left:0;top:33%}.pad .r{right:0;top:33%}
+.pad .ok{left:30%;top:30%;width:40%;height:40%;background:#30303c;font-size:17px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.row{display:flex;gap:10px;margin:10px 0}
+.btn{flex:1;background:var(--card);border:0;color:var(--text);border-radius:14px;padding:13px 8px;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.btn b{font-size:20px;font-weight:400}
+.btn:active{background:var(--card2);transform:scale(.97)}
+.btn.pri{background:var(--acc)}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.keys button{background:var(--card);border:0;color:var(--text);border-radius:12px;padding:14px;font-size:20px}
+h2{font-size:14px;color:var(--mute);font-weight:600;margin:18px 2px 8px}
+input,textarea{width:100%;background:var(--card);border:1px solid #2a2a35;color:var(--text);border-radius:12px;padding:12px;font-size:16px;font-family:inherit}
+textarea{min-height:90px;resize:vertical}
+.item{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .t small{display:block;font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:right}
+.ib{background:var(--card2);border:0;color:var(--text);border-radius:10px;width:38px;height:38px;font-size:16px;flex:0 0 auto}
+.ib.on{background:#3a3220;color:#ffc94d}
+.prog{height:3px;background:#333;border-radius:3px;margin-top:5px;overflow:hidden}.prog i{display:block;height:100%;background:#e50914}
+.empty{color:var(--mute);font-size:14px;padding:14px 4px}
+.note{font-size:12px;color:var(--mute);margin-top:6px;line-height:1.6}
+#toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-80px);background:#2b2b36;color:#fff;padding:10px 16px;border-radius:99px;font-size:14px;transition:transform .25s;z-index:9;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#toast.on{transform:translateX(-50%) translateY(0)}
+#pair{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:30px;text-align:center;z-index:8}
+#pair.on{display:flex}
+#pair button{flex:0 0 auto!important;height:auto!important;max-width:220px;width:100%}
+#pair input{max-width:220px;text-align:center;font-size:28px;letter-spacing:.3em}
+.search{display:flex;gap:8px}.search input{flex:1}
+#alerts .al{display:flex;gap:10px;align-items:center;background:#2a2333;border-radius:14px;padding:10px 12px;margin-bottom:8px;animation:pop .3s}
+#alerts .al b{font-size:22px}#alerts .al div{flex:1;min-width:0}#alerts .al strong{display:block;font-size:14px}#alerts .al small{color:var(--mute);font-size:12px}
+@keyframes pop{from{transform:scale(.95);opacity:0}to{transform:none;opacity:1}}
+/* ===== Elgamal TV look: same theme as the TV (follows the theme picked on the box) ===== */
+:root,html[data-skin=lux]{--bg:#070f2a;--bg2:#163068;--card:rgba(255,255,255,.07);--card2:rgba(255,255,255,.13);--line:rgba(255,255,255,.09);--text:#f3f5fb;--mute:#9aa6c4;--acc:#e9c46a;--accT:#111}
+html[data-skin=atv]{--bg:#000;--bg2:#2c2c2e;--card:rgba(255,255,255,.09);--card2:rgba(255,255,255,.16);--acc:#fff;--accT:#000;--mute:#a1a1a6}
+html[data-skin=gtv]{--bg:#1f1f1f;--bg2:#2d2e31;--card:#2d2e31;--card2:#3c4043;--acc:#8ab4f8;--accT:#202124;--mute:#9aa0a6}
+html[data-skin=fire]{--bg:#0f1111;--bg2:#232f3e;--card:#1b2533;--card2:#232f3e;--acc:#ff9900;--accT:#111;--mute:#9aa5b1}
+html[data-skin=netflix]{--bg:#000;--bg2:#1a0204;--card:#141414;--card2:#232323;--acc:#e50914;--accT:#fff;--mute:#a3a3a3}
+html,body{background:radial-gradient(120% 70% at 80% 0%,var(--bg2),var(--bg) 70%) fixed!important;background-color:var(--bg)!important}
+header h1{font-weight:800;letter-spacing:.2px}
+#prof,.btn,.keys button,.item,input,textarea{background:var(--card)!important;border:1px solid var(--line)!important}
+.btn:active,.keys button:active{background:var(--card2)!important}
+.btn.pri,#pair .btn.pri{background:var(--acc)!important;color:var(--accT)!important;border-color:transparent!important}
+.pad{background:radial-gradient(circle at 50% 35%,var(--card2),var(--card)),var(--bg)!important;border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08)!important}
+.pad .ok{background:var(--acc)!important;color:var(--accT)!important;box-shadow:0 6px 18px rgba(0,0,0,.45)!important}
+.pad button:active{background:rgba(255,255,255,.1)!important}
+nav{background:color-mix(in srgb,var(--bg) 92%,transparent)!important;border-top:1px solid var(--line)!important}
+nav button.on{color:var(--acc)!important}
+nav button.on b{transform:scale(1.08)}
+h2{color:var(--mute)!important}
+.ib{background:var(--card2)!important}
+#toast{background:var(--card2)!important;backdrop-filter:blur(14px);border:1px solid var(--line)}
+#pair{background:radial-gradient(120% 70% at 80% 0%,var(--bg2),var(--bg) 70%)!important}
+
+/* pro look: line icons, quiet main screen, power in the corner */
+.btn svg,nav svg,.mlist svg,.pwr svg{display:block}
+.btn{gap:6px!important}.btn span{font-size:13px}
+.row.vol .btn{padding:14px 8px}
+.pwr{width:40px;height:40px;border-radius:50%;border:0;background:#8b1a1a!important;color:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.pwr:active{transform:scale(.94)}
+header h1{text-align:center}
+nav button svg{width:23px;height:23px;margin-bottom:2px}
+nav button span{font-size:11px}
+.mlist{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.mlist button{display:flex;align-items:center;gap:14px;background:var(--card)!important;border:1px solid var(--line)!important;color:var(--text);border-radius:14px;padding:15px 16px;font-size:15px;text-align:start}
+.mlist button:active{background:var(--card2)!important}
+.mlist button svg{color:var(--acc);flex:0 0 auto}
+</style>
+</head>
+<body><script>try{document.documentElement.dataset.skin=localStorage.getItem("skin")||"lux"}catch(e){}</script>
+<header><button id="tvOffBtn" class="pwr" aria-label="power"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 11-12.8 0"/></svg></button><h1>Elgamal TV</h1><button id="prof">…</button></header>
+<div id="now"></div>
+<main>
+  <section class="tab on" id="t-remote">
+    <div id="alerts"></div>
+    <div class="pad">
+      <button class="u" data-k="up"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button class="d" data-k="down"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <button class="l" data-k="left"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><button class="r" data-k="right"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="ok" data-k="ok">OK</button>
+    </div>
+    <div class="row"><button class="btn" data-k="back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 010 10h-3"/></svg><span data-t="back"></span></button><button class="btn" data-k="home"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span data-t="home"></span></button><button class="btn" data-k="menu"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span data-t="options"></span></button></div>
+    <div class="row vol"><button class="btn" data-v="down"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 12h5"/></svg></button><button class="btn" data-v="mute"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg></button><button class="btn" data-v="up"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 12h6M19 9v6"/></svg></button></div>
+    <div class="row"><button class="btn" data-a="tv"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M17 2l-5 5-5-5"/></svg><span data-t="iptv"></span></button><button class="btn" data-a="last"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 20L9 12l10-8z"/><path d="M5 19V5"/></svg><span data-t="last"></span></button><button class="btn" data-a="sleep"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg><span data-t="sleep"></span></button></div>
+  </section>
+  <section class="tab" id="t-nums"><h2 data-t="numbers"></h2><div class="keys">${KEYS}</div></section>
+  <section class="tab" id="t-type">
+    <h2 data-t="typeTitle"></h2>
+    <textarea id="txt"></textarea>
+    <div class="row"><button class="btn pri" id="sendTxt"><b>⌨️</b><span data-t="sendTv"></span></button><button class="btn" id="searchTxt"><b>🔍</b><span data-t="searchTv"></span></button></div>
+    <p class="note" data-t="typeNote"></p>
+  </section>
+  <section class="tab" id="t-links">
+    <h2 data-t="playlists"></h2><div id="lists"></div>
+    <div class="row" style="flex-wrap:nowrap"><input id="lName" style="flex:0 0 34%" data-ph="name"><input id="lUrl" dir="ltr" placeholder="http://.../playlist.m3u"></div>
+    <div class="row"><button class="btn pri" id="lAdd"><span data-t="add"></span></button></div>
+    <h2>Xtream Codes</h2>
+    <input id="xS" dir="ltr" placeholder="http://server:port">
+    <div class="row"><input id="xU" dir="ltr" data-ph="user"><input id="xP" dir="ltr" type="password" data-ph="pass"></div>
+    <div class="row"><button class="btn pri" id="xAdd"><span data-t="addX"></span></button></div>
+    <h2>EPG (XMLTV)</h2><div class="search"><input id="epg" dir="ltr" placeholder="http://.../epg.xml.gz"><button class="ib" data-save="epg">💾</button></div>
+    <h2 data-t="city"></h2><div class="search"><input id="city"><button class="ib" data-save="city">💾</button></div>
+    <h2 data-t="teams"></h2><div class="search"><input id="favTeams" placeholder="Al Ahly, Zamalek"><button class="ib" data-save="favTeams">💾</button></div>
+    <h2 data-t="backup"></h2>
+    <div class="row"><button class="btn" id="bkDown"><b>⬇️</b><span data-t="bkDown"></span></button><button class="btn" id="bkUp"><b>⬆️</b><span data-t="bkUp"></span></button></div>
+    <input type="file" id="bkFile" accept="application/json,.json" style="display:none">
+    <p class="note" data-t="bkNote"></p>
+    <h2>▶️ قناة يوتيوب للويدجت / YouTube channel</h2><div class="search"><input id="ytChannel" dir="ltr" placeholder="@channel أو لينك القناة"><button class="ib" data-save="ytChannel">➕</button></div>
+    <h2>Telegram bot token / توكن بوت تيليجرام</h2><div class="search"><input id="tgToken" dir="ltr" placeholder="123456789:AA..."><button class="ib" data-save="tgToken">💾</button></div>
+    <h2 data-t="adhan"></h2><div class="search"><input id="adhanUrl" dir="ltr" placeholder="https://.../adhan.mp3"><button class="ib" data-save="adhanUrl">💾</button></div>
+  </section>
+  <section class="tab" id="t-apps"><h2 data-t="favOrder"></h2><div id="favs"></div><h2 data-t="favCh"></h2><div id="favCh"></div><h2 data-t="apps"></h2><div class="search"><input id="appQ" data-ph="findApp"></div><div id="apps" style="margin-top:10px"></div></section>
+  <section class="tab" id="t-watch"><h2 data-t="watch"></h2><div id="watch"></div></section>
+  <section class="tab" id="t-more"><div class="mlist">
+    <button data-tab="watch"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z"/></svg><span data-t="watchS"></span></button>
+    <button data-tab="links"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>صور وروابط وإعدادات</span></button>
+    <button data-tab="nums"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/></svg><span data-t="numbers"></span></button>
+    <button data-a="frame"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/></svg><span data-t="frame"></span></button>
+    <button data-a="update"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><span>حدّث اللانشر على الشاشة</span></button>
+  </div></section>
+</main>
+<nav>
+  <button class="on" data-tab="remote"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2"/><path d="M10 14h.01M14 14h.01M10 17h.01M14 17h.01"/></svg><span data-t="remote"></span></button>
+  <button data-tab="type"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span>كتابة وتاتش</span></button>
+  <button data-tab="apps"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span data-t="apps"></span></button>
+  <button data-tab="more"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span>المزيد</span></button>
+</nav>
+<div id="pair"><div style="font-size:48px">📺</div><h1 data-t="pairTitle" style="font-size:20px"></h1><p class="note" data-t="pairNote"></p>
+  <input id="pairCode" inputmode="numeric" maxlength="4"><button class="btn pri" id="pairGo" style="max-width:220px;width:100%"><span data-t="connect"></span></button></div>
+<div id="toast"></div>
+<script>
+"use strict";
+const TX={ar:{back:"رجوع",home:"الرئيسية",options:"خيارات",iptv:"القنوات",last:"آخر قناة",frame:"البرواز",sleep:"نوم",numbers:"رقم القناة",typeTitle:"اكتب على التلفزيون",sendTv:"ابعت للخانة المفتوحة",searchTv:"دوّر على التلفزيون",
+  typeNote:"لو فيه خانة كتابة مفتوحة على التلفزيون، الكلام هيتكتب فيها. لو مفيش، هيدوّر بيه.",playlists:"قوائم القنوات (M3U)",name:"الاسم",add:"إضافة القائمة",city:"المدينة (طقس وصلاة)",teams:"فرقك المفضلة",adhan:"رابط صوت الأذان (اختياري)",
+  favOrder:"ترتيب المفضلة",favCh:"القنوات المفضلة",findApp:"دوّر على تطبيق...",watch:"كمّل المشاهدة",remote:"ريموت",type:"كتابة",watchS:"متابعة",favs:"المفضلة",apps:"التطبيقات",links:"الروابط",
+  pairTitle:"اكتب كود الربط اللي ظاهر على التلفزيون",pairNote:"الإعدادات ← التحكم من الموبايل",connect:"اتصال",saved:"اتحفظ ✓",sent:"اتبعت ✓",err:"مفيش اتصال بالتلفزيون",kids:"بروفايل الأطفال مش بيسمح بالتعديل",
+  empty:"مفيش حاجة هنا لسه",backup:"نسخة احتياطية",bkDown:"تنزيل على الموبايل",bkUp:"استرجاع من الموبايل",bkNote:"الملف فيه كل الإعدادات والروابط والبروفايلات (وكمان باسوردات Xtream)، فخليه في مكان آمن.",restored:"اتسترجعت ✓",user:"اسم المستخدم",pass:"الباسورد",addX:"إضافة اشتراك Xtream",playing:"شغال دلوقتي:",open:"فتح",pin:"الرقم السري"},
+ en:{back:"Back",home:"Home",options:"Options",iptv:"Channels",last:"Last ch.",frame:"Frame",sleep:"Sleep",numbers:"Channel number",typeTitle:"Type on the TV",sendTv:"Send to the open field",searchTv:"Search on TV",
+  typeNote:"If a text field is open on the TV the text goes there; otherwise it searches.",playlists:"Channel playlists (M3U)",name:"Name",add:"Add playlist",city:"City (weather & prayer)",teams:"Your teams",adhan:"Adhan sound URL (optional)",
+  favOrder:"Favorites order",favCh:"Favorite channels",findApp:"Find an app...",watch:"Continue watching",remote:"Remote",type:"Type",watchS:"Watching",favs:"Favorites",apps:"Apps",links:"Links",
+  pairTitle:"Enter the pairing code shown on the TV",pairNote:"Settings → Phone control",connect:"Connect",saved:"Saved ✓",sent:"Sent ✓",err:"Can't reach the TV",kids:"Kids profile doesn't allow changes",
+  empty:"Nothing here yet",backup:"Backup",bkDown:"Download to phone",bkUp:"Restore from phone",bkNote:"The file holds all settings, links and profiles (including Xtream passwords) — keep it safe.",restored:"Restored ✓",user:"Username",pass:"Password",addX:"Add Xtream account",playing:"Now playing:",open:"Open",pin:"PIN"}};
+let lang=(navigator.language||"ar").startsWith("ar")?"ar":"en", st=null;
+const $=id=>document.getElementById(id), t=k=>TX[lang][k]||k;
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let code=new URLSearchParams(location.search).get("k")||localStorage.getItem("tvcode")||"";
+if(code) localStorage.setItem("tvcode",code);
+function i18n(){ document.documentElement.lang=lang; document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+  document.querySelectorAll("[data-t]").forEach(e=>e.textContent=t(e.dataset.t)); document.querySelectorAll("[data-ph]").forEach(e=>e.placeholder=t(e.dataset.ph)) }
+let toastT; function toast(m){ const e=$("toast"); e.textContent=m; e.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>e.classList.remove("on"),1800) }
+const buzz=()=>{ try{navigator.vibrate&&navigator.vibrate(12)}catch(e){} };
+// inside the phone app the page is the app's own copy, so requests go to the box address the app found; in a browser they stay relative
+const API_BASE=(window.PhoneApp&&PhoneApp.base)?PhoneApp.base():"";
+let apiFails=0;
+async function api(cmd,args){
+  try{
+    const r=await fetch(API_BASE+"/api?k="+encodeURIComponent(code),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({cmd},args||{}))});
+    apiFails=0; if(r.status===403){ $("pair").classList.add("on"); return null }
+    const j=await r.json(); if(j.error==="kids"){ toast(t("kids")); return null } return j;
+  }catch(e){ toast(t("err")); if(++apiFails>=3&&window.PhoneApp&&PhoneApp.rescan){ apiFails=0; PhoneApp.rescan() } return null }
+}
+async function refresh(){
+  const s=await api("state"); if(!s) return; st=s; lang=s.lang||lang; i18n(); document.documentElement.dataset.skin=s.skin||"lux"; try{ localStorage.setItem("skin",s.skin||"lux") }catch(e){}
+  if(typeof s.evId==="number"&&s.evId<lastEv){ lastEv=s.evId; localStorage.setItem("tvEv",lastEv) }
+  $("prof").textContent=`${s.profile.emoji} ${s.profile.name}`;
+  $("now").textContent=s.playing?`${t("playing")} ${s.playing.no?s.playing.no+" · ":""}${s.playing.name}`:"";
+  $("lists").innerHTML=s.lists.length?s.lists.map((l,i)=>`<div class="item"><div class="t"><b>${l.type==="xtream"?"🔑":"📃"} ${esc(l.name)}</b><small>${esc(l.type==="xtream"?l.server+" ("+l.user+")":l.url)}</small></div><button class="ib" data-dl="${i}">🗑</button></div>`).join(""):`<div class="empty">${t("empty")}</div>`;
+  ["epg","city","favTeams","adhanUrl"].forEach(k=>{ if(document.activeElement!==$(k)) $(k).value=s[k]||"" });
+  $("favs").innerHTML=s.favs.length?s.favs.map((a,i)=>`<div class="item"><div class="t"><b>${esc(a.name)}</b></div>
+    <button class="ib" data-mv="${i}:-1">▲</button><button class="ib" data-mv="${i}:1">▼</button><button class="ib" data-launch="${esc(a.pkg)}">▶</button><button class="ib on" data-fav="${esc(a.pkg)}">★</button></div>`).join(""):`<div class="empty">${t("empty")}</div>`;
+  $("favCh").innerHTML=s.favCh.length?s.favCh.map(c=>`<div class="item"><div class="t"><b>${c.no?c.no+" · ":""}${esc(c.name)}</b></div><button class="ib" data-play="${esc(c.url)}">▶</button></div>`).join(""):`<div class="empty">${t("empty")}</div>`;
+  renderApps();
+  $("watch").innerHTML=s.watch.length?s.watch.map(w=>`<div class="item"><div class="t"><b>${esc(w.name)}</b>${w.pct?`<div class="prog"><i style="width:${w.pct}%"></i></div>`:""}</div>
+    ${w.url?`<button class="ib" data-play="${esc(w.url)}">▶</button>`:w.pkg?`<button class="ib" data-launch="${esc(w.pkg)}">▶</button>`:""}<button class="ib" data-wr="${esc(w.key)}">🗑</button></div>`).join(""):`<div class="empty">${t("empty")}</div>`;
+}
+function renderApps(){ if(!st) return; const q=$("appQ").value.trim().toLowerCase();
+  $("apps").innerHTML=st.apps.filter(a=>!q||a.name.toLowerCase().includes(q)).map(a=>`<div class="item"><div class="t"><b>${esc(a.name)}</b></div>
+    <button class="ib${a.fav?" on":""}" data-fav="${esc(a.pkg)}">${a.fav?"★":"☆"}</button><button class="ib" data-launch="${esc(a.pkg)}">▶</button></div>`).join("") }
+$("appQ").addEventListener("input",renderApps);
+// repeat-on-hold for arrows
+let holdT=null, holdI=null;
+function startHold(k){ api("key",{k}); buzz(); if(!["up","down","left","right"].includes(k)) return; holdT=setTimeout(()=>{ holdI=setInterval(()=>api("key",{k}),160) },450) }
+function stopHold(){ clearTimeout(holdT); clearInterval(holdI) }
+document.querySelectorAll("[data-k]").forEach(b=>{
+  b.addEventListener("pointerdown",e=>{ e.preventDefault(); startHold(b.dataset.k) });
+  ["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,stopHold));
+});
+document.querySelector("#t-nums .keys").innerHTML=["1","2","3","4","5","6","7","8","9","","0",""].map(n=>n?`<button data-num="${n}">${n}</button>`:"<span></span>").join("");
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("button"); if(!b) return; const d=b.dataset;
+  if(d.tab){ const nb=b.closest("nav")?b:document.querySelector('nav [data-tab="more"]'); document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===nb)); document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.id==="t-"+d.tab)); if(d.tab!=="remote"&&d.tab!=="type"&&d.tab!=="more"&&d.tab!=="nums") refresh(); return }
+  if(d.num){ buzz(); api("key",{k:d.num}); return }
+  if(d.v){ buzz(); api("volume",{d:d.v}); return }
+  if(b.id==="tvOffBtn"){ buzz(); if(confirm("تقفل التليفزيون؟")) api("power",{}); return }
+  if(d.a){ buzz(); api("action",{a:d.a}); return }
+  if(d.launch){ buzz(); if(await api("launch",{pkg:d.launch})) toast(t("sent")); return }
+  if(d.play){ buzz(); if(await api("play",{url:d.play})) toast(t("sent")); setTimeout(refresh,800); return }
+  if(d.fav){ await api("fav",{pkg:d.fav}); refresh(); return }
+  if(d.wr){ await api("watchRemove",{key:d.wr}); refresh(); return }
+  if(d.mv){ const [i,dir]=d.mv.split(":").map(Number), o=st.favs.map(a=>a.pkg), j=i+dir; if(j<0||j>=o.length) return; [o[i],o[j]]=[o[j],o[i]]; await api("favs",{order:o}); refresh(); return }
+  if(d.dl){ const l=st.lists.slice(); l.splice(+d.dl,1); if(await api("lists",{lists:l})) toast(t("saved")); refresh(); return }
+  if(d.save){ if(await api("set",{k:d.save,v:$(d.save).value})) toast(t("saved")); return }
+  switch(b.id){
+    case "sendTxt": if(await api("text",{t:$("txt").value,submit:true})) toast(t("sent")); return;
+    case "searchTxt": if(await api("search",{t:$("txt").value})) toast(t("sent")); return;
+    case "lAdd": { const u=$("lUrl").value.trim(); if(!u) return; const l=(st?st.lists:[]).concat([{name:$("lName").value.trim()||"IPTV",url:u}]);
+      if(await api("lists",{lists:l})){ toast(t("saved")); $("lUrl").value=$("lName").value="" } refresh(); return }
+    case "xAdd": { const sv=$("xS").value.trim(), u=$("xU").value.trim(); if(!sv||!u) return;
+      const l=(st?st.lists:[]).concat([{type:"xtream",name:sv.replace(/^https?:\/\//,"").split(/[:/]/)[0],server:/^https?:/.test(sv)?sv:"http://"+sv,user:u,pass:$("xP").value}]);
+      if(await api("lists",{lists:l})){ toast(t("saved")); $("xS").value=$("xU").value=$("xP").value="" } refresh(); return }
+    case "bkDown": { const d=await api("backup"); if(!d) return; const blob=new Blob([JSON.stringify(d)],{type:"application/json"});
+      const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`tvlauncher-backup-${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); return }
+    case "bkUp": $("bkFile").click(); return;
+    case "pairGo": code=$("pairCode").value.trim(); localStorage.setItem("tvcode",code); $("pair").classList.remove("on"); refresh(); return;
+    case "prof": { if(!st) return; const names=st.profiles.map((p,i)=>`${i+1}. ${p.emoji} ${p.name}`).join("\n"); const n=+prompt(names); const p=st.profiles[n-1]; if(!p) return;
+      let pin=""; if(st.kids) pin=prompt(t("pin"))||""; if(await api("profile",{id:p.id,pin})) setTimeout(refresh,600); return }
+  }
+});
+$("bkFile").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; try{ const d=JSON.parse(await f.text()); if(await api("restore",{data:d})){ toast(t("restored")); setTimeout(refresh,1500) } }catch(x){ toast("✗") } e.target.value="" });
+// alerts from the TV (prayer, matches, notifications) while this page is open
+let lastEv=+localStorage.getItem("tvEv")||0;
+async function pollEvents(){ const r=await api("events",{since:lastEv}); if(!r||!r.events||!r.events.length) return;
+  r.events.forEach(ev=>{ lastEv=Math.max(lastEv,ev.id); $("alerts").insertAdjacentHTML("afterbegin",`<div class="al"><b>${esc(ev.icon)}</b><div><strong>${esc(ev.title)}</strong><small>${esc(ev.text)}</small></div></div>`) });
+  while($("alerts").children.length>3) $("alerts").lastChild.remove();
+  localStorage.setItem("tvEv",lastEv); const e=r.events[r.events.length-1]; toast(`${e.icon} ${e.title}`); try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(x){} }
+setInterval(()=>{ if(code) pollEvents() },6000);
+i18n(); if(!code) $("pair").classList.add("on"); else refresh();
+setInterval(()=>{ if(!document.hidden&&code) api("state").then(s=>{ if(s){ st=s; $("now").textContent=s.playing?`${t("playing")} ${s.playing.no?s.playing.no+" · ":""}${s.playing.name}`:"" } }) },8000);
+</script>
+<script>
+// opened from the TV's Telegram QR: jump to the token box
+if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById("tgToken"); if(!i) return; var sec=i.closest&&i.closest("section,.page,.tab-page"); if(sec&&sec.id&&window.show) try{ show(sec.id) }catch(e){}
+  [].forEach.call(document.querySelectorAll("section,.page"),function(x){ if(x.contains(i)){ x.style.display="block"; x.classList.add("on") } });
+  i.scrollIntoView({block:"center"}); i.focus(); i.style.outline="3px solid #ffd54a"; },600) }
+</script>
+<div style="padding:10px 14px"><h2 style="margin:6px 0">🖼 صورك على التليفزيون</h2>
+<div style="display:flex;gap:10px"><button id="phWall" style="flex:1;padding:14px;border-radius:14px;border:0;background:#2a7d4f;color:#fff;font-size:16px">خلفية للانشر</button>
+<button id="phFrame" style="flex:1;padding:14px;border-radius:14px;border:0;background:#7a3bff;color:#fff;font-size:16px">صور للبرواز (أكتر من صورة)</button></div>
+<div style="display:flex;gap:10px;margin-top:10px"><button id="phWallX" style="flex:1;padding:12px;border-radius:14px;border:0;background:#3a2230;color:#fff;font-size:15px">🗑 شيل الخلفية</button><button id="phFrameX" style="flex:1;padding:12px;border-radius:14px;border:0;background:#3a2230;color:#fff;font-size:15px">🗑 امسح صور البرواز</button></div>
+<div style="display:flex;gap:10px;margin-top:10px;align-items:center;color:#aab"><span>شكل الصورة:</span><select id="phFit" style="flex:1;padding:10px;border-radius:12px;background:#1b1e2b;color:#fff;border:0"><option value="fit">الصورة كاملة (الجوانب ضبابية)</option><option value="fill">تملا الشاشة (ممكن يتقص منها)</option></select></div>
+<div style="display:flex;gap:10px;margin-top:10px;align-items:center;color:#aab"><span>ضبابية:</span><select id="phBlur" style="flex:1;padding:10px;border-radius:12px;background:#1b1e2b;color:#fff;border:0"><option value="0">من غير</option><option value="4">خفيفة</option><option value="10">وسط</option><option value="20">قوية</option></select>
+<span>ظهور:</span><select id="phShow" style="flex:1;padding:10px;border-radius:12px;background:#1b1e2b;color:#fff;border:0"><option value="100">100%</option><option value="75">75%</option><option value="50">50%</option><option value="25">25%</option></select></div>
+<input type="file" id="phFile" accept="image/*" style="display:none"><div id="phMsg" style="color:#8a90a8;margin-top:6px;font-size:14px"></div></div>
+<div id="tpWrap" style="padding:10px 14px"><input id="liveType" placeholder="⌨️ اكتب هنا — بيتكتب على التليفزيون على طول" style="width:100%;box-sizing:border-box;margin-bottom:10px;padding:14px;border-radius:14px;border:0;background:#1b1e2b;color:#fff;font-size:16px"><div id="tpad" style="height:230px;border-radius:18px;background:#1b1e2b;display:flex;align-items:center;justify-content:center;color:#8a90a8;font-size:15px;user-select:none;touch-action:none">اسحب للأسهم · دوس = OK · دوستين = رجوع</div>
+<div style="display:flex;gap:10px;margin-top:10px"><button id="micBtn" style="flex:1;padding:14px;border-radius:14px;border:0;background:#3b6cff;color:#fff;font-size:17px">🎤 بحث بالصوت</button></div></div>
+<script>
+(function(){ /* keep the Remote tab clean: typing + touchpad + voice go to the Type tab, photos to the Links tab */ try{ var tp=document.getElementById("tpWrap"), ph=document.getElementById("phWall"), ty=document.getElementById("t-type"), lk=document.getElementById("t-links"); if(tp&&ty) ty.insertBefore(tp,ty.firstChild); if(ph&&lk){ var sec=ph.parentNode.parentNode; lk.insertBefore(sec,lk.firstChild) } }catch(e){} })();
+(function(){ var p=document.getElementById("tpad"); if(!p) return; var sx=0,sy=0,st=0,last=0,moved=false;
+  function key(k){ try{ api("key",{k:k}) }catch(e){} if(navigator.vibrate) navigator.vibrate(12) }
+  p.addEventListener("touchstart",function(e){ var t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=Date.now(); moved=false; e.preventDefault() },{passive:false});
+  p.addEventListener("touchmove",function(e){ var t=e.touches[0], dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>45||Math.abs(dy)>45){ moved=true;
+      key(Math.abs(dx)>Math.abs(dy)?(dx>0?"right":"left"):(dy>0?"down":"up")); sx=t.clientX; sy=t.clientY } e.preventDefault() },{passive:false});
+  p.addEventListener("touchend",function(e){ if(!moved&&Date.now()-st<350){ var now=Date.now(); if(now-last<320){ key("back"); last=0 } else { last=now; setTimeout(function(){ if(last&&Date.now()-last>=300){ key("ok"); last=0 } },330) } } e.preventDefault() },{passive:false});
+  document.getElementById("micBtn").onclick=function(){ if(window.PhoneApp&&PhoneApp.voice){ PhoneApp.voice() } else { var q=prompt("قول أو اكتب اللي بتدوّر عليه (استخدم مايك الكيبورد)"); if(q) api("search",{t:q}) } };
+  var phMode="wall", fi=document.getElementById("phFile"), pm=document.getElementById("phMsg");
+  document.getElementById("phWall").onclick=function(){ phMode="wall"; fi.multiple=false; fi.click() };
+  document.getElementById("phWallX").onclick=function(){ api("photoReset",{what:"wall"}); pm.textContent="✓ رجعت الخلفية الأصلية" };
+  document.getElementById("phFrameX").onclick=function(){ api("photoReset",{what:"frames"}); pm.textContent="✓ اتمسحت صور البرواز" };
+  document.getElementById("phBlur").onchange=function(){ api("set",{k:"wallBlur",v:this.value}) };
+  document.getElementById("phShow").onchange=function(){ api("set",{k:"wallShow",v:this.value}) };
+  document.getElementById("phFrame").onclick=function(){ phMode="frame"; fi.multiple=true; fi.click() };
+  function shrink(file){ return new Promise(function(res,rej){ var img=new Image(), r=new FileReader(); r.onload=function(){ img.onload=function(){ var W=1920,H=1080, c=document.createElement("canvas"); c.width=W; c.height=H; var g=c.getContext("2d");
+      var fit=document.getElementById("phFit")?document.getElementById("phFit").value:"fit";
+      if(img.height>img.width*0.9) fit="fit"; /* portrait / square photo: always show it whole (filling would cut the head off) */
+      var cov=Math.max(W/img.width,H/img.height), con=Math.min(W/img.width,H/img.height);
+      if(fit==="fill"){ g.drawImage(img,(W-img.width*cov)/2,(H-img.height*cov)/2,img.width*cov,img.height*cov) }
+      else { /* whole picture visible: a blurred, darker copy fills the sides */
+        /* soft, properly blurred copy of the same photo behind it (no blocky stretch) */
+        if("filter" in g){ g.filter="blur(48px) brightness(.6)"; g.drawImage(img,(W-img.width*cov)/2-60,(H-img.height*cov)/2-60,img.width*cov+120,img.height*cov+120); g.filter="none" }
+        else { var sm=document.createElement("canvas"); sm.width=48; sm.height=27; sm.getContext("2d").drawImage(img,(48-img.width*cov*48/W)/2,(27-img.height*cov*27/H)/2,img.width*cov*48/W,img.height*cov*27/H); g.drawImage(sm,0,0,W,H); g.fillStyle="rgba(0,0,0,.4)"; g.fillRect(0,0,W,H) }
+        /* thin shadow so the photo stands out */
+        g.shadowColor="rgba(0,0,0,.6)"; g.shadowBlur=40;
+        g.drawImage(img,(W-img.width*con)/2,(H-img.height*con)/2,img.width*con,img.height*con); g.shadowBlur=0 }
+      res(c.toDataURL("image/jpeg",0.84)) }; img.onerror=rej; img.src=r.result }; r.onerror=rej; r.readAsDataURL(file) }) }
+  fi.onchange=async function(){ var fs=[].slice.call(fi.files||[]); if(!fs.length) return; var n=0;
+    for(var i=0;i<fs.length;i++){ pm.textContent="بيبعت "+(i+1)+" من "+fs.length+"…"; try{ var d=await shrink(fs[i]); var r=await api("photo",{data:d,mode:phMode}); if(r&&r.ok) n++ }catch(e){} }
+    pm.textContent="✓ اتبعت "+n+" صورة"; fi.value="" };
+  var lt=document.getElementById("liveType"), ltT=null;
+  lt.addEventListener("input",function(){ clearTimeout(ltT); ltT=setTimeout(function(){ api("text",{t:lt.value,submit:false}) },300) });
+  lt.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); api("text",{t:lt.value,submit:true}); lt.value=""; lt.blur() } });
+  window.onPhoneVoice=function(t){ if(t) api("voice",{t:t}) };
+  window.onPhoneShare=function(u){ if(u) api("share",{u:u}) };
+  window.onPhoneVolume=function(d){ api("volume",{d:d}) };
+  if(window.PhoneApp&&PhoneApp.pending){ var x=PhoneApp.pending(); if(x) setTimeout(function(){ onPhoneShare(x) },800) }
+})();
+</script>
+</body>
+</html>

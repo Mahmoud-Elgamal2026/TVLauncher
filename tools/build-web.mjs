@@ -103,4 +103,6 @@ for (const f of readdirSync(join(OUT, "css"))) {
   for (const f of used) rmSync(join(OUT, "js", f));
   console.log(`✓ bundled ${used.length} scripts → js/app.js (${Math.round(bundle.length / 1024)} KB)`);
 }
+// the phone app ships its own copy of the remote screen (so it works whatever version the TV runs)
+{ const pa = join(ROOT, "phone/src/main/assets"); mkdirSync(pa, { recursive: true }); writeFileSync(join(pa, "remote.html"), readFileSync(join(OUT, "remote.html"), "utf8")); }
 console.log(`✓ web → assets: ${jsCount} JS files lowered to ${TARGET} (checked as ES2016), ${cssCount} CSS files converted`);

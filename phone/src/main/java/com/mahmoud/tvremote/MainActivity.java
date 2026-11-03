@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** Phone remote for the TV Launcher: finds the box on the Wi-Fi by itself and opens its control page. */
 public class MainActivity extends Activity {
     static final int PORT = 8765;
+    String boxBase = null;
     WebView web; TextView msg; SharedPreferences prefs; String pendingShare;
     static final int REQ_VOICE = 7, REQ_FILE = 8; ValueCallback<Uri[]> fileCb;
 
@@ -94,6 +95,9 @@ public class MainActivity extends Activity {
     void open(final String host) {
         web = new WebView(this);
         WebSettings s = web.getSettings(); s.setJavaScriptEnabled(true); s.setDomStorageEnabled(true);
+        // the remote screen ships inside this app (independent of the TV's version); it talks to the box over the Wi-Fi
+        s.setAllowFileAccess(true); s.setAllowFileAccessFromFileURLs(true); s.setAllowUniversalAccessFromFileURLs(true);
+        boxBase = "http://" + host + ":" + PORT;
         web.setWebViewClient(new WebViewClient() {
             @Override public void onReceivedError(WebView v, int code, String desc, String url) {
                 if (url != null && url.startsWith("http://" + host)) runOnUiThread(() -> { msg.setText("بيدوّر على البوكس في الواي فاي…"); setContentView(msg); web = null; scan(); });
@@ -109,7 +113,7 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
-        web.loadUrl("http://" + host + ":" + PORT + "/");
+        web.loadUrl("file:///android_asset/remote.html");
         setContentView(web);
     }
 
@@ -118,6 +122,8 @@ public class MainActivity extends Activity {
             try { Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
                     .putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ar-EG").putExtra(RecognizerIntent.EXTRA_PROMPT, "قول اللي بتدوّر عليه");
                 startActivityForResult(i, REQ_VOICE); } catch (Exception e) { js("alert('مفيش خدمة صوت على الموبايل')"); } }); }
+        @JavascriptInterface public String base() { return boxBase == null ? "" : boxBase; }
+        @JavascriptInterface public void rescan() { runOnUiThread(() -> { msg.setText("بيدوّر على البوكس في الواي فاي…"); setContentView(msg); web = null; scan(); }); }
         @JavascriptInterface public String pending() { String s = pendingShare; pendingShare = null; return s == null ? "" : s; }
     }
 

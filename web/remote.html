@@ -173,12 +173,15 @@ function i18n(){ document.documentElement.lang=lang; document.documentElement.di
   document.querySelectorAll("[data-t]").forEach(e=>e.textContent=t(e.dataset.t)); document.querySelectorAll("[data-ph]").forEach(e=>e.placeholder=t(e.dataset.ph)) }
 let toastT; function toast(m){ const e=$("toast"); e.textContent=m; e.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>e.classList.remove("on"),1800) }
 const buzz=()=>{ try{navigator.vibrate&&navigator.vibrate(12)}catch(e){} };
+// inside the phone app the page is the app's own copy, so requests go to the box address the app found; in a browser they stay relative
+const API_BASE=(window.PhoneApp&&PhoneApp.base)?PhoneApp.base():"";
+let apiFails=0;
 async function api(cmd,args){
   try{
-    const r=await fetch("/api?k="+encodeURIComponent(code),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({cmd},args||{}))});
-    if(r.status===403){ $("pair").classList.add("on"); return null }
+    const r=await fetch(API_BASE+"/api?k="+encodeURIComponent(code),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({cmd},args||{}))});
+    apiFails=0; if(r.status===403){ $("pair").classList.add("on"); return null }
     const j=await r.json(); if(j.error==="kids"){ toast(t("kids")); return null } return j;
-  }catch(e){ toast(t("err")); return null }
+  }catch(e){ toast(t("err")); if(++apiFails>=3&&window.PhoneApp&&PhoneApp.rescan){ apiFails=0; PhoneApp.rescan() } return null }
 }
 async function refresh(){
   const s=await api("state"); if(!s) return; st=s; lang=s.lang||lang; i18n(); document.documentElement.dataset.skin=s.skin||"lux"; try{ localStorage.setItem("skin",s.skin||"lux") }catch(e){}
