@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0b10">
-<title>TV Remote</title>
+<title>Elgamal TV · Remote</title>
 <style>
 :root{--bg:#0b0b10;--card:#17171f;--card2:#22222c;--text:#f3f3f7;--mute:#8d8da0;--acc:#4f7cff;--ok:#2ecc71;--bad:#ff5a5f}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -55,10 +55,32 @@ textarea{min-height:90px;resize:vertical}
 #alerts .al{display:flex;gap:10px;align-items:center;background:#2a2333;border-radius:14px;padding:10px 12px;margin-bottom:8px;animation:pop .3s}
 #alerts .al b{font-size:22px}#alerts .al div{flex:1;min-width:0}#alerts .al strong{display:block;font-size:14px}#alerts .al small{color:var(--mute);font-size:12px}
 @keyframes pop{from{transform:scale(.95);opacity:0}to{transform:none;opacity:1}}
+/* ===== Elgamal TV look: same theme as the TV (follows the theme picked on the box) ===== */
+:root,html[data-skin=lux]{--bg:#070f2a;--bg2:#163068;--card:rgba(255,255,255,.07);--card2:rgba(255,255,255,.13);--line:rgba(255,255,255,.09);--text:#f3f5fb;--mute:#9aa6c4;--acc:#e9c46a;--accT:#111}
+html[data-skin=atv]{--bg:#000;--bg2:#2c2c2e;--card:rgba(255,255,255,.09);--card2:rgba(255,255,255,.16);--acc:#fff;--accT:#000;--mute:#a1a1a6}
+html[data-skin=gtv]{--bg:#1f1f1f;--bg2:#2d2e31;--card:#2d2e31;--card2:#3c4043;--acc:#8ab4f8;--accT:#202124;--mute:#9aa0a6}
+html[data-skin=fire]{--bg:#0f1111;--bg2:#232f3e;--card:#1b2533;--card2:#232f3e;--acc:#ff9900;--accT:#111;--mute:#9aa5b1}
+html[data-skin=netflix]{--bg:#000;--bg2:#1a0204;--card:#141414;--card2:#232323;--acc:#e50914;--accT:#fff;--mute:#a3a3a3}
+html,body{background:radial-gradient(120% 70% at 80% 0%,var(--bg2),var(--bg) 70%) fixed!important;background-color:var(--bg)!important}
+header h1{font-weight:800;letter-spacing:.2px}
+#prof,.btn,.keys button,.item,input,textarea{background:var(--card)!important;border:1px solid var(--line)!important}
+.btn:active,.keys button:active{background:var(--card2)!important}
+.btn.pri,#pair .btn.pri{background:var(--acc)!important;color:var(--accT)!important;border-color:transparent!important}
+.pad{background:radial-gradient(circle at 50% 35%,var(--card2),var(--card)),var(--bg)!important;border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08)!important}
+.pad .ok{background:var(--acc)!important;color:var(--accT)!important;box-shadow:0 6px 18px rgba(0,0,0,.45)!important}
+.pad button:active{background:rgba(255,255,255,.1)!important}
+nav{background:color-mix(in srgb,var(--bg) 92%,transparent)!important;border-top:1px solid var(--line)!important}
+nav button.on{color:var(--acc)!important}
+nav button.on b{transform:scale(1.08)}
+h2{color:var(--mute)!important}
+.ib{background:var(--card2)!important}
+#toast{background:var(--card2)!important;backdrop-filter:blur(14px);border:1px solid var(--line)}
+#pair{background:radial-gradient(120% 70% at 80% 0%,var(--bg2),var(--bg) 70%)!important}
+#tvOffBtn{background:#8b1a1a!important;border-color:transparent!important}
 </style>
 </head>
-<body>
-<header><h1>📺 TV Remote</h1><button id="prof">…</button></header>
+<body><script>try{document.documentElement.dataset.skin=localStorage.getItem("skin")||"lux"}catch(e){}</script>
+<header><h1>📺 Elgamal TV</h1><button id="prof">…</button></header>
 <div id="now"></div>
 <main>
   <section class="tab on" id="t-remote">
@@ -144,7 +166,7 @@ async function api(cmd,args){
   }catch(e){ toast(t("err")); return null }
 }
 async function refresh(){
-  const s=await api("state"); if(!s) return; st=s; lang=s.lang||lang; i18n();
+  const s=await api("state"); if(!s) return; st=s; lang=s.lang||lang; i18n(); document.documentElement.dataset.skin=s.skin||"lux"; try{ localStorage.setItem("skin",s.skin||"lux") }catch(e){}
   if(typeof s.evId==="number"&&s.evId<lastEv){ lastEv=s.evId; localStorage.setItem("tvEv",lastEv) }
   $("prof").textContent=`${s.profile.emoji} ${s.profile.name}`;
   $("now").textContent=s.playing?`${t("playing")} ${s.playing.no?s.playing.no+" · ":""}${s.playing.name}`:"";

@@ -21,7 +21,7 @@ function remoteText(t,submit){
   openSearch(t); return "search";
 }
 function remoteState(){
-  return {profile:profile(),profiles:S.profiles.map(p=>({id:p.id,name:p.name,emoji:p.emoji,kids:!!p.kids})),kids:isKids(),lang:S.lang,
+  return {skin:S.skin||"lux",profile:profile(),profiles:S.profiles.map(p=>({id:p.id,name:p.name,emoji:p.emoji,kids:!!p.kids})),kids:isKids(),lang:S.lang,
     lists:isKids()?[]:S.lists.map(l=>l.type==="xtream"?Object.assign({},l,{pass:l.pass?"••••":""}):l),epg:isKids()?"":S.epg,city:S.city,favTeams:S.favTeams,adhanUrl:S.adhanUrl,
     favs:S.favs.map(byPkg).filter(Boolean).map(a=>({pkg:a.pkg,name:appName(a)})),
     apps:visibleApps().map(a=>({pkg:a.pkg,name:appName(a),fav:S.favs.includes(a.pkg)})),
