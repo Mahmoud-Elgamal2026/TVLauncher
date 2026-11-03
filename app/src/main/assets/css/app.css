@@ -1173,3 +1173,4 @@ html body .mcr.f{border-radius:1vh;padding:.4vh .6vw;margin:0 -.6vw;transition:n
 html body .mcr.f.focus{background:var(--sel)!important;transform:none!important;box-shadow:none!important}
 html body .mcr.f.focus,html body .mcr.f.focus *{color:var(--selText)!important}
 html body .mcr.f.focus small{background:rgba(0,0,0,.15)!important}
+html body .mcr .mtv{font-size:1.45vh!important;opacity:.85!important}

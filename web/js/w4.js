@@ -80,7 +80,7 @@ hwBody=(function(prev){ return function(w){ let h=prev(w); if(w.t!=="matches"||h
     const mins=Math.round(left/60000);
     const badge=st==="live"?`● <span dir="ltr">${esc(liveMin(e)||L("live"))}</span>`:(st==="ns"&&left>0&&mins<60)?`${esc(L("mIn"))} ${mins} ${S.lang==="ar"?"د":"min"}`:day;
     const rk=n=>w.sz>2?teamRank(e._lg,n):"", nm=n=>esc(teamAr(n));
-    return `<div class="mcr f${fav?" mfav":""}" tabindex="0" data-mt="${esc(e.idEvent||(e.strHomeTeam+"|"+e.strAwayTeam))}"><span class="mtn">${fav?"⭐ ":""}${logo(e.strHomeTeamBadge)}${nm(e.strHomeTeam)}${rk(e.strHomeTeam)} <i>×</i> ${logo(e.strAwayTeamBadge)}${nm(e.strAwayTeam)}${rk(e.strAwayTeam)}${e._tv?`<span class="mtv">📺 ${esc(e._tv)}</span>`:""}</span><b class="${cls}">${mid}</b><small class="${st==="live"?"mlive":""}">${badge}</small></div>` }) } })(hwBody);
+    return `<div class="mcr f${fav?" mfav":""}" tabindex="0" data-mt="${esc(e.idEvent||(e.strHomeTeam+"|"+e.strAwayTeam))}"><span class="mtn">${fav?"⭐ ":""}${logo(e.strHomeTeamBadge)}${nm(e.strHomeTeam)}${rk(e.strHomeTeam)} <i>×</i> ${logo(e.strAwayTeamBadge)}${nm(e.strAwayTeam)}${rk(e.strAwayTeam)}${tvName(e)?`<span class="mtv">📺 ${esc(tvName(e))}</span>`:""}</span><b class="${cls}">${mid}</b><small class="${st==="live"?"mlive":""}">${badge}</small></div>` }) } })(hwBody);
 // OK on the matches widget opens your match app (asked once)
 activators.unshift(el=>{ if(!el.dataset||!el.dataset.hw) return false; const w=hwGet(el.dataset.hw); if(!w||w.t!=="matches") return false;
   const go=()=>{ if(S.matchApp&&byPkg(S.matchApp)) launch(S.matchApp) };
@@ -119,3 +119,10 @@ hwCard=(function(prev){ return function(w){ let h=prev(w); if(w.t==="matches"&&h
 hwMenu=(function(prev){ return function(id){ prev(id); const w=hwGet(id); if(!w||w.t!=="matches") return; const box=$("dbox"), items=box&&box._items, g=box&&box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
   const a=S.matchApp&&byPkg(S.matchApp); items.splice(2,0,{icon:"📺",label:(S.lang==="ar"?"تطبيق الماتشات: ":"Match app: ")+(a?appName(a):"—"),fn:()=>{ S.matchApp=""; setTimeout(openMatchApp,30) }});
   g.innerHTML=items.map((it,k)=>`<button class="btn f${it.pri?" pri":""}" data-di="${k}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) } })(hwMenu);
+
+// channel name in Arabic: from the source when it has one, otherwise the usual broadcaster of that competition in Egypt/MENA (marked with ~)
+const TV_USUAL={"egy.1":"أون سبورت","egy.cup":"أون سبورت","ksa.1":"ثمانية","uefa.champions":"بي إن سبورتس","uefa.europa":"بي إن سبورتس","uefa.europa.conf":"بي إن سبورتس",
+  "eng.1":"بي إن سبورتس","fra.1":"بي إن سبورتس","caf.champions":"بي إن سبورتس","caf.confed":"بي إن سبورتس","afc.champions":"بي إن سبورتس","caf.nations":"بي إن سبورتس",
+  "fifa.world":"بي إن سبورتس","fifa.worldq.caf":"بي إن سبورتس","fifa.worldq.afc":"بي إن سبورتس","fifa.cwc":"بي إن سبورتس"};
+function tvAr(n){ if(S.lang!=="ar") return n; return String(n).replace(/bein\s*sports?\s*(max\s*)?/i,(m,x)=>"بي إن سبورتس "+(x?"ماكس ":"")).replace(/on\s*sports?\s*(max|plus|\+)?/i,(m,x)=>"أون سبورت"+(x?(/max/i.test(x)?" ماكس":" بلس"):"")).replace(/\bssc\b/i,"SSC").replace(/thmanyah/i,"ثمانية").replace(/shahid/i,"شاهد").replace(/ad sports?/i,"أبوظبي الرياضية").replace(/alkass|al kass/i,"الكاس").replace(/\s+/g," ").trim() }
+function tvName(e){ if(e._tv) return tvAr(e._tv); const u=TV_USUAL[e._lg]; return u?(S.lang==="ar"?u:u)+" ~":"" }
