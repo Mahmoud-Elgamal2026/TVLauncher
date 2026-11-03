@@ -80,7 +80,7 @@ hwBody=(function(prev){ return function(w){ let h=prev(w); if(w.t!=="matches"||h
     const mins=Math.round(left/60000);
     const badge=st==="live"?`● <span dir="ltr">${esc(liveMin(e)||L("live"))}</span>`:(st==="ns"&&left>0&&mins<60)?`${esc(L("mIn"))} ${mins} ${S.lang==="ar"?"د":"min"}`:day;
     const rk=n=>w.sz>2?teamRank(e._lg,n):"", nm=n=>esc(teamAr(n));
-    return `<div class="mcr${fav?" mfav":""}"><span class="mtn">${fav?"⭐ ":""}${logo(e.strHomeTeamBadge)}${nm(e.strHomeTeam)}${rk(e.strHomeTeam)} <i>×</i> ${logo(e.strAwayTeamBadge)}${nm(e.strAwayTeam)}${rk(e.strAwayTeam)}${e._tv?`<span class="mtv">📺 ${esc(e._tv)}</span>`:""}</span><b class="${cls}">${mid}</b><small class="${st==="live"?"mlive":""}">${badge}</small></div>` }) } })(hwBody);
+    return `<div class="mcr f${fav?" mfav":""}" tabindex="0" data-mt="${esc(e.idEvent||(e.strHomeTeam+"|"+e.strAwayTeam))}"><span class="mtn">${fav?"⭐ ":""}${logo(e.strHomeTeamBadge)}${nm(e.strHomeTeam)}${rk(e.strHomeTeam)} <i>×</i> ${logo(e.strAwayTeamBadge)}${nm(e.strAwayTeam)}${rk(e.strAwayTeam)}${e._tv?`<span class="mtv">📺 ${esc(e._tv)}</span>`:""}</span><b class="${cls}">${mid}</b><small class="${st==="live"?"mlive":""}">${badge}</small></div>` }) } })(hwBody);
 // OK on the matches widget opens your match app (asked once)
 activators.unshift(el=>{ if(!el.dataset||!el.dataset.hw) return false; const w=hwGet(el.dataset.hw); if(!w||w.t!=="matches") return false;
   const go=()=>{ if(S.matchApp&&byPkg(S.matchApp)) launch(S.matchApp) };
@@ -105,3 +105,11 @@ const TEAM_AR={"al ahly":"الأهلي","zamalek":"الزمالك","pyramids":"�
  "egypt":"مصر","saudi arabia":"السعودية","morocco":"المغرب","algeria":"الجزائر","tunisia":"تونس","qatar":"قطر","jordan":"الأردن","iraq":"العراق","uae":"الإمارات","united arab emirates":"الإمارات"};
 function teamAr(n){ if(S.lang!=="ar") return n; const k=String(n||"").toLowerCase().replace(/\s+fc$|^fc\s+/,"").trim(); return TEAM_AR[k]||n }
 window.teamAr=teamAr;
+
+// OK on a single match opens your match app (picked once)
+function openMatchApp(){ if(S.matchApp&&byPkg(S.matchApp)){ launch(S.matchApp); return }
+  const l=visibleApps().slice().sort((a,b)=>(/yacine|koora|yalla|ssc|bein|shahid|live|tv/i.test(b.pkg+appName(b))?1:0)-(/yacine|koora|yalla|ssc|bein|shahid|live|tv/i.test(a.pkg+appName(a))?1:0));
+  dialog("⚽ "+L("mPickApp"),l.slice(0,30).map(a=>({label:appName(a),fn:()=>{ S.matchApp=a.pkg; launch(a.pkg) }})),{grid:3}) }
+activators.unshift(el=>{ if(el.dataset&&el.dataset.mt!=null){ openMatchApp(); return true } return false });
+// long-press a match: change the app used for matches
+optionHandlers.unshift(el=>{ if(el.dataset&&el.dataset.mt!=null){ S.matchApp=""; openMatchApp(); return true } return false });

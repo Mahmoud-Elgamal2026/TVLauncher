@@ -1169,3 +1169,7 @@ html body .mcr .mtn{display:flex;flex-wrap:wrap;align-items:center;column-gap:.3
 html body .mcr .mtv{flex-basis:100%;font-size:1.2vh!important;opacity:.7!important;max-width:none;margin-top:.1vh}
 html body .mct.one{font-size:1.6vh!important;border-bottom:0!important;opacity:.85!important}
 .mmore{font-size:1.5vh;opacity:.8;text-align:center;margin-top:.4vh}
+html body .mcr.f{border-radius:1vh;padding:.4vh .6vw;margin:0 -.6vw;transition:none}
+html body .mcr.f.focus{background:var(--sel)!important;transform:none!important;box-shadow:none!important}
+html body .mcr.f.focus,html body .mcr.f.focus *{color:var(--selText)!important}
+html body .mcr.f.focus small{background:rgba(0,0,0,.15)!important}
