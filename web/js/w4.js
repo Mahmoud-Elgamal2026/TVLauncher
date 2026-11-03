@@ -112,4 +112,10 @@ function openMatchApp(){ if(S.matchApp&&byPkg(S.matchApp)){ launch(S.matchApp); 
   dialog("⚽ "+L("mPickApp"),l.slice(0,30).map(a=>({label:appName(a),fn:()=>{ S.matchApp=a.pkg; launch(a.pkg) }})),{grid:3}) }
 activators.unshift(el=>{ if(el.dataset&&el.dataset.mt!=null){ openMatchApp(); return true } return false });
 // long-press a match: change the app used for matches
-optionHandlers.unshift(el=>{ if(el.dataset&&el.dataset.mt!=null){ S.matchApp=""; openMatchApp(); return true } return false });
+optionHandlers.unshift(el=>{ if(el.dataset&&el.dataset.mt!=null){ const w=el.closest("[data-hw]"); if(w) hwMenu(w.dataset.hw); return true } return false });
+// the widget frame stops taking focus when it has matches inside, so the arrows land on each match directly
+hwCard=(function(prev){ return function(w){ let h=prev(w); if(w.t==="matches"&&h.indexOf('class="mcr f')>=0) h=h.replace(/^<div class="hw f /,'<div class="hw '); return h } })(hwCard);
+// widget menu: change the app matches open in
+hwMenu=(function(prev){ return function(id){ prev(id); const w=hwGet(id); if(!w||w.t!=="matches") return; const box=$("dbox"), items=box&&box._items, g=box&&box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
+  const a=S.matchApp&&byPkg(S.matchApp); items.splice(2,0,{icon:"📺",label:(S.lang==="ar"?"تطبيق الماتشات: ":"Match app: ")+(a?appName(a):"—"),fn:()=>{ S.matchApp=""; setTimeout(openMatchApp,30) }});
+  g.innerHTML=items.map((it,k)=>`<button class="btn f${it.pri?" pri":""}" data-di="${k}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) } })(hwMenu);
