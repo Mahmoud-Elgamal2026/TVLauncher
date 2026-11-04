@@ -1257,3 +1257,8 @@ html[dir=rtl].nofg .ytrecrow > * + *{margin-right:1vw}
 .ytrc.f.focus{background:var(--sel)!important}.ytrc.f.focus span{color:var(--selText)!important}
 .ytw{display:flex;flex-direction:column;gap:.6vh}
 html.nofg .ytw > * + *{margin-top:.6vh}.ytw .ytprow img{width:7vw!important;height:3.9vw!important}.ytw .ytprow b{font-size:1.6vh;max-height:4.4vh}.ytw .ytprow small{font-size:1.3vh}
+
+/* w9 */
+.srcdown{background:rgba(255,170,0,.14);border:1px solid rgba(255,170,0,.45);color:#ffd27a;border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:.95em}
+#setCats .setfind{border:1px dashed rgba(255,255,255,.3)}
+#setScroll .srhit{box-shadow:0 0 0 2px #ffd27a}
