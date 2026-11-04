@@ -6,6 +6,11 @@ Object.assign(T.en,{ytFindQ:"Type the channel name",ytFinding:"⏳ Searching",yt
   ytNoNew:"No new videos right now",ytOnHome:"🏠 On Home ✓",ytToHome:"🏠 Put on Home",ytHomeAdded:"Latest episodes widget added to Home",ytHomeRemoved:"Latest episodes widget removed from Home",
   ytNoApp:"No YouTube app on the box — install SmartTube or YouTube",ytRemoveW:"Remove widget from Home"});
 
+// show a subset of the feed for one render, safely even when two renders overlap
+let ytSwapN=0, ytSwapFull=null; const ytSwapSet=[];
+const ytFull=()=>ytSwapN?ytSwapFull:ytpAll;
+async function ytSubset(sub,fn){ if(ytSwapN++===0) ytSwapFull=ytpAll; ytSwapSet.push(sub); ytpAll=sub;
+  try{ return await fn() }finally{ ytSwapSet.splice(ytSwapSet.indexOf(sub),1); if(--ytSwapN===0){ if(ytpAll===sub||ytSwapSet.indexOf(ytpAll)>=0||ytpAll===ytSwapFull||!ytpAll.length) ytpAll=ytSwapFull; ytSwapFull=null } else if(ytpAll===sub) ytpAll=ytSwapSet[ytSwapSet.length-1]||ytSwapFull } }
 // ---- search YouTube channels by name (the results page lists channels with their real names)
 async function ytSearchCh(q){ const x=await A.fetchText("https://www.youtube.com/results?search_query="+encodeURIComponent(q)+"&sp=EgIQAg%253D%253D&hl=ar");
   const out=[], seen={}, un=s=>{ try{ return JSON.parse('"'+s+'"') }catch(e){ return s } };
@@ -50,8 +55,8 @@ window.openYt=openYt;
 renderYtp=(function(prev){ return async function(){
   // keep each video's category in step with its channel (changing a category used to be undone on the next refresh)
   const cm={}; (S.ytCh||[]).forEach(c=>cm[c.id]=c.cat||""); ytpAll.forEach(v=>{ if(cm[v.chId]!=null) v.cat=cm[v.chId] });
-  const isNew=ytpCat==="__new", full=ytpAll, nw=full.filter(ytNew); let r;
-  if(isNew&&nw.length){ ytpAll=nw; ytpCat=""; try{ r=await prev.apply(this,arguments) }finally{ if(ytpAll===nw) ytpAll=full; ytpCat="__new" } }
+  const isNew=ytpCat==="__new", full=ytFull(), nw=full.filter(ytNew); let r;
+  if(isNew&&nw.length){ ytpCat=""; try{ r=await ytSubset(nw,()=>prev.apply(this,arguments)) }finally{ ytpCat="__new" } }
   else if(isNew){ ytpCat=""; try{ r=await prev.apply(this,arguments) }finally{ ytpCat="__new" } }
   else r=await prev.apply(this,arguments);
   const m=$("ytpMain"); if(!m) return r; const ch=m.querySelector(".ychips");
@@ -82,3 +87,27 @@ ytAddDlg=function(){ const pop=[]; YT_SUGG.forEach(([k,l])=>l.forEach(([n,h])=>{
     t=setTimeout(async()=>{ const my=++seq; draw("⏳ "+q,[]); let l=[]; try{ l=await ytSearchCh(q) }catch(e){} if(my!==seq||!$("ytSug")) return;
       if(!l.length) return draw(L("ytFindNone")+": "+q,[]);
       draw("▶️ "+q,l.map(r=>({icon:(S.ytCh||[]).some(c=>c.id===r.id)?"✓":"▶️",label:r.name+(r.subs?" · "+r.subs:""),fn:()=>ytPickCat(c=>ytAddCh(r,c))}))) },600) }) };
+
+// ---- the old "▶️ YouTube" row on Home becomes the new "Latest episodes" widget (one YouTube widget, with ⚙️ and remove)
+(function(){ const l=hwList(); if(l.some(w=>w.t==="yt")){ const n=l.filter(w=>w.t!=="yt"); if(!n.some(w=>w.t==="ytnew")) n.push({id:"ytnew",t:"ytnew",sz:2,st:"glass"}); hwSave(n); try{ renderHW(); renderYt() }catch(e){} } })();
+for(let i=HW_TYPES.length-1;i>=0;i--) if(HW_TYPES[i][0]==="yt") HW_TYPES.splice(i,1);
+
+// ---- "📋 My channels": search the channels you follow by name; pick one to see only its videos (or open its menu)
+Object.assign(T.ar,{ytMine:"📋 قنواتي",ytMineQ:"دوّر في قنواتك",ytMineNone:"مفيش قناة بالاسم ده في قنواتك",ytOnly:"فيديوهات",ytChMenu:"⚙️ خيارات القناة"});
+Object.assign(T.en,{ytMine:"📋 My channels",ytMineQ:"Search your channels",ytMineNone:"No channel with that name",ytOnly:"Videos of",ytChMenu:"⚙️ Channel options"});
+let ytpOnly="";
+function ytMineDlg(){ const chs=(S.ytCh||[]).slice().sort((a,b)=>String(a.name).localeCompare(String(b.name),"ar"));
+  const draw=q=>{ const box=$("dbox"), s=$("ytMineL"); if(!box||!s) return; const n=setNorm(q), l=chs.filter(c=>!n||setNorm(c.name+" "+(c.cat||"")).indexOf(n)>=0);
+    box._items=l.map(c=>({label:c.name,fn:()=>{ ytpOnly=c.id; ytpCat=""; showPage("ytp"); renderYtp().then(()=>ytpFocus("#ytpMain .ytplist .f")) }}));
+    s.innerHTML=l.length?`<div class="mgrid c3">${l.map((c,i)=>`<button class="btn f" data-di="${i}" data-ytch="${esc(c.id)}"><b>▶️</b>${esc(c.name)}${c.cat?` <small>· ${esc(c.cat)}</small>`:""}${c.bell?" 🔔":""}</button>`).join("")}</div>`:`<p class="hint">${esc(L("ytMineNone"))}</p>` };
+  dialog(L("ytMine")+" ("+chs.length+")",[],{html:`<input class="inp f" id="dIn" placeholder="${esc(L("ytMineQ"))}"><div id="ytMineL"></div>`});
+  draw(""); $("dIn").addEventListener("input",()=>draw($("dIn").value.trim())) }
+renderYtp=(function(prev){ return async function(){ if(!ytpOnly) return prev.apply(this,arguments);
+  const only=ytFull().filter(v=>v.chId===ytpOnly); const r=only.length?await ytSubset(only,()=>prev.apply(this,arguments)):await prev.apply(this,arguments);
+  const m=$("ytpMain"), ch=m&&m.querySelector(".ychips"), c=(S.ytCh||[]).find(x=>x.id===ytpOnly);
+  if(ch&&c){ ch.querySelectorAll(".on").forEach(e=>e.classList.remove("on")); ch.insertAdjacentHTML("afterbegin",`<button class="ych f on" id="ytpOnlyX">${esc(L("ytOnly")+" "+c.name)} ✕</button>`) }
+  return r } })(renderYtp);
+renderYtp=(function(prev){ return async function(){ const r=await prev.apply(this,arguments); const head=$("ytpMain")&&$("ytpMain").querySelector(".ytphead");
+  if(head&&!$("ytpMine")&&(S.ytCh||[]).length) head.insertAdjacentHTML("beforeend",`<button class="ych f" id="ytpMine">${esc(L("ytMine"))}</button>`); return r } })(renderYtp);
+activators.unshift(el=>{ if(el.id==="ytpMine"){ ytMineDlg(); return true } if(el.id==="ytpOnlyX"){ ytpOnly=""; renderYtp().then(()=>ytpFocus("#ytpMine")); return true }
+  if(el.dataset&&el.dataset.ytc!=null&&ytpOnly){ ytpOnly="" } return false });
