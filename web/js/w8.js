@@ -60,3 +60,14 @@ hwBody=(function(prev){ return function(w){ if(w.t!=="ytnew") return prev(w);
 // the widget frame lets the remote land on each video
 hwCard=(function(prev){ return function(w){ let h=prev(w); if(w.t==="ytnew"&&h.indexOf('class="ytprow f')>=0) h=h.replace(/^<div class="hw f /,'<div class="hw '); return h } })(hwCard);
 setInterval(()=>{ if(hwHas("ytnew")&&document.querySelector("#home.on")) ytpLoad(false).then(()=>renderHW()) },20*60000);
+// a visible ⚙️ on the "Latest episodes" widget: OK on it opens a small menu (no long-press needed)
+hwCard=(function(prev){ return function(w){ let h=prev(w); if(w.t!=="ytnew") return h; h=h.replace(/^<div class="hw f /,'<div class="hw ');
+  return h.replace(/(<div class="hwt">)([\s\S]*?)(<\/div>)/,(m,a,b,c)=>`${a}${b}<button class="hwgear f" tabindex="0" data-ytgear="${esc(w.id)}">⚙️ ${S.lang==="ar"?"تحكم":"Edit"}</button>${c}`) } })(hwCard);
+activators.unshift(el=>{ if(!el.dataset||!el.dataset.ytgear) return false; const id=el.dataset.ytgear, ar=S.lang==="ar";
+  dialog("▶️ "+L("w_ytnew"),[
+    {icon:"▶️",label:ar?"افتح تابة اليوتيوب":"Open YouTube tab",fn:()=>showPage("ytp")},
+    {icon:"⟳",label:ar?"حدّث دلوقتي":"Refresh now",fn:()=>{ ytpAt=0; ytpLoad(true).then(()=>renderHW()); A.toast("⟳") }},
+    {icon:"＋",label:ar?"ضيف قناة":"Add channel",fn:()=>setTimeout(()=>{ if(typeof ytAddDlg==="function") ytAddDlg() },30)},
+    {icon:"✨",label:L("ytSugg"),fn:()=>setTimeout(ytSuggDlg,30)},
+    {icon:S.ytNoShorts?"🎞":"🚫",label:L(S.ytNoShorts?"ytShortsShow":"ytShortsHide"),fn:()=>{ S.ytNoShorts=!S.ytNoShorts; renderHW() }},
+    {icon:"🧩",label:ar?"الحجم والشكل والمكان":"Size, style, position",fn:()=>setTimeout(()=>hwMenu(id),30)}],{grid:3}); return true });
