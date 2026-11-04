@@ -68,3 +68,17 @@ activators.unshift(el=>{ if(el.id!=="ytpHome") return false; const onH=hwList().
 activators.unshift(el=>{ if(!el.dataset||!el.dataset.ytgear) return false; const id=el.dataset.ytgear; setTimeout(()=>{ const box=$("dbox"), items=box&&box._items, g=box&&box.querySelector(".mgrid,.dlist"); if(!items||!g) return;
     items.push({icon:"🗑",label:L("ytRemoveW"),fn:()=>{ hwSave(hwList().filter(w=>w.id!==id)); A.toast(L("ytHomeRemoved")); setTimeout(()=>{ try{ renderHW(); const f=document.querySelector("#home .f"); if(f) focus(f) }catch(e){} },50) }});
     g.innerHTML=items.map((it,k)=>`<button class="btn f${it.pri?" pri":""}" data-di="${k}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join(""); focus(g.querySelector(".f")) },0); return false });
+
+// ---- the add-channel box suggests channels: popular ones before typing, live YouTube matches while you type (also when typing from the phone)
+Object.assign(T.ar,{ytSugHint:"✨ مقترحات — أو اكتب الاسم وهتظهر القنوات وإنت بتكتب",ytSugGo:"🔍 دوّر"}); Object.assign(T.en,{ytSugHint:"✨ Suggestions — or type a name to see matching channels",ytSugGo:"🔍 Search"});
+ytAddDlg=function(){ const pop=[]; YT_SUGG.forEach(([k,l])=>l.forEach(([n,h])=>{ if(!(S.ytCh||[]).some(c=>c.handle===h)) pop.push({n,h}) })); let seq=0, t=0;
+  const go={icon:"",label:L("ytSugGo"),pri:1,fn:()=>{ const v=$("dIn").value.trim(); if(v) setTimeout(()=>ytFindDlg(v),40) }};
+  const draw=(hint,items)=>{ const box=$("dbox"), s=$("ytSug"); if(!box||!s) return; box._items=[go].concat(items);
+    s.innerHTML=`<div class="ytsugh">${esc(hint)}</div><div class="mgrid c3">${items.map((it,i)=>`<button class="btn f" data-di="${i+1}">${it.icon?`<b>${esc(it.icon)}</b>`:""}${esc(it.label)}</button>`).join("")}</div>` };
+  const popular=()=>draw(L("ytSugHint"),pop.slice(0,12).map(p=>({icon:"✨",label:p.n,fn:()=>ytPickCat(c=>ytAddHandle(p.h,p.n,c))})));
+  dialog(L("ytFindQ"),[go],{html:`<input class="inp f" id="dIn" placeholder="${esc(L("ytFindQ"))}"><div class="dlist"><button class="btn pri f" data-di="0">${esc(L("ytSugGo"))}</button></div><div id="ytSug"></div>`});
+  popular();
+  $("dIn").addEventListener("input",()=>{ clearTimeout(t); const q=$("dIn").value.trim(); if(q.length<2) return popular();
+    t=setTimeout(async()=>{ const my=++seq; draw("⏳ "+q,[]); let l=[]; try{ l=await ytSearchCh(q) }catch(e){} if(my!==seq||!$("ytSug")) return;
+      if(!l.length) return draw(L("ytFindNone")+": "+q,[]);
+      draw("▶️ "+q,l.map(r=>({icon:(S.ytCh||[]).some(c=>c.id===r.id)?"✓":"▶️",label:r.name+(r.subs?" · "+r.subs:""),fn:()=>ytPickCat(c=>ytAddCh(r,c))}))) },600) }) };

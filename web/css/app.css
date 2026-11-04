@@ -1075,3 +1075,5 @@ html body .hw.mwnew .hwt{display:none!important}
 .srcdown{background:rgba(255,170,0,.14);border:1px solid rgba(255,170,0,.45);color:#ffd27a;border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:.95em}
 #setCats .setfind{border:1px dashed rgba(255,255,255,.3)}
 #setScroll .srhit{box-shadow:0 0 0 2px #ffd27a}
+#ytSug .ytsugh{opacity:.75;font-size:.9em;margin:14px 2px 8px}
+#ytSug .mgrid{max-height:46vh;overflow:auto}
