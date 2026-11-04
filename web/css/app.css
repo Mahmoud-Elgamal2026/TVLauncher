@@ -1028,3 +1028,4 @@ html body .hwgear.focus{background:var(--sel)!important;color:var(--selText)!imp
 .nwgrid .lbc{width:13vw}.nwgrid .lbi{height:26vh;background-size:cover;background-position:center}
 .nwgrid .lbs{font-size:1.4vh;opacity:.75;max-height:4vh;overflow:hidden}
 html body .mcr small:empty{display:none!important}
+.mtbig .mct{color:#e9c46a!important}

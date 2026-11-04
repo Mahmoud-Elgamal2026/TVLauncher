@@ -13,7 +13,7 @@ Object.assign(T.en,{mtTab:"⚽ Matches",nwTab:"🆕 New",mtYday:"Yesterday",mtTo
 
 // ================= ⚽ Matches tab =================
 let mtCat="d0", mtLg="";
-const mtCats=()=>[["d-1","mtYday"],["d0","mtToday"],["d1","mtTmrw"],["d2","mtAfter"],["mine","mtMine"],["table","mtTable"]];
+let mtCats=()=>[["d-1","mtYday"],["d0","mtToday"],["d1","mtTmrw"],["d2","mtAfter"],["mine","mtMine"],["table","mtTable"]];
 function mtCatsHtml(){ return mtCats().map(([k,l])=>`<div class="it f${k===mtCat?" on sel":""}" tabindex="0" data-mtcat="${k}">${esc(L(l))}</div>`).join("") }
 function mtMsg(t){ $("mtMain").innerHTML=`<p class="hint">${esc(t)}</p>` }
 function mtRow(e){ const st=evState(e), fav=teamFav(e), logo=u=>u?`<img class="mlg" src="${esc(u)}" loading="lazy" alt="">`:"";
