@@ -99,7 +99,7 @@ async function checkUpdates(manual){
     if(r.latest>r.current&&r.url){
       const go=()=>{ banner("⬇️",L("updDownloading"),r.tag); nat("installUpdate",r.url) };
       if(manual) dialog(`⬆️ ${L("updAvail")} ${r.tag}`,[{label:L("updInstall"),pri:1,fn:go},{label:L("later"),fn:()=>{}}],{sub:(r.notes||"").slice(0,200)});
-      else banner("⬆️",`${L("updAvail")} ${r.tag}`,L("updHint"),12000);
+      else if(store.get("updShown","")!==r.tag){ store.set("updShown",r.tag); banner("⬆️",`${L("updAvail")} ${r.tag}`,L("updHint"),8000) } // once per version, not every hour
       window._pendingUpdate=r;
     } else if(manual) A.toast(L("updNone")+` (v${r.current})`);
   }catch(e){ if(manual) A.toast(L("loadErr")+": "+e.message) }
@@ -108,7 +108,7 @@ window.onUpdateProgress=p=>{
   if(p===-2) banner("🔐",L("updPerm"),L("updPermSub"),12000);
   else if(p===-1) banner("⚠️",L("loadErr"));
   else if(p===100) banner("✅",L("updReady"));
-  else if(p%25===0&&p>0) banner("⬇️",L("updDownloading"),p+"%",2500);
+  
 };
 setInterval(()=>{ if(S.autoUpdate&&Date.now()-store.get("lastUpdCheck",0)>3600000) checkUpdates(false) },5*60000); setTimeout(()=>{ if(S.autoUpdate) checkUpdates(false) },60000);
 
