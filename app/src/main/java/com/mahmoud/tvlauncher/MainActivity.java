@@ -1144,6 +1144,15 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public boolean openUriIn(String uri, String pkg) {
+            try { Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(uri)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                if (pkg != null && !pkg.isEmpty()) i.setPackage(pkg);
+                if (i.resolveActivity(getPackageManager()) == null) return false;
+                startActivity(i); return true; }
+            catch (Exception e) { return false; }
+        }
+
+        @JavascriptInterface
         public void openUri(String uri) {
             ui.post(() -> {
                 try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); }

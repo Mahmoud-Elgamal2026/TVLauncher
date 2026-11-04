@@ -69,6 +69,7 @@ function remoteCmd(m){
       if(/youtube\.com\/(@|channel\/|c\/|user\/)/i.test(u)||/^@/.test(u)){ if(window.ytAddFromPhone) ytAddFromPhone(u); return {ok:1,did:"channel"} }
       const v=u.match(/(?:youtu\.be\/|v=|shorts\/|live\/)([\w-]{11})/); if(v){ if(on("player")) stopPlayer(); if(window.openYt) openYt(v[1]); else nat("openUri",u); return {ok:1,did:"video"} }
       if(/\.(m3u8|mp4|mkv|mp3|ts)(\?|$)/i.test(u)){ play({name:u.split("/").pop(),url:u,kind:"movie"}); return {ok:1,did:"media"} }
+      if(!/^https?:/i.test(u)){ if(window.ytAddFromPhone) ytAddFromPhone(u); return {ok:1,did:"find"} }
       nat("openUri",u); return {ok:1,did:"link"} }
     case "photoReset": if(m.what==="frames") window.remoteFramesReset&&remoteFramesReset(); else window.remoteWallReset&&remoteWallReset(); return {ok:1};
     case "photo": { const u=nat("saveImageB64",String(m.data||"")); if(!u) return {error:"photo"};
