@@ -30,7 +30,7 @@ A.fetchText=(function(prev){ return async function(url){ const u=String(url); if
   try{ t=await prev.apply(this,arguments) }catch(e){ err=e }
   if(t){ st.ok=Date.now(); st.stale=0; if(t.length<250000) fcPut(u,t); return t }
   st.fail=Date.now(); const c=fcGet(u); if(c){ st.stale=c.at; return c.t } st.stale=0; if(err) throw err; return t } })(A.fetchText);
-function srcNote(rx){ for(const h of Object.keys(srcHealth)){ const s=srcHealth[h]; if(rx.test(h)&&s.fail&&(!s.ok||s.fail>s.ok))
+function srcNote(rx){ for(const h of Object.keys(srcHealth)){ const s=srcHealth[h]; if(rx.test(h)&&s.fail&&(!s.ok||s.fail-s.ok>120000))
     return `<div class="srcdown">${esc(s.stale?L("srcStale")+" "+agoAr(Date.now()-s.stale):L("srcDown"))}</div>` } return "" }
 const withNote=(prev,id,rx)=>async function(){ const r=await prev.apply(this,arguments); const m=$(id), n=srcNote(rx); if(m&&n&&!m.querySelector(".srcdown")) m.insertAdjacentHTML("afterbegin",n); return r };
 renderMt=withNote(renderMt,"mtMain",/espn/); renderNw=withNote(renderNw,"nwMain",/tvmaze|itunes/); renderYtp=withNote(renderYtp,"ytpMain",/youtube/);
