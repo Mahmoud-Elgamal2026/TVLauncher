@@ -140,6 +140,7 @@ nav button span{font-size:11px}
     <button data-tab="links"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>صور وروابط وإعدادات</span></button>
     <button data-tab="nums"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/></svg><span data-t="numbers"></span></button>
     <button data-a="frame"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/></svg><span data-t="frame"></span></button>
+    <button id="ytAddBtn"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z"/></svg><span>ضيف قناة يوتيوب (الصق اللينك)</span></button>
     <button data-a="update"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><span>حدّث اللانشر على الشاشة</span></button>
   </div></section>
 </main>
@@ -225,6 +226,8 @@ document.addEventListener("click",async e=>{
   if(d.dl){ const l=st.lists.slice(); l.splice(+d.dl,1); if(await api("lists",{lists:l})) toast(t("saved")); refresh(); return }
   if(d.save){ if(await api("set",{k:d.save,v:$(d.save).value})) toast(t("saved")); return }
   switch(b.id){
+    case "ytAddBtn": { let v=(prompt("الصق لينك القناة من يوتيوب أو اكتب @اسم_القناة\n(أو من تطبيق يوتيوب: افتح القناة ← مشاركة ← Phone Remote)")||"").trim(); if(!v) return;
+      const m=v.match(/https?:\/\/\S+/); v=m?m[0]:v; if(!/^https?:|^@/.test(v)) v="@"+v.replace(/\s+/g,""); if(await api("share",{u:/^https?:/.test(v)?v:v})) toast("⏳ بيضيف القناة…"); return }
     case "sendTxt": if(await api("text",{t:$("txt").value,submit:true})) toast(t("sent")); return;
     case "searchTxt": if(await api("search",{t:$("txt").value})) toast(t("sent")); return;
     case "lAdd": { const u=$("lUrl").value.trim(); if(!u) return; const l=(st?st.lists:[]).concat([{name:$("lName").value.trim()||"IPTV",url:u}]);

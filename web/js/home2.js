@@ -137,8 +137,9 @@ activators.unshift(el=>{ if(el.id==="railBoost"){ boostNow(); return true } retu
 window.ytAddFromPhone=async v=>{ if(!v) return; try{ const r=await ytResolve(v); if(!r) return A.toast(L("ytBad"));
   if(!r.name){ try{ const x=await A.fetchText("https://www.youtube.com/feeds/videos.xml?channel_id="+r.id); const m=x.match(/<title>([^<]+)<\/title>/); r.name=m?m[1]:r.id }catch(e){ r.name=r.id } }
   const chs=(S.ytCh||[]).filter(c=>c.id!==r.id); chs.push({id:r.id,name:r.name}); S.ytCh=chs;
-  if(!hwList().some(w=>w.t==="yt")) hwSave(hwList().concat([{id:"yt",t:"yt",sz:1,st:"glass"}]));
-  ytAt=0; ytLoad(true); banner("▶️",r.name,S.lang==="ar"?"اتضافت لويدجت يوتيوب":"Added to YouTube widget",5000) }catch(e){ A.toast(L("ytBad")) } };
+  if(!hwList().some(w=>w.t==="yt"||w.t==="ytnew")) hwSave(hwList().concat([{id:"ytnew",t:"ytnew",sz:2,st:"glass"}]));
+  ytAt=0; ytLoad(true); if(typeof ytpLoad==="function"){ ytpAt=0; ytpLoad(true).then(()=>{ try{ renderHW(); if(document.querySelector("#ytp.on")) renderYtp() }catch(e){} }) }
+  banner("▶️",r.name,S.lang==="ar"?"✓ القناة اتضافت (تابة اليوتيوب وويدجت أحدث الحلقات)":"✓ Channel added (YouTube tab and Latest episodes widget)",6000) }catch(e){ A.toast(L("ytBad")) } };
 
 // ================= Voice search: a mic on the side rail (same as the remote's mic key) =================
 const _renderPagerV=renderPager; renderPager=function(){ _renderPagerV(); const d=$("homePager"); if(!d||$("railMic")) return;

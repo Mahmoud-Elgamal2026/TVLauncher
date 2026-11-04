@@ -15,9 +15,15 @@ function pressKey(k){
   if(key==="Enter") document.dispatchEvent(new KeyboardEvent("keyup",{key,bubbles:true}));
 }
 function remoteText(t,submit){
-  const el=document.activeElement&&document.activeElement.tagName==="INPUT"?document.activeElement:(focused&&focused.tagName==="INPUT"?focused:null);
+  // the field to type into: the focused one, else the one in the open dialog, else any visible one on the current page
+  const isIn=e=>e&&(e.tagName==="INPUT"&&!/^(checkbox|radio|range|button|file)$/i.test(e.type)||e.tagName==="TEXTAREA");
+  const vis=e=>e&&e.offsetParent!==null;
+  let el=isIn(document.activeElement)?document.activeElement:isIn(focused)?focused:null;
+  if(!el&&on("dlg")) el=[].slice.call($("dlg").querySelectorAll("input,textarea")).find(e=>isIn(e)&&vis(e))||null;
+  if(!el){ const pg=document.querySelector(".page.on"); if(pg) el=[].slice.call(pg.querySelectorAll("input,textarea")).find(e=>isIn(e)&&vis(e))||null }
   if(el){ el.value=t; el.dispatchEvent(new Event("input",{bubbles:true}));
-    if(submit){ el.focus(); document.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true})) } return "input" }
+    if(submit){ if(on("dlg")&&$("dlg").contains(el)){ const b=$("dlg").querySelector('.btn.pri[data-di]')||$("dlg").querySelector('[data-di="0"]'); if(b){ activate(b); return "dialog" } }
+      focus(el); el.focus(); document.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true})) } return "input" }
   openSearch(t); return "search";
 }
 function remoteState(){
