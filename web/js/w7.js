@@ -88,3 +88,17 @@ Object.assign(TEAM_AR,{"como":"كومو","lens":"لانس","rc lens":"لانس",
   "brighton & hove albion":"برايتون","west ham united":"وست هام","everton":"إيفرتون","fulham":"فولهام","crystal palace":"كريستال بالاس","brentford":"برينتفورد","nottingham forest":"نوتنجهام فورست","wolverhampton wanderers":"وولفرهامبتون","bournemouth":"بورنموث",
   "eintracht frankfurt":"فرانكفورت","vfl wolfsburg":"فولفسبورج","borussia monchengladbach":"مونشنجلادباخ","sc freiburg":"فرايبورج","nice":"نيس","rennes":"رين","club brugge":"كلوب بروج","celtic":"سيلتك","rangers":"رينجرز","olympiacos":"أولمبياكوس","red bull salzburg":"سالزبورج","dinamo zagreb":"دينامو زغرب",
   "zed fc":"زد","tala'ea el-gaish":"طلائع الجيش","talaea el gaish":"طلائع الجيش","el masry":"المصري","petrojet":"بتروجت","national bank":"البنك الأهلي","ghazl el-mahalla":"غزل المحلة"});
+
+// side lists in the Matches / New tabs: update the highlight in place (rebuilding them stole the remote's focus)
+function syncCats(boxId,html,attr,cur){ const b=$(boxId); if(!b) return; const items=b.querySelectorAll(`[${attr}]`);
+  const want=(html.match(new RegExp(attr+'="','g'))||[]).length;
+  if(items.length!==want){ b.innerHTML=html; return }
+  items.forEach(e=>{ const on=e.getAttribute(attr)===cur; e.classList.toggle("on",on); e.classList.toggle("sel",on) }) }
+renderMt=(function(prev){ return async function(){ const b=$("mtCats"), keep=b&&b.innerHTML; const html=mtCatsHtml();
+  const orig=b?Object.getOwnPropertyDescriptor(Element.prototype,"innerHTML"):null;
+  // run the original, but keep the existing category buttons
+  if(b&&keep){ const real=b; Object.defineProperty(real,"innerHTML",{configurable:true,set(v){ syncCats("mtCats",v,"data-mtcat",mtCat) },get(){ return orig.get.call(real) }}) }
+  try{ return await prev.apply(this,arguments) }finally{ if(b) delete b.innerHTML } } })(renderMt);
+renderNw=(function(prev){ return async function(){ const b=$("nwCats"), keep=b&&b.innerHTML; const orig=Object.getOwnPropertyDescriptor(Element.prototype,"innerHTML");
+  if(b&&keep){ Object.defineProperty(b,"innerHTML",{configurable:true,set(v){ syncCats("nwCats",v,"data-nwcat",nwCat) },get(){ return orig.get.call(b) }}) }
+  try{ return await prev.apply(this,arguments) }finally{ if(b) delete b.innerHTML } } })(renderNw);
