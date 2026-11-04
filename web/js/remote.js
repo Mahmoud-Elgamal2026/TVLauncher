@@ -60,6 +60,11 @@ function remoteCmd(m){
       loadLists().then(loadEpg); renderSettings(); return {ok:1} }
     case "favs": { if(!Array.isArray(m.order)) return {error:"favs"}; S.favs=m.order.filter(p=>typeof p==="string"&&byPkg(p)); renderHome(); return {ok:1} }
     case "fav": toggleList("favs",String(m.pkg)); renderHome(); return {ok:1};
+    case "ytImport": { const l=Array.isArray(m.list)?m.list:[]; const chs=(S.ytCh||[]).slice(); let added=0;
+      l.slice(0,300).forEach(c=>{ const id=String(c&&c.id||""); if(!/^UC[\w-]{22}$/.test(id)||chs.some(x=>x.id===id)) return; chs.push({id,name:String(c.name||id).slice(0,80)}); added++ });
+      S.ytCh=chs; if(typeof hwList==="function"&&!hwList().some(w=>w.t==="yt"||w.t==="ytnew")) hwSave(hwList().concat([{id:"ytnew",t:"ytnew",sz:2,st:"glass"}]));
+      if(typeof ytpLoad==="function"){ ytpAt=0; if(typeof ytpAll!=="undefined") ytpAll=[]; ytpLoad(true).then(()=>{ try{ renderHW(); if(document.querySelector("#ytp.on")) renderYtp() }catch(e){} }) }
+      banner("▶️",(S.lang==="ar"?"اتضاف ":"Added ")+added+(S.lang==="ar"?" قناة يوتيوب":" YouTube channels"),"",6000); return {ok:1,added} }
     case "share": { const u=String(m.u||"").trim(); if(!u) return {error:"share"}; if(on("frame")) stopFrame();
       if(/youtube\.com\/(@|channel\/|c\/|user\/)/i.test(u)||/^@/.test(u)){ if(window.ytAddFromPhone) ytAddFromPhone(u); return {ok:1,did:"channel"} }
       const v=u.match(/(?:youtu\.be\/|v=|shorts\/|live\/)([\w-]{11})/); if(v){ if(on("player")) stopPlayer(); if(window.openYt) openYt(v[1]); else nat("openUri",u); return {ok:1,did:"video"} }

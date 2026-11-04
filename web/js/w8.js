@@ -54,7 +54,7 @@ setInterval(async()=>{ /* ytBell */ const chs=(S.ytCh||[]).filter(c=>c.bell); if
 HW_TYPES.push(["ytnew","▶️","w_ytnew"]);
 hwBody=(function(prev){ return function(w){ if(w.t!=="ytnew") return prev(w);
   if(!(S.ytCh||[]).length) return `<div class="hwico">▶️</div><div class="hwsub dim">${esc(L("ytNoCh"))}</div>`;
-  if(!ytpVids.length){ ytpLoad(false).then(()=>renderHW()); return `<div class="hwsub dim">${esc(L("ytLoading"))}</div>` }
+  if(!ytpVids.length){ if(!ytpAt||Date.now()-ytpAt>5*60000){ ytpAt=Date.now(); ytpLoad(true).then(()=>renderHW()); return `<div class="hwsub dim">${esc(L("ytLoading"))}</div>` } return `<div class="hwsub dim">${esc(L("ytNothingNew"))}</div>` }
   const n=w.sz>2?5:w.sz>1?3:2, l=ytVisible().filter(ytNew).slice(0,n), list=l.length?l:ytVisible().slice(0,n);
   return `<div class="ytw">${!l.length?`<div class="hwsub dim">${esc(L("ytNothingNew"))}</div>`:""}${list.map(v=>`<div class="ytprow f${ytNew(v)?" new":""}" tabindex="0" data-ytv="${esc(v.v)}" data-ytch="${esc(v.chId)}"><img loading="lazy" src="https://i.ytimg.com/vi/${esc(v.v)}/mqdefault.jpg" alt=""><div><b>${esc(v.title)}</b><small>${esc(v.ch)} · ${esc(agoAr(Date.now()-v.at))}</small></div></div>`).join("")}</div>` } })(hwBody);
 // the widget frame lets the remote land on each video
