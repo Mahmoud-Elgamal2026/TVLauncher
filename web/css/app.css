@@ -1064,3 +1064,9 @@ html body .hw.mwnew .hwt{display:none!important}
 .mwr.f.focus{background:var(--sel)!important}.mwr.f.focus,.mwr.f.focus *{color:var(--selText)!important}
 .mwf{display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.1);margin-top:.8vh;padding-top:.8vh;font-size:1.4vh;opacity:.8}
 .ytprow img{width:10vw!important;height:5.6vw!important}
+.ytrec{margin-top:1.4vh}.ytrect{font-size:1.7vh;opacity:.8;margin-bottom:.8vh}
+.ytrecrow{display:flex;gap:1vw;overflow:hidden}
+.ytrc{width:12vw;flex:0 0 auto;border-radius:1.2vh;padding:.5vh}.ytrc img{width:100%;height:6.7vw;object-fit:cover;border-radius:1vh;background:#111}
+.ytrc span{display:block;font-size:1.4vh;line-height:1.4;max-height:4vh;overflow:hidden;margin-top:.4vh}
+.ytrc.f.focus{background:var(--sel)!important}.ytrc.f.focus span{color:var(--selText)!important}
+.ytw{display:flex;flex-direction:column;gap:.6vh}.ytw .ytprow img{width:7vw!important;height:3.9vw!important}.ytw .ytprow b{font-size:1.6vh;max-height:4.4vh}.ytw .ytprow small{font-size:1.3vh}

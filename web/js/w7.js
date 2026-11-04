@@ -56,7 +56,7 @@ optionHandlers.unshift(el=>{ const d=el.dataset||{}; if(!d.ytch) return false; c
   const setCat=v=>{ c.cat=v; S.ytCh=chs; ytpVids.forEach(x=>{ if(x.chId===c.id) x.cat=v }); renderYtp() };
   dialog("▶️ "+c.name,[{icon:"🏷",label:L("ytCat")+": "+(c.cat||L("ytNoCat")),pri:1,fn:()=>setTimeout(()=>dialog(L("ytCat"),cats.map(k=>({label:k,fn:()=>setCat(k)})).concat([{icon:"＋",label:L("ytNewCat"),fn:()=>setTimeout(()=>prompt2(L("ytCatName"),"",v=>{ if(v) setCat(v.trim()) }),30)},{label:L("ytNoCat"),fn:()=>setCat("")}]),{grid:3}),30)},
     {icon:"✓",label:L("ytMarkSeen"),fn:()=>{ const s=Object.assign({},S.ytSeen||{}); ytpVids.forEach(v=>s[v.v]=Date.now()); S.ytSeen=s; renderYtp() }},
-    {icon:"🗑",label:L("ytRemCh"),fn:()=>{ S.ytCh=chs.filter(x=>x.id!==c.id); ytpVids=ytpVids.filter(x=>x.chId!==c.id); renderYtp() }},{label:L("done"),fn:()=>{}}]); return true });
+    {icon:"🗑",label:L("ytRemCh"),fn:()=>{ S.ytCh=chs.filter(x=>x.id!==c.id); ytpVids=ytpVids.filter(x=>x.chId!==c.id); if(typeof ytpAll!=="undefined") ytpAll=ytpAll.filter(x=>x.chId!==c.id); renderYtp() }},{label:L("done"),fn:()=>{}}]); return true });
 
 // ---------------- ⚽ matches widget, new look: status chips, competition chips, two-line rows, last update ----------------
 let mwAt=Date.now(); const _loadSportsMW=loadSports; loadSports=async function(){ const r=await _loadSportsMW.apply(this,arguments); mwAt=Date.now(); return r };
