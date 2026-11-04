@@ -1200,3 +1200,51 @@ html.nofg .mtpage > * + *{margin-top:2.4vh}
 .nwgrid .lbs{font-size:1.4vh;opacity:.75;max-height:4vh;overflow:hidden}
 html body .mcr small:empty{display:none!important}
 .mtbig .mct{color:#e9c46a!important}
+/* chips (YouTube tab + matches widget) */
+.ychips{display:flex;flex-wrap:wrap;gap:.6vw;margin:.9vh 0}
+html[dir=ltr].nofg .ychips > * + *{margin-left:.6vw}
+html[dir=rtl].nofg .ychips > * + *{margin-right:.6vw}
+html.nofg .ychips > *{margin-bottom:.6vw}
+.ych{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:99px;padding:.6vh 1.1vw;font-size:1.6vh;font-family:inherit;font-weight:600}
+.ych i{font-style:normal;opacity:.7}
+html[dir=ltr] .ych i{margin-left:.3vw}
+html[dir=rtl] .ych i{margin-right:.3vw}
+.ych.sm{font-size:1.4vh;padding:.45vh .9vw}
+.ych.on{background:rgba(233,196,106,.18);border-color:#e9c46a;color:#fff}
+.ych.f.focus{background:var(--sel)!important;color:var(--selText)!important;border-color:transparent;transform:scale(1.06)}
+.ych.f.focus i{opacity:.8}
+/* ▶️ YouTube tab */
+.ytpanel{max-width:64vw;margin:0 auto;padding:1vh 1vw 8vh}
+.ytphead{display:flex;align-items:center;gap:.8vw;font-size:2.6vh;margin-bottom:.6vh}
+html[dir=ltr].nofg .ytphead > * + *{margin-left:.8vw}
+html[dir=rtl].nofg .ytphead > * + *{margin-right:.8vw}
+.ytpico{display:inline-flex;align-items:center;justify-content:center;width:4vh;height:4vh;border-radius:1vh;background:#d9468f;color:#fff;font-size:2vh}
+.ytpn{font-style:normal;background:#3b82f6;color:#fff;border-radius:99px;padding:.1vh .8vw;font-size:1.6vh}
+.ytpsp{flex:1}
+.ytplist{display:flex;flex-direction:column;gap:1vh;margin-top:1.4vh;border-top:1px solid rgba(255,255,255,.1);padding-top:1.4vh}
+html.nofg .ytplist > * + *{margin-top:1vh}
+.ytprow{display:flex;gap:1.2vw;align-items:center;padding:.8vh .8vw;border-radius:1.4vh}
+html[dir=ltr].nofg .ytprow > * + *{margin-left:1.2vw}
+html[dir=rtl].nofg .ytprow > * + *{margin-right:1.2vw}
+.ytprow img{width:13vw;height:7.3vw;object-fit:cover;border-radius:1vh;flex:0 0 auto;background:#111}
+.ytprow b{display:block;font-size:2vh;line-height:1.4;max-height:5.6vh;overflow:hidden}
+.ytprow small{display:block;font-size:1.5vh;opacity:.7;margin-top:.4vh}
+.ytprow.new b::before{content:"● ";color:#3b82f6}
+.ytprow.f.focus{background:var(--sel)!important}.ytprow.f.focus,.ytprow.f.focus *{color:var(--selText)!important}
+.ytpopen{display:block;width:100%;margin-top:2vh}
+/* ⚽ matches widget new look */
+html body .hw.mwnew .hwt{display:none!important}
+.mwh{display:flex;align-items:center;gap:.7vw;font-size:2.1vh}
+html[dir=ltr].nofg .mwh > * + *{margin-left:.7vw}
+html[dir=rtl].nofg .mwh > * + *{margin-right:.7vw}
+.mwico{display:inline-flex;align-items:center;justify-content:center;width:3.4vh;height:3.4vh;border-radius:.9vh;background:#16a34a;font-size:1.8vh}
+.mwl{display:flex;flex-direction:column;gap:.4vh;margin-top:.6vh;border-top:1px solid rgba(255,255,255,.1);padding-top:.8vh}
+html.nofg .mwl > * + *{margin-top:.4vh}
+.mwr{padding:.7vh .7vw;border-radius:1.2vh}
+.mwr b{display:block;font-size:1.85vh;font-weight:700}.mwr b i{font-style:normal;opacity:.6;margin:0 .3vw}.mwr b em{font-style:normal;color:#f87171;margin:0 .4vw}
+.mwr small{display:block;font-size:1.4vh;opacity:.7!important;margin-top:.2vh}
+.mwr.mfav b{color:#e9c46a!important}
+.mlivet{color:#f87171!important;font-weight:700}
+.mwr.f.focus{background:var(--sel)!important}.mwr.f.focus,.mwr.f.focus *{color:var(--selText)!important}
+.mwf{display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.1);margin-top:.8vh;padding-top:.8vh;font-size:1.4vh;opacity:.8}
+.ytprow img{width:10vw!important;height:5.6vw!important}
