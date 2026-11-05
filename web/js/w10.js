@@ -98,7 +98,7 @@ Object.assign(T.en,{ytMine:"📋 My channels",ytMineQ:"Search your channels",ytM
 let ytpOnly="";
 function ytMineDlg(){ const chs=(S.ytCh||[]).slice().sort((a,b)=>String(a.name).localeCompare(String(b.name),"ar"));
   const draw=q=>{ const box=$("dbox"), s=$("ytMineL"); if(!box||!s) return; const n=setNorm(q), l=chs.filter(c=>!n||setNorm(c.name+" "+(c.cat||"")).indexOf(n)>=0);
-    box._items=l.map(c=>({label:c.name,fn:()=>{ ytpOnly=c.id; ytpCat=""; showPage("ytp"); renderYtp().then(()=>ytpFocus("#ytpMain .ytplist .f")) }}));
+    box._items=l.map(c=>({label:c.name,fn:()=>setTimeout(()=>ytChMenu(c.id),40)}));
     s.innerHTML=l.length?`<div class="mgrid c3">${l.map((c,i)=>`<button class="btn f" data-di="${i}" data-ytch="${esc(c.id)}"><b>▶️</b>${esc(c.name)}${c.cat?` <small>· ${esc(c.cat)}</small>`:""}${c.bell?" 🔔":""}</button>`).join("")}</div>`:`<p class="hint">${esc(L("ytMineNone"))}</p>` };
   dialog(L("ytMine")+" ("+chs.length+")",[],{html:`<input class="inp f" id="dIn" placeholder="${esc(L("ytMineQ"))}"><div id="ytMineL"></div>`});
   draw(""); $("dIn").addEventListener("input",()=>draw($("dIn").value.trim())) }
@@ -111,3 +111,13 @@ renderYtp=(function(prev){ return async function(){ const r=await prev.apply(thi
   if(head&&!$("ytpMine")&&(S.ytCh||[]).length) head.insertAdjacentHTML("beforeend",`<button class="ych f" id="ytpMine">${esc(L("ytMine"))}</button>`); return r } })(renderYtp);
 activators.unshift(el=>{ if(el.id==="ytpMine"){ ytMineDlg(); return true } if(el.id==="ytpOnlyX"){ ytpOnly=""; renderYtp().then(()=>ytpFocus("#ytpMine")); return true }
   if(el.dataset&&el.dataset.ytc!=null&&ytpOnly){ ytpOnly="" } return false });
+
+// one menu per channel: its videos, category, alerts, remove
+function ytChMenu(id){ const chs=(S.ytCh||[]).slice(), c=chs.find(x=>x.id===id); if(!c) return; const ar=S.lang==="ar";
+  dialog("▶️ "+c.name,[
+    {icon:"▶️",label:ar?"فيديوهاتها بس":"Only its videos",pri:1,fn:()=>{ ytpOnly=c.id; ytpCat=""; showPage("ytp"); renderYtp().then(()=>ytpFocus("#ytpMain .ytplist .f")) }},
+    {icon:"🏷",label:L("ytCat")+": "+(c.cat||L("ytNoCat")),fn:()=>ytPickCat(v=>{ c.cat=v; S.ytCh=chs; renderYtp() })},
+    {icon:c.bell?"🔕":"🔔",label:L(c.bell?"ytBellOff":"ytBell"),fn:()=>{ c.bell=!c.bell; S.ytCh=chs; A.toast((c.bell?"🔔 ":"🔕 ")+c.name) }},
+    {icon:"🗑",label:(ar?"احذف القناة: ":"Remove channel: ")+c.name,fn:()=>{ S.ytCh=chs.filter(x=>x.id!==id); ytpAll=ytpAll.filter(v=>v.chId!==id); ytpVids=ytpVids.filter(v=>v.chId!==id); if(ytpOnly===id) ytpOnly="";
+      A.toast("🗑 "+c.name); renderYtp(); try{ renderHW() }catch(e){} }}],{grid:2}) }
+window.ytChMenu=ytChMenu;
