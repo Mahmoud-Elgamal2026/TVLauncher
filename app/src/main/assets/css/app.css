@@ -1264,3 +1264,43 @@ html.nofg .ytw > * + *{margin-top:.6vh}.ytw .ytprow img{width:7vw!important;heig
 #setScroll .srhit{box-shadow:0 0 0 2px #ffd27a}
 #ytSug .ytsugh{opacity:.75;font-size:.9em;margin:14px 2px 8px}
 #ytSug .mgrid{max-height:46vh;overflow:auto}
+/* w11: match cards */
+#mtMain .mtg{display:flex!important;flex-wrap:wrap;justify-content:space-between;align-items:stretch;grid-template-columns:none}
+#mtMain .mtg>.mct{width:100%;order:-1;writing-mode:horizontal-tb;margin:1.4vh 0 1vh;font-size:2vh;font-weight:700;border:0;padding:0}
+#mtMain .mtday{width:100%}
+.mtc{box-sizing:border-box;width:calc(50% - .6vw);margin:0 0 1.2vh;padding:1.4vh 1.2vw 1.6vh;border-radius:1.6vh;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column}
+#mtMain .mtpage>.mtc{width:100%}
+.mtc.mfav{border-color:rgba(255,210,122,.45)}
+.mtc.focus,.mtc:focus{background:rgba(255,255,255,.16);border-color:#fff;transform:scale(1.02)}
+.mtch{display:flex;justify-content:space-between;align-items:center;font-size:1.5vh;opacity:.8;margin-bottom:1vh}
+.mtch i{font-style:normal;border:1px solid rgba(255,255,255,.3);border-radius:2vh;padding:.2vh .9vw;font-size:1.35vh}
+.mtcb{display:flex;align-items:center;justify-content:space-between}
+.mtct{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0}
+.mtct img,.mcq img,.mteam img{width:4.4vh;height:4.4vh;object-fit:contain;margin-bottom:.6vh}
+.mtct span{font-size:1.75vh;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.mnol{font-style:normal;font-size:3.4vh;display:block;margin-bottom:.6vh;opacity:.6}
+.mtcm{flex:0 0 auto;padding:0 1vw;text-align:center;display:flex;flex-direction:column;align-items:center}
+.mtcm b{font-size:3vh;font-weight:700;letter-spacing:.05em}
+.mtcm b.live{color:#ff6b6b}
+.mtcm small{font-size:1.3vh;opacity:.7;margin-top:.3vh}
+.mtcm small.mlive{color:#ff6b6b;opacity:1}
+.mteams{display:flex;flex-wrap:wrap;margin-top:1vh}
+.mteam{box-sizing:border-box;width:calc(25% - .8vw);margin:0 .8vw 1.2vh 0;padding:1.4vh .6vw;border-radius:1.4vh;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;text-align:center;position:relative}
+.mteam span{font-size:1.6vh}
+.mteam.on{border-color:#ffd27a;background:rgba(255,210,122,.12)}
+.mteam b{position:absolute;top:.6vh;left:.6vw;font-size:1.6vh}
+.mteam.focus,.mteam:focus{background:rgba(255,255,255,.18);border-color:#fff}
+/* big rotating card on Home */
+.hw-mcard .hwb{flex:1;display:flex}
+.mcbig{flex:1;display:flex;flex-direction:column;justify-content:center}
+.mcqL{align-self:flex-start;background:rgba(0,0,0,.35);border-radius:1.2vh;padding:.4vh .9vw;font-size:1.5vh;margin-bottom:.8vh}
+.mcc{display:flex;align-items:center;justify-content:space-between}
+.mcq{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0}
+.mcq span{font-size:1.8vh;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.mcm{text-align:center;display:flex;flex-direction:column;align-items:center;padding:0 .6vw}
+.mcm b{font-size:3.6vh;font-weight:800}
+.mcm b.live{color:#ff6b6b}
+.mcm small{font-size:1.4vh;opacity:.8}
+.mcdots{display:flex;justify-content:center;margin-top:.8vh}
+.mcdots i{width:.7vh;height:.7vh;border-radius:50%;background:rgba(255,255,255,.3);margin:0 .25vw}
+.mcdots i.on{background:#fff}
