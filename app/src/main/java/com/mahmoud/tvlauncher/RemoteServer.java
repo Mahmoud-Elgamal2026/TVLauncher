@@ -33,8 +33,10 @@ class RemoteServer {
     private ExecutorService pool;
     private volatile boolean running;
 
-    RemoteServer(AssetManager assets, String code, Handler handler) {
-        this.assets = assets; this.code = code; this.handler = handler;
+    private final java.io.File cacheDir;
+
+    RemoteServer(AssetManager assets, String code, Handler handler, java.io.File cacheDir) {
+        this.assets = assets; this.code = code; this.handler = handler; this.cacheDir = cacheDir;
     }
 
     void setCode(String c) { code = c; }
@@ -85,6 +87,26 @@ class RemoteServer {
             if ("GET".equals(method) && ("/".equals(path) || "/index.html".equals(path))) {
                 byte[] page = readAsset("remote.html");
                 send(out, 200, "text/html; charset=utf-8", page);
+                return;
+            }
+            // an APK sent from the phone: saved as the installer file, then the launcher opens the system installer
+            if ("POST".equals(method) && "/apk".equals(path)) {
+                String k = param(query, "k");
+                if (k == null || !k.equals(code)) { send(out, 403, "application/json", "{\"error\":\"code\"}".getBytes("UTF-8")); return; }
+                long len = 0;
+                try { len = Long.parseLong(headers.getOrDefault("content-length", "0")); } catch (Exception ignored) {}
+                if (len <= 0 || len > 400_000_000L) { send(out, 413, "application/json", "{\"error\":\"size\"}".getBytes("UTF-8")); return; }
+                sock.setSoTimeout(60000);
+                java.io.File dir = new java.io.File(cacheDir, "update"); dir.mkdirs();
+                java.io.File f = new java.io.File(dir, "update.apk");
+                long got = 0;
+                try (OutputStream fo = new java.io.FileOutputStream(f)) {
+                    byte[] buf = new byte[65536];
+                    while (got < len) { int n = in.read(buf, 0, (int) Math.min(buf.length, len - got)); if (n < 0) break; fo.write(buf, 0, n); got += n; }
+                }
+                if (got < len) { send(out, 400, "application/json", "{\"error\":\"short\"}".getBytes("UTF-8")); return; }
+                String res = handler.call("{\"cmd\":\"apkReady\",\"name\":" + org.json.JSONObject.quote(param(query, "n") == null ? "" : java.net.URLDecoder.decode(param(query, "n"), "UTF-8")) + "}");
+                send(out, 200, "application/json; charset=utf-8", (res == null ? "{}" : res).getBytes("UTF-8"));
                 return;
             }
             if ("POST".equals(method) && "/api".equals(path)) {

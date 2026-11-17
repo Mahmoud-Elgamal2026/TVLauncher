@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
         web.loadUrl("file:///android_asset/index.html");
         String code = prefs.getString("remoteCode", null);
         if (code == null) { code = newCode(); prefs.edit().putString("remoteCode", code).apply(); }
-        remote = new RemoteServer(getAssets(), code, this::remoteCall);
+        remote = new RemoteServer(getAssets(), code, this::remoteCall, getCacheDir());
         if (prefs.getBoolean("remoteOn", true)) remote.start();
         handleAction(getIntent());
         ui.postDelayed(watchdog, 30000);
@@ -1090,6 +1090,22 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void installUpdate(String url) { installApk(url, "update"); }
+
+        /** Opens the system installer for the APK the phone just sent (saved as cache/update/update.apk). */
+        @JavascriptInterface
+        public boolean installLocal() {
+            if (android.os.Build.VERSION.SDK_INT >= 26 && !getPackageManager().canRequestPackageInstalls()) {
+                ui.post(() -> { try { startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName()))); } catch (Exception ignored) {} });
+                return false;
+            }
+            File f = new File(new File(getCacheDir(), "update"), "update.apk");
+            if (!f.exists()) return false;
+            Uri uri = UpdateProvider.uriFor(MainActivity.this, f);
+            Intent i = new Intent(Intent.ACTION_VIEW).setDataAndType(uri, "application/vnd.android.package-archive")
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+            ui.post(() -> { try { startActivity(i); } catch (Exception e) { toast("Install failed"); } });
+            return true;
+        }
 
         /** Downloads any APK and opens the system installer. Progress: onApkProgress(id, pct); -2 = needs permission, -1 = error. */
         @JavascriptInterface

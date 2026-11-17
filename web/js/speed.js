@@ -32,7 +32,7 @@ activators.unshift(el=>{ const d=el.dataset||{};
   return false });
 // back on Home: the apps you used are closed so they hold no RAM (their data/settings are untouched)
 const _onBgF=window.onBg; window.onBg=function(b){ _onBgF(b);
-  if(!b&&S.autoCloseApps&&typeof openedApps!=="undefined"&&openedApps.length){ const l=openedApps.slice(); setTimeout(()=>{ if(window.__bg) return; l.forEach(p=>{ try{ closeOne(p) }catch(e){} }) },1500) } };
+  if(!b&&S.autoCloseApps&&typeof openedApps!=="undefined"&&openedApps.length){ const l=openedApps.slice(2); /* the last 2 apps stay warm so they reopen fast */ if(!l.length) return; setTimeout(()=>{ if(window.__bg) return; l.forEach(p=>{ try{ closeOne(p) }catch(e){} }) },1500) } };
 
 // ================= Settings: 8 clear groups instead of 25 scattered sections =================
 const SET_GROUPS=[

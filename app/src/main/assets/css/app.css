@@ -1304,3 +1304,6 @@ html.nofg .ytw > * + *{margin-top:.6vh}.ytw .ytprow img{width:7vw!important;heig
 .mcdots{display:flex;justify-content:center;margin-top:.8vh}
 .mcdots i{width:.7vh;height:.7vh;border-radius:50%;background:rgba(255,255,255,.3);margin:0 .25vw}
 .mcdots i.on{background:#fff}
+/* w12 lite: simpler Home */
+body.lite #profBtn,body.lite #railGuest,body.lite #smartRow,body.lite h2[data-row="smartRow"],body.lite #matchRow,body.lite h2[data-row="matchRow"],
+body.lite #quickRow,body.lite h2[data-row="quickRow"],body.lite #recentRow,body.lite h2[data-row="recentRow"],body.lite #xSources,body.lite #ticker{display:none!important}

@@ -36,6 +36,7 @@ function remoteState(){
     last:S.lastCh?{url:S.lastCh.url,name:S.lastCh.name}:null,playing:on("player")&&playing?{name:playing.name,no:playing.no}:null,
     page:(document.querySelector(".page.on")||{}).id};
 }
+const NA_PKG="com.mahmoud.tvlauncher";
 const KID_SAFE=new Set(["state","key","text","launch","play","action","volume","profile","search"]);
 function remoteCmd(m){
   if(isKids()&&!KID_SAFE.has(m.cmd)&&m.pin!==S.pin) return {error:"kids"};
@@ -45,6 +46,8 @@ function remoteCmd(m){
     case "key": pressKey(String(m.k)); return {ok:1};
     case "text": return {ok:1,to:remoteText(String(m.t||""),!!m.submit)};
     case "search": openSearch(String(m.t||"")); return {ok:1};
+    case "apkReady": { if(on("frame")) stopFrame(); const ok=nat("installLocal"); banner("📦",(m.name||"APK")+"",ok?(S.lang==="ar"?"وافق على التثبيت على الشاشة":"Confirm the install on screen"):(S.lang==="ar"?"اسمح للانشر بتثبيت التطبيقات وابعته تاني":"Allow installs for the launcher, then send it again"),8000); return {ok:ok?1:0} }
+    case "uninstall": { const pkg=String(m.pkg||""); if(!pkg||pkg===NA_PKG) return {ok:0}; if(on("frame")) stopFrame(); nat("uninstallApp",pkg); return {ok:1} }
     case "launch": if(on("frame")) stopFrame(); if(on("player")) stopPlayer(); launch(String(m.pkg)); return {ok:1};
     case "play": if(on("frame")) stopFrame(); playUrl(String(m.url)); return {ok:1};
     case "action": runAction(String(m.a)); return {ok:1};

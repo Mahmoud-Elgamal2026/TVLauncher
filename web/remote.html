@@ -90,6 +90,7 @@ nav button span{font-size:11px}
 .mlist button{display:flex;align-items:center;gap:14px;background:var(--card)!important;border:1px solid var(--line)!important;color:var(--text);border-radius:14px;padding:15px 16px;font-size:15px;text-align:start}
 .mlist button:active{background:var(--card2)!important}
 .mlist button svg{color:var(--acc);flex:0 0 auto}
+.wide{display:block;width:100%;padding:14px;border-radius:14px;margin:6px 0 12px;font-size:15px;font-weight:600}
 </style>
 </head>
 <body><script>try{document.documentElement.dataset.skin=localStorage.getItem("skin")||"lux"}catch(e){}</script>
@@ -134,7 +135,7 @@ nav button span{font-size:11px}
     <h2>Telegram bot token / توكن بوت تيليجرام</h2><div class="search"><input id="tgToken" dir="ltr" placeholder="123456789:AA..."><button class="ib" data-save="tgToken">💾</button></div>
     <h2 data-t="adhan"></h2><div class="search"><input id="adhanUrl" dir="ltr" placeholder="https://.../adhan.mp3"><button class="ib" data-save="adhanUrl">💾</button></div>
   </section>
-  <section class="tab" id="t-apps"><h2 data-t="favOrder"></h2><div id="favs"></div><h2 data-t="favCh"></h2><div id="favCh"></div><h2 data-t="apps"></h2><div class="search"><input id="appQ" data-ph="findApp"></div><div id="apps" style="margin-top:10px"></div></section>
+  <section class="tab" id="t-apps"><h2 data-t="favOrder"></h2><div id="favs"></div><h2 data-t="favCh"></h2><div id="favCh"></div><h2 data-t="apps"></h2><button class="wide" id="apkBtn">📦 نزّل تطبيق على الشاشة (ملف APK من موبايلك)</button><input type="file" id="apkFile" accept=".apk,application/vnd.android.package-archive,*/*" style="display:none"><div id="apkProg" style="display:none;margin:8px 0;font-size:14px"></div><div class="search"><input id="appQ" data-ph="findApp"></div><div id="apps" style="margin-top:10px"></div></section>
   <section class="tab" id="t-watch"><h2 data-t="watch"></h2><div id="watch"></div></section>
   <section class="tab" id="t-more"><div class="mlist">
     <button data-tab="watch"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z"/></svg><span data-t="watchS"></span></button>
@@ -202,8 +203,13 @@ async function refresh(){
 }
 function renderApps(){ if(!st) return; const q=$("appQ").value.trim().toLowerCase();
   $("apps").innerHTML=st.apps.filter(a=>!q||a.name.toLowerCase().includes(q)).map(a=>`<div class="item"><div class="t"><b>${esc(a.name)}</b></div>
-    <button class="ib${a.fav?" on":""}" data-fav="${esc(a.pkg)}">${a.fav?"★":"☆"}</button><button class="ib" data-launch="${esc(a.pkg)}">▶</button></div>`).join("") }
+    <button class="ib${a.fav?" on":""}" data-fav="${esc(a.pkg)}">${a.fav?"★":"☆"}</button><button class="ib" data-launch="${esc(a.pkg)}">▶</button><button class="ib" data-uninst="${esc(a.pkg)}" data-n="${esc(a.name)}" title="حذف">🗑</button></div>`).join("") }
 $("appQ").addEventListener("input",renderApps);
+$("apkFile").addEventListener("change",e=>{ const f=e.target.files[0]; e.target.value=""; if(!f) return; const pr=$("apkProg"); pr.style.display="block"; pr.textContent="⬆️ بيبعت "+f.name+" …";
+  const x=new XMLHttpRequest(); x.open("POST",API_BASE+"/apk?k="+encodeURIComponent(code)+"&n="+encodeURIComponent(f.name));
+  x.upload.onprogress=ev=>{ if(ev.lengthComputable) pr.textContent="⬆️ "+f.name+" — "+Math.round(ev.loaded*100/ev.total)+"%" };
+  x.onload=()=>{ pr.textContent=x.status===200?"✓ وصل — وافق على التثبيت على الشاشة":x.status===413?"الملف كبير قوي":"حصل خطأ، جرّب تاني"; setTimeout(()=>pr.style.display="none",8000); if(x.status===200) setTimeout(refresh,15000) };
+  x.onerror=()=>{ pr.textContent="مقدرتش أبعته — اتأكد إن الموبايل والبوكس على نفس الواي فاي" }; x.send(f) });
 // repeat-on-hold for arrows
 let holdT=null, holdI=null;
 function startHold(k){ api("key",{k}); buzz(); if(!["up","down","left","right"].includes(k)) return; holdT=setTimeout(()=>{ holdI=setInterval(()=>api("key",{k}),160) },450) }
@@ -220,6 +226,8 @@ document.addEventListener("click",async e=>{
   if(d.v){ buzz(); api("volume",{d:d.v}); return }
   if(b.id==="tvOffBtn"){ buzz(); if(confirm("تقفل التليفزيون؟")) api("power",{}); return }
   if(d.a){ buzz(); api("action",{a:d.a}); return }
+  if(d.uninst){ buzz(); if(confirm("تحذف «"+d.n+"» من البوكس؟\nهيظهر سؤال تأكيد على الشاشة، دوس OK بالريموت")) { if(await api("uninstall",{pkg:d.uninst})) toast("بصّ على الشاشة ووافق") } return }
+  if(b.id==="apkBtn"){ $("apkFile").click(); return }
   if(d.launch){ buzz(); if(await api("launch",{pkg:d.launch})) toast(t("sent")); return }
   if(d.play){ buzz(); if(await api("play",{url:d.play})) toast(t("sent")); setTimeout(refresh,800); return }
   if(d.fav){ await api("fav",{pkg:d.fav}); refresh(); return }

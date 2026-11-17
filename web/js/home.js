@@ -69,7 +69,7 @@ function launch(pkg){
   guard(isLocked(pkg),()=>{
     if(!A.launch(pkg)){A.toast(L("notInst"));return}
     S.recent=[pkg,...S.recent.filter(p=>p!==pkg)].slice(0,10);
-    setTimeout(renderHome,800);
+    window.__homeDirty=true; // redrawn when you come back, not while the app is starting
   });
 }
 function moveFav(pkg,d){ const l=S.favs, i=l.indexOf(pkg), j=i+d; if(i<0||j<0||j>=l.length) return; [l[i],l[j]]=[l[j],l[i]]; S.favs=l; renderHome();
