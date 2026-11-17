@@ -29,3 +29,24 @@ launch=(function(prev){ return function(pkg){ const others=(typeof openedApps!==
 renderSettings=(function(prev){ return function(){ const r=prev.apply(this,arguments); const a=document.querySelector('[data-hv="autoCloseApps:on"]'), f=a&&a.closest(".field");
   if(f&&!$("coOn")) f.insertAdjacentHTML("afterend",`<div class="field"><label>${esc(L("coLabel"))}</label><div class="inline"><button class="btn f${S.closeOthers?" pri":""}" id="coOn">${esc(L("on"))}</button><button class="btn f${!S.closeOthers?" pri":""}" id="coOff">${esc(L("off"))}</button></div></div>`); return r } })(renderSettings);
 activators.unshift(el=>{ if(el.id!=="coOn"&&el.id!=="coOff") return false; S.closeOthers=el.id==="coOn"; $("coOn").classList.toggle("pri",S.closeOthers); $("coOff").classList.toggle("pri",!S.closeOthers); return true });
+
+// ---- silent installs through Shizuku: launcher updates go in by themselves when the box is idle, and APKs from the phone install with no prompt
+Object.assign(DEF,{silentUpd:true});
+Object.assign(T.ar,{suTitle:"🤫 التحديث من غير ما تدوس",suOk:"✓ شغال — التحديث بيتثبت لوحده لما البوكس يكون فاضي 10 دقايق",suNeed:"محتاج Shizuku يكون شغال ومسموحله",suBtn:"🔐 اسمح لـ Shizuku",suGet:"⬇️ نزّل Shizuku",
+  suInst:"بيتثبت…",suDone:"✓ اتثبت",suFail:"التثبيت الصامت ماظبطش — هيظهرلك طلب التثبيت العادي"});
+Object.assign(T.en,{suTitle:"🤫 Updates with no prompt",suOk:"✓ On — updates install by themselves after 10 idle minutes",suNeed:"Needs Shizuku running and allowed",suBtn:"🔐 Allow Shizuku",suGet:"⬇️ Get Shizuku",
+  suInst:"Installing…",suDone:"✓ Installed",suFail:"Silent install failed — the normal install prompt will show"});
+const canSilent=()=>!!(NA&&NA.silentInstall)&&typeof shz==="function"&&shz()==="ok";
+window.silentApk=(name)=>{ if(!canSilent()) return false; banner("📦",name||"APK",L("suInst"),6000); nat("silentInstall","","phone:"+(name||"")); return true };
+window.onSilentInstall=(id,res)=>{ const ph=id.indexOf("phone:")===0, nm=ph?id.slice(6):"Elgamal TV";
+  if(res==="ok"){ banner("✅",nm,L("suDone"),5000); return }
+  banner("⚠️",nm,L("suFail"),6000); if(ph) nat("installLocal"); else if(window._pendingUpdate) nat("installUpdate",window._pendingUpdate.url) };
+setInterval(()=>{ /* autoUpdate silent */ const r=window._pendingUpdate; if(!r||!r.url||!S.silentUpd||!canSilent()) return;
+  if(store.get("silentTried","")===r.tag||window.__bg||Date.now()-idleAt<10*60000||on("player")) return;
+  store.set("silentTried",r.tag); nat("silentInstall",r.url,"update") },5*60000);
+renderSettings=(function(prev){ return function(){ const r=prev.apply(this,arguments); const b=$("checkUpd"), f=b&&b.closest(".field");
+  if(f&&!$("suSec")){ const ok=canSilent();
+    f.insertAdjacentHTML("afterend",`<div class="field" id="suSec"><label>${esc(L("suTitle"))}</label><div class="inline"><span class="hint">${esc(L(ok?"suOk":"suNeed"))}</span>${ok?"":`<button class="btn f" id="suAllow">${esc(L("suBtn"))}</button><button class="btn f" id="suGet">${esc(L("suGet"))}</button>`}</div></div>`) } return r } })(renderSettings);
+activators.unshift(el=>{ if(el.id==="suAllow"){ nat("shizukuRequest"); setTimeout(()=>{ try{ renderSettings() }catch(e){} },4000); return true }
+  if(el.id==="suGet"){ A.toast("⬇️ Shizuku"); A.fetchJSON("https://api.github.com/repos/RikkaApps/Shizuku/releases/latest").then(r=>{ const a=(r.assets||[]).find(x=>/\.apk$/i.test(x.name||""));
+      if(a) nat("installApk",a.browser_download_url,"shizuku"); else A.toast(L("loadErr")) }).catch(()=>A.toast(L("loadErr"))); return true } return false });

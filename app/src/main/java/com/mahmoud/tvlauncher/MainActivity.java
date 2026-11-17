@@ -1091,6 +1091,55 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void installUpdate(String url) { installApk(url, "update"); }
 
+        /** Installs an APK with no on-screen prompt through Shizuku ("pm install"). url empty = the APK the phone sent.
+         *  Result: onSilentInstall(id, "ok" | error text). Updating the launcher itself restarts it (MY_PACKAGE_REPLACED). */
+        @JavascriptInterface
+        public void silentInstall(String url, String id) {
+            new Thread(() -> {
+                String res;
+                try {
+                    File dir = getExternalFilesDir(null); if (dir == null) throw new Exception("no storage");
+                    dir.mkdirs();
+                    File f = new File(dir, "silent.apk");
+                    if (url == null || url.isEmpty()) {
+                        File src = new File(new File(getCacheDir(), "update"), "update.apk");
+                        try (InputStream in = new java.io.FileInputStream(src); OutputStream out = new java.io.FileOutputStream(f)) {
+                            byte[] buf = new byte[65536]; int n; while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+                        }
+                    } else {
+                        HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+                        c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android TV) TVLauncher");
+                        c.setConnectTimeout(15000); c.setReadTimeout(60000);
+                        for (int hop = 0; hop < 5; hop++) {
+                            int code = c.getResponseCode();
+                            if (code >= 300 && code < 400 && c.getHeaderField("Location") != null) {
+                                URL next = new URL(c.getURL(), c.getHeaderField("Location")); c.disconnect();
+                                c = (HttpURLConnection) next.openConnection();
+                                c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android TV) TVLauncher");
+                            } else break;
+                        }
+                        try (InputStream in = c.getInputStream(); OutputStream out = new java.io.FileOutputStream(f)) {
+                            byte[] buf = new byte[65536]; int n; while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+                        }
+                    }
+                    java.lang.reflect.Method m = rikka.shizuku.Shizuku.class.getDeclaredMethod("newProcess", String[].class, String[].class, String.class);
+                    m.setAccessible(true);
+                    Process p = (Process) m.invoke(null, new String[]{"pm", "install", "-r", f.getAbsolutePath()}, null, null);
+                    StringBuilder sb = new StringBuilder();
+                    try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) { String line; while ((line = r.readLine()) != null) sb.append(line).append('\n'); }
+                    try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getErrorStream()))) { String line; while ((line = r.readLine()) != null) sb.append(line).append('\n'); }
+                    p.waitFor();
+                    String out = sb.toString().trim();
+                    res = out.contains("Success") ? "ok" : (out.isEmpty() ? "failed" : out);
+                    f.delete();
+                } catch (Throwable t) {
+                    Throwable cause = t instanceof java.lang.reflect.InvocationTargetException && t.getCause() != null ? t.getCause() : t;
+                    res = String.valueOf(cause.getMessage());
+                }
+                js("window.onSilentInstall&&onSilentInstall(" + JSONObject.quote(id) + "," + JSONObject.quote(res) + ")");
+            }).start();
+        }
+
         /** Opens the system installer for the APK the phone just sent (saved as cache/update/update.apk). */
         @JavascriptInterface
         public boolean installLocal() {

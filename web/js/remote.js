@@ -46,7 +46,7 @@ function remoteCmd(m){
     case "key": pressKey(String(m.k)); return {ok:1};
     case "text": return {ok:1,to:remoteText(String(m.t||""),!!m.submit)};
     case "search": openSearch(String(m.t||"")); return {ok:1};
-    case "apkReady": { if(on("frame")) stopFrame(); const ok=nat("installLocal"); banner("📦",(m.name||"APK")+"",ok?(S.lang==="ar"?"وافق على التثبيت على الشاشة":"Confirm the install on screen"):(S.lang==="ar"?"اسمح للانشر بتثبيت التطبيقات وابعته تاني":"Allow installs for the launcher, then send it again"),8000); return {ok:ok?1:0} }
+    case "apkReady": { if(on("frame")) stopFrame(); if(window.silentApk&&silentApk(m.name)) return {ok:1,silent:1}; const ok=nat("installLocal"); banner("📦",(m.name||"APK")+"",ok?(S.lang==="ar"?"وافق على التثبيت على الشاشة":"Confirm the install on screen"):(S.lang==="ar"?"اسمح للانشر بتثبيت التطبيقات وابعته تاني":"Allow installs for the launcher, then send it again"),8000); return {ok:ok?1:0} }
     case "uninstall": { const pkg=String(m.pkg||""); if(!pkg||pkg===NA_PKG) return {ok:0}; if(on("frame")) stopFrame(); nat("uninstallApp",pkg); return {ok:1} }
     case "launch": if(on("frame")) stopFrame(); if(on("player")) stopPlayer(); launch(String(m.pkg)); return {ok:1};
     case "play": if(on("frame")) stopFrame(); playUrl(String(m.url)); return {ok:1};
