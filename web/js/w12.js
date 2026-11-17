@@ -20,3 +20,12 @@ renderSettings=(function(prev){ return function(){ const r=prev.apply(this,argum
   const c=$("setCats"); if(c&&typeof buildSetCats==="function"){ buildSetCats() } return r } })(renderSettings);
 // home: back from an app → redraw once (launch no longer redraws while the app is starting)
 const _onBgLite=window.onBg; window.onBg=function(b){ _onBgLite.apply(this,arguments); if(!b&&window.__homeDirty){ window.__homeDirty=false; setTimeout(()=>{ if(!window.__bg) try{ renderHome() }catch(e){} },350) } };
+
+// ---- opening an app closes every other app you opened (they keep their data/settings); on/off in Settings ⚡
+Object.assign(DEF,{closeOthers:true});
+Object.assign(T.ar,{coLabel:"لما أفتح أي تطبيق، اقفل الباقي لوحده"}); Object.assign(T.en,{coLabel:"When I open an app, close the others"});
+launch=(function(prev){ return function(pkg){ const others=(typeof openedApps!=="undefined"?openedApps:[]).filter(p=>p!==pkg&&p!==NA_PKG); const r=prev.apply(this,arguments);
+  if(S.closeOthers&&others.length) setTimeout(()=>others.forEach(p=>{ try{ closeOne(p) }catch(e){} }),1500); return r } })(launch);
+renderSettings=(function(prev){ return function(){ const r=prev.apply(this,arguments); const a=document.querySelector('[data-hv="autoCloseApps:on"]'), f=a&&a.closest(".field");
+  if(f&&!$("coOn")) f.insertAdjacentHTML("afterend",`<div class="field"><label>${esc(L("coLabel"))}</label><div class="inline"><button class="btn f${S.closeOthers?" pri":""}" id="coOn">${esc(L("on"))}</button><button class="btn f${!S.closeOthers?" pri":""}" id="coOff">${esc(L("off"))}</button></div></div>`); return r } })(renderSettings);
+activators.unshift(el=>{ if(el.id!=="coOn"&&el.id!=="coOff") return false; S.closeOthers=el.id==="coOn"; $("coOn").classList.toggle("pri",S.closeOthers); $("coOff").classList.toggle("pri",!S.closeOthers); return true });
