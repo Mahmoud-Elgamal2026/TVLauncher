@@ -27,6 +27,12 @@ jobs:
         run: |
           url=$(curl -sfL -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/RikkaApps/Shizuku/releases/latest | python3 -c "import json,sys;a=[x['browser_download_url'] for x in json.load(sys.stdin)['assets'] if x['name'].endswith('.apk')];print(a[0] if a else '')")
           if [ -n "$url" ]; then curl -sfL -o app/src/main/assets/shizuku.apk "$url" && ls -l app/src/main/assets/shizuku.apk; else echo "::warning::Shizuku not bundled"; fi
+      # fingerprint of the phone app's sources: the phone compares its own copy with the release's to offer an update
+      - name: Phone version fingerprint
+        id: phsrc
+        run: |
+          h=$(find phone/src -type f ! -name src.txt | sort | xargs cat | sha256sum | cut -c1-16)
+          echo "$h" > phone/src/main/assets/src.txt; echo "h=$h" >> "$GITHUB_OUTPUT"
       - name: Build APK
         shell: bash
         env: { KEYSTORE_PASS: "${{ secrets.KEYSTORE_PASS }}" }
@@ -62,5 +68,5 @@ jobs:
           name: Phone remote
           prerelease: true
           make_latest: false
-          body: Phone remote app for TV Launcher
+          body: "Phone remote app for TV Launcher · src:${{ steps.phsrc.outputs.h }}"
           files: phoneout/PhoneRemote.apk

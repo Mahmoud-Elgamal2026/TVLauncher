@@ -107,13 +107,18 @@ public class MainActivity extends Activity {
         web.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> cb, FileChooserParams p) {
                 if (fileCb != null) fileCb.onReceiveValue(null); fileCb = cb;
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT).addCategory(Intent.CATEGORY_OPENABLE).setType("image/*");
+                String type = "*/*"; String[] acc = p.getAcceptTypes();
+                if (acc != null) { boolean img = acc.length > 0; for (String a : acc) if (a == null || !a.startsWith("image/")) img = false; if (img) type = "image/*"; }
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT).addCategory(Intent.CATEGORY_OPENABLE).setType(type);
                 if (p.getMode() == FileChooserParams.MODE_OPEN_MULTIPLE) i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                try { startActivityForResult(Intent.createChooser(i, "اختار صورة"), REQ_FILE); } catch (Exception e) { fileCb = null; return false; }
+                try { startActivityForResult(Intent.createChooser(i, "image/*".equals(type) ? "اختار صورة" : "اختار ملف"), REQ_FILE); } catch (Exception e) { fileCb = null; return false; }
                 return true;
             }
         });
+        // downloads from the box (file browser) go to the phone's Downloads through Android's download manager
+        web.setDownloadListener((url, ua, cd, mime, len) -> { String n = android.webkit.URLUtil.guessFileName(url, cd, mime); download(url, n); });
         web.loadUrl("file:///android_asset/remote.html");
+        checkSelfUpdate();
         setContentView(web);
     }
 
@@ -124,10 +129,32 @@ public class MainActivity extends Activity {
                 startActivityForResult(i, REQ_VOICE); } catch (Exception e) { js("alert('مفيش خدمة صوت على الموبايل')"); } }); }
         @JavascriptInterface public String base() { return boxBase == null ? "" : boxBase; }
         @JavascriptInterface public void rescan() { runOnUiThread(() -> { msg.setText("بيدوّر على البوكس في الواي فاي…"); setContentView(msg); web = null; scan(); }); }
+        // ---- full backup kept on the phone: settings (JSON) + the APKs of the box's apps
+        @JavascriptInterface public void saveBackup(String json) { try { writeFile(new java.io.File(getFilesDir(), "backup.json"), json.getBytes("UTF-8")); prefs.edit().putLong("bkAt", System.currentTimeMillis()).apply(); } catch (Exception ignored) {} }
+        @JavascriptInterface public String loadBackup() { try { return new String(readAll(new java.io.FileInputStream(new java.io.File(getFilesDir(), "backup.json"))), "UTF-8"); } catch (Exception e) { return ""; } }
+        @JavascriptInterface public long backupAt() { return prefs.getLong("bkAt", 0); }
+        /** {pkg: versionCode} of the APKs already saved on the phone */
+        @JavascriptInterface public String savedApks() { JSONObject o = new JSONObject(); java.io.File[] fs = apkDir().listFiles();
+            if (fs != null) for (java.io.File f : fs) { String n = f.getName(); if (!n.endsWith(".apk")) continue; try { o.put(n.substring(0, n.length() - 4), prefs.getInt("v_" + n, 0)); } catch (Exception ignored) {} } return o.toString(); }
+        @JavascriptInterface public void pullApk(String url, String pkg, int ver) { new Thread(() -> { boolean ok = false;
+            java.io.File tmp = new java.io.File(apkDir(), pkg + ".part"), f = new java.io.File(apkDir(), pkg + ".apk");
+            try { HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection(); c.setConnectTimeout(5000); c.setReadTimeout(60000);
+                if (c.getResponseCode() == 200) { try (java.io.InputStream in = c.getInputStream(); java.io.OutputStream out = new java.io.FileOutputStream(tmp)) { byte[] b = new byte[65536]; int n; while ((n = in.read(b)) > 0) out.write(b, 0, n); }
+                    ok = tmp.length() > 0 && tmp.renameTo(f); if (ok) prefs.edit().putInt("v_" + pkg + ".apk", ver).apply(); } } catch (Exception ignored) {}
+            if (!ok) tmp.delete(); final boolean r = ok; runOnUiThread(() -> js("window.onApkSaved&&onApkSaved(" + JSONObject.quote(pkg) + "," + r + ")")); }).start(); }
+        @JavascriptInterface public void pushApk(String url, String pkg) { new Thread(() -> { int code = 0;
+            java.io.File f = new java.io.File(apkDir(), pkg + ".apk");
+            try { HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection(); c.setDoOutput(true); c.setRequestMethod("POST"); c.setFixedLengthStreamingMode(f.length());
+                c.setConnectTimeout(5000); c.setReadTimeout(120000);
+                try (java.io.InputStream in = new java.io.FileInputStream(f); java.io.OutputStream out = c.getOutputStream()) { byte[] b = new byte[65536]; int n; while ((n = in.read(b)) > 0) out.write(b, 0, n); }
+                code = c.getResponseCode(); } catch (Exception ignored) {}
+            final int r = code; runOnUiThread(() -> js("window.onApkPushed&&onApkPushed(" + JSONObject.quote(pkg) + "," + r + ")")); }).start(); }
+        @JavascriptInterface public void download(String url, String name) { MainActivity.this.download(url, name); }
+        @JavascriptInterface public void updateSelf() { runOnUiThread(MainActivity.this::updateSelf); }
         @JavascriptInterface public String pending() { String s = pendingShare; pendingShare = null; return s == null ? "" : s; }
     }
 
-    void js(String code) { if (web != null) web.evaluateJavascript(code, null); }
+    void js(String code) { runOnUiThread(() -> { if (web != null) web.evaluateJavascript(code, null); }); }
 
     @Override protected void onActivityResult(int req, int res, Intent data) {
         super.onActivityResult(req, res, data);
@@ -163,6 +190,50 @@ public class MainActivity extends Activity {
             return true;
         }
         return super.dispatchKeyEvent(e);
+    }
+
+
+    java.io.File apkDir() { java.io.File d = new java.io.File(getFilesDir(), "apks"); d.mkdirs(); return d; }
+    static void writeFile(java.io.File f, byte[] b) throws Exception { try (java.io.OutputStream o = new java.io.FileOutputStream(f)) { o.write(b); } }
+    static byte[] readAll(java.io.InputStream in) throws Exception { try (java.io.InputStream i = in) { java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream(); byte[] b = new byte[65536]; int n; while ((n = i.read(b)) > 0) bo.write(b, 0, n); return bo.toByteArray(); } }
+
+    void download(String url, String name) {
+        try { android.app.DownloadManager dm = (android.app.DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+            android.app.DownloadManager.Request r = new android.app.DownloadManager.Request(Uri.parse(url)).setTitle(name)
+                .setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setDestinationInExternalPublicDir(android.os.Environment.DIRECTORY_DOWNLOADS, name);
+            dm.enqueue(r); js("window.toast&&toast('⬇️ بينزل في Downloads')");
+        } catch (Exception e) { js("window.toast&&toast('مقدرتش أنزّله')"); }
+    }
+
+    // ---- the app updates itself: the GitHub "phone" release says which version of the remote it holds
+    static final String REL = "https://api.github.com/repos/Mahmoud-Elgamal2026/TVLauncher/releases/tags/phone";
+    static final String APK = "https://github.com/Mahmoud-Elgamal2026/TVLauncher/releases/download/phone/PhoneRemote.apk";
+    String mySrc() { try { return new String(readAll(getAssets().open("src.txt")), "UTF-8").trim(); } catch (Exception e) { return ""; } }
+    void checkSelfUpdate() {
+        if (System.currentTimeMillis() - prefs.getLong("updChk", 0) < 6 * 3600000L) { if (prefs.getBoolean("updAvail", false)) js("window.onPhoneUpdate&&onPhoneUpdate()"); return; }
+        new Thread(() -> { try { HttpURLConnection c = (HttpURLConnection) new URL(REL).openConnection(); c.setConnectTimeout(8000); c.setReadTimeout(15000);
+            String body = new JSONObject(new String(readAll(c.getInputStream()), "UTF-8")).optString("body", "");
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("src:([0-9a-f]{8,})").matcher(body); String mine = mySrc();
+            boolean avail = m.find() && !mine.isEmpty() && !m.group(1).equals(mine);
+            prefs.edit().putLong("updChk", System.currentTimeMillis()).putBoolean("updAvail", avail).apply();
+            if (avail) runOnUiThread(() -> js("window.onPhoneUpdate&&onPhoneUpdate()")); } catch (Exception ignored) {} }).start();
+    }
+    void updateSelf() {
+        try { android.app.DownloadManager dm = (android.app.DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+            java.io.File old = new java.io.File(getExternalFilesDir(null), "PhoneRemote.apk"); old.delete();
+            final long id = dm.enqueue(new android.app.DownloadManager.Request(Uri.parse(APK)).setTitle("Phone Remote")
+                .setDestinationInExternalFilesDir(this, null, "PhoneRemote.apk"));
+            android.content.BroadcastReceiver rc = new android.content.BroadcastReceiver() { @Override public void onReceive(android.content.Context c, Intent i) {
+                if (i.getLongExtra(android.app.DownloadManager.EXTRA_DOWNLOAD_ID, -1) != id) return; try { unregisterReceiver(this); } catch (Exception ignored) {}
+                Uri u = dm.getUriForDownloadedFile(id); if (u == null) { js("toast('التحميل ماكملش، جرّب تاني')"); return; }
+                prefs.edit().putBoolean("updAvail", false).putLong("updChk", 0).apply();
+                Intent in = new Intent(Intent.ACTION_VIEW).setDataAndType(u, "application/vnd.android.package-archive").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+                try { startActivity(in); } catch (Exception e) { js("toast('افتح الملف من الإشعارات')"); } } };
+            android.content.IntentFilter flt = new android.content.IntentFilter(android.app.DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+            if (android.os.Build.VERSION.SDK_INT >= 33) registerReceiver(rc, flt, android.content.Context.RECEIVER_EXPORTED); else registerReceiver(rc, flt);
+            js("toast('⬇️ بينزّل النسخة الجديدة…')");
+        } catch (Exception e) { js("toast('مقدرتش أنزّل التحديث')"); }
     }
 
     @Override public void onBackPressed() { if (web != null && web.canGoBack()) web.goBack(); else super.onBackPressed(); }

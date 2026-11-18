@@ -126,6 +126,12 @@ nav button span{font-size:11px}
     <h2>EPG (XMLTV)</h2><div class="search"><input id="epg" dir="ltr" placeholder="http://.../epg.xml.gz"><button class="ib" data-save="epg">💾</button></div>
     <h2 data-t="city"></h2><div class="search"><input id="city"><button class="ib" data-save="city">💾</button></div>
     <h2 data-t="teams"></h2><div class="search"><input id="favTeams" placeholder="Al Ahly, Zamalek"><button class="ib" data-save="favTeams">💾</button></div>
+    <div id="fullBk" style="display:none"><h2>🛟 نسخة احتياطية كاملة على الموبايل</h2>
+    <p class="note" id="bkState">…</p>
+    <div class="row"><button class="btn pri" id="bkNow"><b>💾</b><span>احفظ دلوقتي</span></button><button class="btn" id="bkAll"><b>♻️</b><span>رجّع كل حاجة للبوكس</span></button></div>
+    <div id="bkProg" class="note" style="display:none"></div>
+    <p class="note">بتتحفظ لوحدها كل يوم وانت فاتح التطبيق: الإعدادات والقنوات والويدجتات، وكمان ملفات التطبيقات اللي على البوكس (الأسطورة، أوسكار، الداونلودر…). لو البوكس اتعمله فورمات: نزّل اللانشر، افتح الموبايل، ودوس «رجّع كل حاجة».</p>
+    <div class="row"><button class="btn" id="acctBtn"><b>👤</b><span>افتح تسجيل حساب جوجل على البوكس</span></button></div></div>
     <h2 data-t="backup"></h2>
     <div class="row"><button class="btn" id="bkDown"><b>⬇️</b><span data-t="bkDown"></span></button><button class="btn" id="bkUp"><b>⬆️</b><span data-t="bkUp"></span></button></div>
     <input type="file" id="ytFile" accept=".csv,text/csv,text/plain,text/comma-separated-values,*/*" style="display:none">
@@ -136,10 +142,13 @@ nav button span{font-size:11px}
     <h2 data-t="adhan"></h2><div class="search"><input id="adhanUrl" dir="ltr" placeholder="https://.../adhan.mp3"><button class="ib" data-save="adhanUrl">💾</button></div>
   </section>
   <section class="tab" id="t-apps"><h2 data-t="favOrder"></h2><div id="favs"></div><h2 data-t="favCh"></h2><div id="favCh"></div><h2 data-t="apps"></h2><button class="wide" id="apkBtn">📦 نزّل تطبيق على الشاشة (ملف APK من موبايلك)</button><input type="file" id="apkFile" accept=".apk,application/vnd.android.package-archive,*/*" style="display:none"><div id="apkProg" style="display:none;margin:8px 0;font-size:14px"></div><div class="search"><input id="appQ" data-ph="findApp"></div><div id="apps" style="margin-top:10px"></div></section>
+  <section class="tab" id="t-files"><h2>📁 ملفات البوكس</h2><div class="row"><button class="btn" id="fUp"><b>⬆️</b><span>رجوع لفوق</span></button><button class="btn pri" id="fSend"><b>📤</b><span>ابعت ملف هنا</span></button></div>
+    <p class="note" id="fPath" dir="ltr"></p><div id="fProg" class="note" style="display:none"></div><div id="fList"></div><input type="file" id="fFile" multiple style="display:none"></section>
   <section class="tab" id="t-watch"><h2 data-t="watch"></h2><div id="watch"></div></section>
   <section class="tab" id="t-more"><div class="mlist">
     <button data-tab="watch"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z"/></svg><span data-t="watchS"></span></button>
     <button data-tab="links"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>صور وروابط وإعدادات</span></button>
+    <button data-tab="files"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>ملفات البوكس</span></button>
     <button data-tab="nums"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/></svg><span data-t="numbers"></span></button>
     <button data-a="frame"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/></svg><span data-t="frame"></span></button>
     <button id="ytAddBtn"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z"/></svg><span>ضيف قناة يوتيوب بالاسم</span></button>
@@ -323,6 +332,73 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
   window.onPhoneShare=function(u){ if(u) api("share",{u:u}) };
   window.onPhoneVolume=function(d){ api("volume",{d:d}) };
   if(window.PhoneApp&&PhoneApp.pending){ var x=PhoneApp.pending(); if(x) setTimeout(function(){ onPhoneShare(x) },800) }
+})();
+</script>
+
+<div id="updBar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:50;background:#2a7d4f;color:#fff;padding:12px 14px;font-size:15px;display:none;align-items:center;gap:10px"><span style="flex:1">⬆️ فيه نسخة جديدة من تطبيق الموبايل</span><button id="updGo" style="border:0;border-radius:10px;padding:8px 14px;background:#fff;color:#1d5c39;font-weight:700">حدّث</button><button id="updX" style="border:0;background:none;color:#fff;font-size:18px">✕</button></div>
+<script>
+(function(){ var P=window.PhoneApp, $=function(i){ return document.getElementById(i) };
+  function sz(n){ return n>1e9?(n/1e9).toFixed(1)+" GB":n>1e6?(n/1e6).toFixed(1)+" MB":n>1e3?Math.round(n/1e3)+" KB":(n||0)+" B" }
+  function q(u){ return API_BASE+u+(u.indexOf("?")<0?"?":"&")+"k="+encodeURIComponent(code) }
+  // ---- (7) the app tells you when it has a new version
+  window.onPhoneUpdate=function(){ $("updBar").style.display="flex" };
+  $("updGo").onclick=function(){ if(P&&P.updateSelf) P.updateSelf(); $("updBar").style.display="none" };
+  $("updX").onclick=function(){ $("updBar").style.display="none" };
+  // ---- (1)(2) full backup on the phone: settings + the APKs of the box's apps
+  if(P&&P.saveBackup){ $("fullBk").style.display="block" }
+  function bkLine(){ if(!P||!P.backupAt) return; var at=+P.backupAt(), sv={}; try{ sv=JSON.parse(P.savedApks()) }catch(e){}
+    var n=Object.keys(sv).length; $("bkState").textContent=at?("آخر نسخة: "+new Date(at).toLocaleString("ar-EG")+" · "+n+" تطبيق محفوظ"):"لسه مفيش نسخة محفوظة" }
+  var waitSaved={}, waitPushed={};
+  window.onApkSaved=function(pkg,ok){ var f=waitSaved[pkg]; delete waitSaved[pkg]; if(f) f(ok) };
+  window.onApkPushed=function(pkg,c){ var f=waitPushed[pkg]; delete waitPushed[pkg]; if(f) f(c) };
+  function prog(t){ var e=$("bkProg"); e.style.display=t?"block":"none"; e.textContent=t||"" }
+  var busy=false;
+  async function backupNow(silent){ if(busy||!P||!P.saveBackup) return; busy=true;
+    try{ var d=await api("backup"); if(!d){ busy=false; return } var ua=await api("userApps"), apps=(ua&&ua.apps)||[];
+      P.saveBackup(JSON.stringify({app:"elgamal-full",at:Date.now(),settings:d,apps:apps}));
+      var sv={}; try{ sv=JSON.parse(P.savedApks()) }catch(e){}
+      var todo=apps.filter(function(a){ return !a.split&&a.size<300e6&&sv[a.pkg]!==a.ver }), done=0, skipped=apps.filter(function(a){ return a.split }).length;
+      for(var i=0;i<todo.length;i++){ var a=todo[i]; prog("💾 بيحفظ "+a.name+" ("+(i+1)+" من "+todo.length+") · "+sz(a.size));
+        var ok=await new Promise(function(res){ waitSaved[a.pkg]=res; P.pullApk(q("/pkg?p="+encodeURIComponent(a.pkg)),a.pkg,a.ver) }); if(ok) done++ }
+      prog(""); bkLine(); if(!silent) toast("✓ اتحفظت النسخة"+(todo.length?" · "+done+" تطبيق جديد":"")+(skipped?" · "+skipped+" تطبيق مقسوم مااتحفظش":""));
+    }catch(e){ prog("") } busy=false }
+  async function restoreAll(){ if(busy||!P) return; var raw=P.loadBackup(); if(!raw){ toast("مفيش نسخة محفوظة على الموبايل ده"); return }
+    var bk; try{ bk=JSON.parse(raw) }catch(e){ toast("النسخة بايظة"); return }
+    if(!confirm("هيرجّع الإعدادات والتطبيقات المحفوظة للبوكس.\nلو Shizuku مش شغال، هتوافق على كل تطبيق على الشاشة بالريموت.\nنبدأ؟")) return;
+    busy=true; var sv={}; try{ sv=JSON.parse(P.savedApks()) }catch(e){} var apps=(bk.apps||[]).filter(function(a){ return sv[a.pkg]!=null }), put=0;
+    for(var i=0;i<apps.length;i++){ var a=apps[i]; var h=await api("hasApp",{pkg:a.pkg}); if(h&&h.has) continue;
+      prog("📦 بيبعت "+a.name+" ("+(i+1)+" من "+apps.length+")…");
+      var c=await new Promise(function(res){ waitPushed[a.pkg]=res; P.pushApk(q("/apk?n="+encodeURIComponent(a.name)),a.pkg) });
+      if(c!==200){ prog("✗ "+a.name+" ماوصلش"); continue }
+      prog("⏳ "+a.name+": وافق على التثبيت على الشاشة لو ظهر سؤال…");
+      for(var t=0;t<60;t++){ await new Promise(function(r){ setTimeout(r,3000) }); var x=await api("hasApp",{pkg:a.pkg}); if(x&&x.has){ put++; break } } }
+    prog("⚙️ بيرجّع الإعدادات…"); if(bk.settings) await api("restore",{data:bk.settings});
+    busy=false; prog("✓ خلصت: "+put+" تطبيق اتثبت والإعدادات رجعت. سجّل حساب جوجل من الزرار اللي تحت."); setTimeout(refresh,3000) }
+  $("bkNow").onclick=function(){ backupNow(false) }; $("bkAll").onclick=restoreAll;
+  $("acctBtn").onclick=async function(){ if(await api("addAccount")) toast("بصّ على الشاشة") };
+  bkLine();
+  // automatic: once a day while the app is open
+  setTimeout(function(){ if(P&&P.backupAt&&code&&Date.now()-P.backupAt()>20*3600000) backupNow(true) },8000);
+  // ---- (5) the box's files
+  var fCur="", fParent=[];
+  async function ls(p){ try{ var r=await fetch(q("/ls?p="+encodeURIComponent(p||""))), j=await r.json();
+      if(j.error==="perm"){ $("fList").innerHTML='<div class="empty">وافق على طلب «الملفات» اللي ظهر على الشاشة، وبعدين ارجع هنا</div>'; return }
+      if(j.error){ toast("الفولدر ده مش موجود"); return }
+      fCur=j.path; $("fPath").textContent=fCur||"الأماكن"; $("fSend").style.display=fCur?"":"none";
+      $("fList").innerHTML=j.items.length?j.items.map(function(it){ return '<div class="item"><div class="t"><b>'+(it.d?"📁 ":"📄 ")+esc(it.n)+'</b>'+(it.d?"":"<small>"+sz(it.s)+"</small>")+'</div>'+(it.d?'<button class="ib" data-fo="'+esc(it.p)+'">›</button>':'<button class="ib" data-fg="'+esc(it.p)+'" data-fn="'+esc(it.n)+'">⬇️</button>')+'</div>' }).join(""):'<div class="empty">فاضي</div>'
+    }catch(e){ toast(t("err")) } }
+  document.addEventListener("click",function(e){ var b=e.target.closest("button"); if(!b) return; var d=b.dataset;
+    if(d.tab==="files"&&!fCur) ls("");
+    if(d.fo){ fParent.push(fCur); ls(d.fo) }
+    if(d.fg){ var u=q("/get?p="+encodeURIComponent(d.fg)); if(P&&P.download) P.download(u,d.fn); else window.open(u) }
+    if(b.id==="fUp"){ ls(fParent.length?fParent.pop():"") }
+    if(b.id==="fSend"){ $("fFile").click() } });
+  $("fFile").addEventListener("change",async function(e){ var fs=[].slice.call(e.target.files||[]); e.target.value=""; var pr=$("fProg");
+    for(var i=0;i<fs.length;i++){ var f=fs[i]; pr.style.display="block";
+      await new Promise(function(res){ var x=new XMLHttpRequest(); x.open("POST",q("/put?p="+encodeURIComponent(fCur)+"&n="+encodeURIComponent(f.name)));
+        x.upload.onprogress=function(ev){ if(ev.lengthComputable) pr.textContent="📤 "+f.name+" — "+Math.round(ev.loaded*100/ev.total)+"%" };
+        x.onload=x.onerror=function(){ pr.textContent=x.status===200?"✓ "+f.name:"✗ "+f.name; res() }; x.send(f) }) }
+    setTimeout(function(){ pr.style.display="none" },4000); ls(fCur) });
 })();
 </script>
 </body>

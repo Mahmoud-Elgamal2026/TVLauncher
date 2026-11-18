@@ -115,6 +115,7 @@ public class MainActivity extends Activity {
         web.loadUrl("file:///android_asset/index.html");
         String code = prefs.getString("remoteCode", null);
         if (code == null) { code = newCode(); prefs.edit().putString("remoteCode", code).apply(); }
+        RemoteServer.ctx = getApplicationContext();
         remote = new RemoteServer(getAssets(), code, this::remoteCall, getCacheDir());
         if (prefs.getBoolean("remoteOn", true)) remote.start();
         handleAction(getIntent());
@@ -433,7 +434,68 @@ public class MainActivity extends Activity {
     private android.media.MediaPlayer radioMp;
     private void stopRadioMp(){ try{ if(radioMp!=null){ radioMp.release(); } }catch(Exception ignored){} radioMp=null; }
 
+
+    // ---------- typing from the phone into any app, through the hidden RemoteIME keyboard ----------
+    static final String IME_ID = "com.mahmoud.tvlauncher/.RemoteIME";
+    String prevIme = null;
+    final Runnable imeRestore = () -> new Thread(() -> { String p = prevIme; if (p != null && !p.equals(IME_ID)) { shRun("ime", "set", p); prevIme = null; } }).start();
+
+    String shRun(String... args) {
+        try {
+            java.lang.reflect.Method m = rikka.shizuku.Shizuku.class.getDeclaredMethod("newProcess", String[].class, String[].class, String.class);
+            m.setAccessible(true);
+            Process p = (Process) m.invoke(null, args, null, null);
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) { String line; while ((line = r.readLine()) != null) sb.append(line).append('\n'); }
+            p.waitFor(); return sb.toString();
+        } catch (Throwable t) { return null; }
+    }
+
+    boolean shizukuOk() {
+        try { return rikka.shizuku.Shizuku.pingBinder() && rikka.shizuku.Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED; } catch (Throwable t) { return false; }
+    }
+
+    /** "ok" = typed (or will be as soon as the keyboard binds), "need" = Shizuku is needed to switch keyboards. */
+    String imeWrite(final String t, final boolean submit) {
+        String cur = Settings.Secure.getString(getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
+        RemoteIME k = RemoteIME.inst;
+        if (k != null && IME_ID.equals(cur)) { ui.post(() -> { if (!k.write(t, submit)) { RemoteIME.pending = t; RemoteIME.pendingSubmit = submit; } }); }
+        else {
+            if (!shizukuOk()) return "need";
+            if (cur != null && !cur.equals(IME_ID)) prevIme = cur;
+            RemoteIME.pending = t; RemoteIME.pendingSubmit = submit;
+            new Thread(() -> { shRun("ime", "enable", IME_ID); shRun("ime", "set", IME_ID); }).start();
+        }
+        ui.removeCallbacks(imeRestore); ui.postDelayed(imeRestore, submit ? 4000 : 25000);
+        return "ok";
+    }
     class Bridge {
+
+        @JavascriptInterface public String imeText(String t, boolean submit) { return imeWrite(t, submit); }
+
+        /** Apps the user installed (not system ones): for the phone's full backup. */
+        @JavascriptInterface
+        public String userApps() {
+            JSONArray arr = new JSONArray(); PackageManager pm = getPackageManager();
+            for (ApplicationInfo a : pm.getInstalledApplications(0)) {
+                if ((a.flags & ApplicationInfo.FLAG_SYSTEM) != 0 || a.packageName.equals(getPackageName())) continue;
+                try { PackageInfo pi = pm.getPackageInfo(a.packageName, 0); File f = new File(a.sourceDir);
+                    arr.put(new JSONObject().put("pkg", a.packageName).put("name", String.valueOf(pm.getApplicationLabel(a))).put("ver", pi.versionCode).put("size", f.length())
+                        .put("split", a.splitSourceDirs != null && a.splitSourceDirs.length > 0)); } catch (Exception ignored) {}
+            }
+            return arr.toString();
+        }
+
+        @JavascriptInterface
+        public boolean hasPkg(String pkg) { try { getPackageManager().getPackageInfo(pkg, 0); return true; } catch (Exception e) { return false; } }
+
+        /** Opens Android's "add a Google account" screen (the password is always typed by the user, never stored). */
+        @JavascriptInterface
+        public void addAccount() { ui.post(() -> { try { startActivity(new Intent(Settings.ACTION_ADD_ACCOUNT).putExtra(Settings.EXTRA_ACCOUNT_TYPES, new String[]{"com.google"}).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); }
+            catch (Exception e) { try { startActivity(new Intent(Settings.ACTION_SYNC_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); } catch (Exception ignored) {} } }); }
+
+        @JavascriptInterface
+        public void openImeSettings() { ui.post(() -> { try { startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); } catch (Exception ignored) {} }); }
         @JavascriptInterface
         public void playAudio(final String url) {
             runOnUiThread(() -> {

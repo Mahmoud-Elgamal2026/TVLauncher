@@ -1120,3 +1120,8 @@ html body .hw.mwnew .hwt{display:none!important}
 /* w12 lite: simpler Home */
 body.lite #profBtn,body.lite #railGuest,body.lite #smartRow,body.lite h2[data-row="smartRow"],body.lite #matchRow,body.lite h2[data-row="matchRow"],
 body.lite #quickRow,body.lite h2[data-row="quickRow"],body.lite #recentRow,body.lite h2[data-row="recentRow"],body.lite #xSources,body.lite #ticker{display:none!important}
+
+/* weak-box mode (1–1.5 GB RAM): no blur, no big shadows, no animations */
+body.lowram *,body.lowram *::before,body.lowram *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;animation-duration:0s!important;animation-iteration-count:1!important;transition-duration:0s!important}
+body.lowram .hw,body.lowram .tile,body.lowram .card,body.lowram .mtc,body.lowram .dlg,body.lowram #dbox{box-shadow:none!important}
+body.lowram .hw,body.lowram .dlg,body.lowram #dbox{background-color:rgba(18,20,30,.92)!important}
