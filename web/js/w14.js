@@ -45,3 +45,15 @@ remoteCmd=(function(prev){ return function(m){ m=m||{};
       if(m.install) setTimeout(()=>maInstall(maMissing(),true),300) }
     return {list:S.myApps||[],builtin:MA_BUILTIN.map(a=>a.name),missing:maMissing().map(a=>a.name)} }
   return prev.apply(this,arguments) } })(remoteCmd);
+
+// ---- Home: widgets on top, apps under them (first thing under the clock/shelf, above "continue watching" too)
+DEF.homeOrder="w";
+if(!S.wTopMig){ S.wTopMig=1; S.homeOrder="w" }
+applyHomeLook=(function(prev){ return function(){ const r=prev.apply(this,arguments);
+  if(S.homeOrder==="w"){ const sc=document.querySelector("#home .scroll"), first=document.querySelector('#home .scroll > h2[data-row="watchRow"]'), wh=$("hwH"), wb=$("hwBoard");
+    if(sc&&first&&wh&&wb){ const ex=[$("ytH"),$("ytRow"),$("libFavH"),$("libFavRow")].filter(Boolean); [wh,wb].concat(ex).forEach(e=>sc.insertBefore(e,first)) } } return r } })(applyHomeLook);
+try{ applyHomeLook() }catch(e){}
+// a fresh box (or one left with only the old empty "hero" card) gets the basic widgets — after the older first-run seeding (3 s) is done
+setTimeout(()=>{ try{ const all=hwList(), l=all.filter(w=>LITE_HW.indexOf(w.t)>=0);
+  if(!l.length&&!S.wDefMig){ S.wDefMig=1; hwSave([{id:"weather",t:"weather",sz:2,st:"glass"},{id:"prayer",t:"prayer",sz:2,st:"glass"},{id:"mcard",t:"mcard",sz:2,st:"glass"},{id:"ytnew",t:"ytnew",sz:2,st:"glass"}]) }
+  else if(l.length!==all.length) hwSave(l); applyHomeLook() }catch(e){} },4500);
