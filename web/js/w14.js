@@ -1,10 +1,13 @@
 // ================= 📲 My apps: the apps Mahmoud always wants on the box install by themselves when missing (after a reset too) =================
 // SmartTube and Downloader are built in (official sources); any other app is added once from the phone with its APK link.
-Object.assign(T.ar,{maTitle:"📲 تطبيقاتي (بتنزل لوحدها)",maMissing:"تطبيقات ناقصة",maInst:"بينزّل",maDone:"اتسطّب",maFail:"ماعرفش ينزّل",maTap:"وافق على التثبيت على الشاشة",maAll:"⬇️ نزّل الناقص دلوقتي",maNone:"كل تطبيقاتك متسطبة ✓"});
-Object.assign(T.en,{maTitle:"📲 My apps (install by themselves)",maMissing:"Missing apps",maInst:"Installing",maDone:"Installed",maFail:"Couldn't install",maTap:"Confirm the install on screen",maAll:"⬇️ Install missing now",maNone:"All your apps are installed ✓"});
-const MA_BUILTIN=[{name:"SmartTube",pkg:"com.teamsmart.videomanager.tv",src:"gh:yuliskov/SmartTube"},{name:"Downloader",pkg:"com.esaba.downloader",src:"play"}];
+Object.assign(T.ar,{maTitle:"📲 تطبيقاتي (بتنزل لوحدها)",maMissing:"تطبيقات ناقصة",maInst:"بينزّل",maDone:"اتسطّب",maFail:"ماعرفش ينزّل",maTap:"وافق على التثبيت على الشاشة",maAll:"⬇️ نزّل الناقص دلوقتي",maNone:"كل تطبيقاتك متسطبة ✓",maWeb:"اللينك ده مش ملف مباشر — فتحته في المتصفح، نزّله من هناك"});
+Object.assign(T.en,{maTitle:"📲 My apps (install by themselves)",maMissing:"Missing apps",maInst:"Installing",maDone:"Installed",maFail:"Couldn't install",maTap:"Confirm the install on screen",maAll:"⬇️ Install missing now",maNone:"All your apps are installed ✓",maWeb:"Not a direct APK link — opened it in the browser, download it there"});
+const MA_BUILTIN=[{name:"Shizuku",pkg:"moe.shizuku.privileged.api",url:"https://github.com/Mahmoud-Elgamal2026/TVLauncher/raw/main/dist/Shizuku.apk"},{name:"SmartTube",pkg:"com.teamsmart.videomanager.tv",src:"gh:yuliskov/SmartTube"},{name:"Downloader",pkg:"com.esaba.downloader",src:"play"}];
 Object.assign(DEF,{myApps:[],maAuto:true});
-const maList=()=>MA_BUILTIN.concat((S.myApps||[]).filter(a=>a&&a.url&&!MA_BUILTIN.some(b=>b.pkg&&b.pkg===a.pkg)));
+const maList=()=>{ const mine=(S.myApps||[]).filter(a=>a&&a.url&&!MA_BUILTIN.some(b=>b.pkg&&b.pkg===a.pkg||b.name.toLowerCase()===String(a.name).toLowerCase()||b.url===a.url));
+  // order: Shizuku first (it makes the rest silent), then your apps, then GitHub ones, the Play Store one last
+  return MA_BUILTIN.slice(0,1).concat(mine,MA_BUILTIN.slice(1)) };
+const userPkgs=()=>{ try{ return JSON.parse(nat("userApps")||"[]") }catch(e){ return [] } };
 const maHas=a=>a.pkg?!!nat("hasPkg",a.pkg):(()=>{ try{ return visibleApps().some(x=>appName(x).toLowerCase()===String(a.name).toLowerCase()) }catch(e){ return false } })();
 const maMissing=()=>maList().filter(a=>!maHas(a));
 // a GitHub release → the APK for this box (32-bit ARM boxes need armeabi-v7a)
@@ -20,8 +23,14 @@ async function maInstall(list,manual){ if(maBusy) return; maBusy=true;
     let url=""; try{ url=await maUrl(a) }catch(e){}
     if(!url){ banner("⚠️",a.name,L("maFail"),5000); continue }
     banner("📲",a.name,L("maInst")+"…",5000);
+    const before=userPkgs().map(x=>x.pkg);
     if(silent){ await new Promise(res=>{ maWait["my:"+a.name]=res; nat("silentInstall",url,"my:"+a.name); setTimeout(res,180000) }) }
-    else if(manual){ nat("installApk",url,"my:"+a.name); banner("📲",a.name,L("maTap"),8000); await new Promise(r=>setTimeout(r,45000)) }
+    else if(manual){ nat("installApk",url,"my:"+a.name); banner("📲",a.name,L("maTap"),8000) }
+    else continue;
+    // wait until the app really shows up (you may still be pressing Install), then remember its package
+    let got=null; for(let t=0;t<50&&!got;t++){ got=userPkgs().find(x=>before.indexOf(x.pkg)<0)||(a.pkg&&nat("hasPkg",a.pkg)?{pkg:a.pkg}:null); if(!got) await new Promise(r=>setTimeout(r,3000)) }
+    if(got){ if(!a.pkg&&a.url&&!MA_BUILTIN.includes(a)){ S.myApps=(S.myApps||[]).map(x=>x.url===a.url?Object.assign({},x,{pkg:got.pkg,name:/^app$/i.test(x.name)&&got.name?got.name:x.name}):x) } banner("✅",a.name,L("maDone"),4000) }
+    else if(manual){ banner("🌐",a.name,L("maWeb"),10000); nat("openUri",url) } // not a direct APK link (a download page): let the browser handle it
   }
   maBusy=false; try{ if(document.querySelector("#settings.on")) renderSettings() }catch(e){} }
 const maWait={};
