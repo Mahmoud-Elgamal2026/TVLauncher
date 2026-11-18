@@ -1265,6 +1265,34 @@ public class MainActivity extends Activity {
             }).start();
         }
 
+
+        /** Downloads an APK into cache/update/update.apk and reports what's inside: onApkProbe(id, {pkg,name,ver} | {error}).
+         *  Then installLocal() / silentInstall("", id) install that same file. */
+        @JavascriptInterface
+        public void probeApk(String url, String id) {
+            new Thread(() -> {
+                JSONObject o = new JSONObject();
+                try {
+                    File dir = new File(getCacheDir(), "update"); dir.mkdirs(); File f = new File(dir, "update.apk");
+                    HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+                    c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 7.1; TV) AppleWebKit/537.36 Chrome/120 Safari/537.36");
+                    c.setConnectTimeout(15000); c.setReadTimeout(60000);
+                    for (int hop = 0; hop < 6; hop++) { int code = c.getResponseCode();
+                        if (code >= 300 && code < 400 && c.getHeaderField("Location") != null) { URL next = new URL(c.getURL(), c.getHeaderField("Location")); c.disconnect();
+                            c = (HttpURLConnection) next.openConnection(); c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 7.1; TV) AppleWebKit/537.36 Chrome/120 Safari/537.36"); } else break; }
+                    long total = c.getContentLengthLong(), got = 0; int last = -1;
+                    try (InputStream in = c.getInputStream(); OutputStream out = new java.io.FileOutputStream(f)) { byte[] buf = new byte[65536]; int n;
+                        while ((n = in.read(buf)) > 0) { out.write(buf, 0, n); got += n; int pct = total > 0 ? (int) (got * 100 / total) : -1; if (pct != last && pct % 10 == 0) { last = pct; apkProgress(id, pct); } } }
+                    PackageInfo pi = getPackageManager().getPackageArchiveInfo(f.getAbsolutePath(), 0);
+                    if (pi == null) { o.put("error", "notapk"); }
+                    else { pi.applicationInfo.sourceDir = f.getAbsolutePath(); pi.applicationInfo.publicSourceDir = f.getAbsolutePath();
+                        o.put("pkg", pi.packageName).put("ver", pi.versionCode).put("name", String.valueOf(pi.applicationInfo.loadLabel(getPackageManager())));
+                        try { PackageInfo cur = getPackageManager().getPackageInfo(pi.packageName, 0); o.put("installed", cur.versionCode); } catch (Exception ignored) {} }
+                } catch (Throwable t) { try { o.put("error", String.valueOf(t.getMessage())); } catch (Exception ignored) {} }
+                js("window.onApkProbe&&onApkProbe(" + JSONObject.quote(id) + "," + o.toString() + ")");
+            }).start();
+        }
+
         private void apkProgress(String id, int pct) {
             js("window.onApkProgress&&onApkProgress(" + JSONObject.quote(id) + "," + pct + ")");
             if ("update".equals(id)) js("window.onUpdateProgress&&onUpdateProgress(" + pct + ")");

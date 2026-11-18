@@ -8,7 +8,7 @@ const maList=()=>{ const mine=(S.myApps||[]).filter(a=>a&&a.url&&!MA_BUILTIN.som
   // order: Shizuku first (it makes the rest silent), then your apps, then GitHub ones, the Play Store one last
   return MA_BUILTIN.slice(0,1).concat(mine,MA_BUILTIN.slice(1)) };
 const userPkgs=()=>{ try{ return JSON.parse(nat("userApps")||"[]") }catch(e){ return [] } };
-const maHas=a=>a.pkg?!!nat("hasPkg",a.pkg):(()=>{ try{ return visibleApps().some(x=>appName(x).toLowerCase()===String(a.name).toLowerCase()) }catch(e){ return false } })();
+const maHas=a=>(a.pkg&&!!nat("hasPkg",a.pkg))||(()=>{ try{ const n=String(a.name).toLowerCase(); return n!=="app"&&visibleApps().some(x=>appName(x).toLowerCase()===n) }catch(e){ return false } })();
 const maMissing=()=>maList().filter(a=>!maHas(a));
 // a GitHub release → the APK for this box (32-bit ARM boxes need armeabi-v7a)
 async function maUrl(a){ if(a.url) return a.url; if(!/^gh:/.test(a.src||"")) return "";
@@ -16,24 +16,28 @@ async function maUrl(a){ if(a.url) return a.url; if(!/^gh:/.test(a.src||"")) ret
   const pick=l.find(x=>/stable/i.test(x.name)&&/armeabi|arm32|universal/i.test(x.name))||l.find(x=>/armeabi|universal/i.test(x.name))||l.find(x=>/stable/i.test(x.name))||l[0];
   return pick?pick.browser_download_url:"" }
 let maBusy=false;
-async function maInstall(list,manual){ if(maBusy) return; maBusy=true;
+async function maInstall(list,manual){ if(maBusy){ if(manual) banner("⏳",L("maTitle"),L("maInst")+"…",4000); return } maBusy=true;
   const silent=typeof canSilent==="function"&&canSilent();
   for(const a of list){
     if(a.src==="play"){ if(manual) nat("openUri","market://details?id="+a.pkg); continue }
     let url=""; try{ url=await maUrl(a) }catch(e){}
     if(!url){ banner("⚠️",a.name,L("maFail"),5000); continue }
     banner("📲",a.name,L("maInst")+"…",5000);
-    const before=userPkgs().map(x=>x.pkg);
-    if(silent){ await new Promise(res=>{ maWait["my:"+a.name]=res; nat("silentInstall",url,"my:"+a.name); setTimeout(res,180000) }) }
-    else if(manual){ nat("installApk",url,"my:"+a.name); banner("📲",a.name,L("maTap"),8000) }
+    // download first and look inside: we learn the real package and name, and skip it if it's already installed
+    const id="my:"+a.name, pr=await new Promise(res=>{ maProbe[id]=res; nat("probeApk",url,id); setTimeout(()=>res({error:"timeout"}),300000) });
+    if(pr.error){ if(manual){ banner("🌐",a.name,L("maWeb"),10000); nat("openUri",url) } continue }
+    if(!MA_BUILTIN.includes(a)) S.myApps=(S.myApps||[]).map(x=>x.url===a.url?Object.assign({},x,{pkg:pr.pkg,name:(x.auto||/^app$/i.test(x.name))&&pr.name?pr.name:x.name,auto:false}):x);
+    if(pr.installed!=null&&pr.installed>=pr.ver){ banner("✅",pr.name||a.name,L("maDone"),3000); continue }
+    if(silent){ await new Promise(res=>{ maWait[id]=res; nat("silentInstall","",id); setTimeout(res,180000) }) }
+    else if(manual){ nat("installLocal"); banner("📲",pr.name||a.name,L("maTap"),10000);
+      for(let t=0;t<50&&!nat("hasPkg",pr.pkg);t++) await new Promise(r=>setTimeout(r,3000)) }
     else continue;
-    // wait until the app really shows up (you may still be pressing Install), then remember its package
-    let got=null; for(let t=0;t<50&&!got;t++){ got=userPkgs().find(x=>before.indexOf(x.pkg)<0)||(a.pkg&&nat("hasPkg",a.pkg)?{pkg:a.pkg}:null); if(!got) await new Promise(r=>setTimeout(r,3000)) }
-    if(got){ if(!a.pkg&&a.url&&!MA_BUILTIN.includes(a)){ S.myApps=(S.myApps||[]).map(x=>x.url===a.url?Object.assign({},x,{pkg:got.pkg,name:(x.auto||/^app$/i.test(x.name))&&got.name?got.name:x.name,auto:false}):x) } banner("✅",a.name,L("maDone"),4000) }
-    else if(manual){ banner("🌐",a.name,L("maWeb"),10000); nat("openUri",url) } // not a direct APK link (a download page): let the browser handle it
+    if(nat("hasPkg",pr.pkg)) banner("✅",pr.name||a.name,L("maDone"),4000)
   }
   maBusy=false; try{ if(document.querySelector("#settings.on")) renderSettings() }catch(e){} }
-const maWait={};
+const maWait={}, maProbe={};
+window.onApkProbe=(id,o)=>{ const f=maProbe[id]; delete maProbe[id]; if(f) f(o||{error:"x"}) };
+const _onApkPrMa=window.onApkProgress; window.onApkProgress=function(id,p){ if(String(id).indexOf("my:")===0){ if(p>0&&p%20===0) banner("⬇️",id.slice(3),p+"%",2000); else if(p===-1) banner("⚠️",id.slice(3),L("maFail"),5000); return } return _onApkPrMa&&_onApkPrMa.apply(this,arguments) };
 const _onSilentMa=window.onSilentInstall; window.onSilentInstall=function(id,res){
   if(String(id).indexOf("my:")!==0) return _onSilentMa&&_onSilentMa.apply(this,arguments);
   banner(res==="ok"?"✅":"⚠️",id.slice(3),L(res==="ok"?"maDone":"maFail"),5000); const f=maWait[id]; delete maWait[id]; if(f) f() };
