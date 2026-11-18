@@ -29,7 +29,7 @@ async function maInstall(list,manual){ if(maBusy) return; maBusy=true;
     else continue;
     // wait until the app really shows up (you may still be pressing Install), then remember its package
     let got=null; for(let t=0;t<50&&!got;t++){ got=userPkgs().find(x=>before.indexOf(x.pkg)<0)||(a.pkg&&nat("hasPkg",a.pkg)?{pkg:a.pkg}:null); if(!got) await new Promise(r=>setTimeout(r,3000)) }
-    if(got){ if(!a.pkg&&a.url&&!MA_BUILTIN.includes(a)){ S.myApps=(S.myApps||[]).map(x=>x.url===a.url?Object.assign({},x,{pkg:got.pkg,name:/^app$/i.test(x.name)&&got.name?got.name:x.name}):x) } banner("✅",a.name,L("maDone"),4000) }
+    if(got){ if(!a.pkg&&a.url&&!MA_BUILTIN.includes(a)){ S.myApps=(S.myApps||[]).map(x=>x.url===a.url?Object.assign({},x,{pkg:got.pkg,name:(x.auto||/^app$/i.test(x.name))&&got.name?got.name:x.name,auto:false}):x) } banner("✅",a.name,L("maDone"),4000) }
     else if(manual){ banner("🌐",a.name,L("maWeb"),10000); nat("openUri",url) } // not a direct APK link (a download page): let the browser handle it
   }
   maBusy=false; try{ if(document.querySelector("#settings.on")) renderSettings() }catch(e){} }
@@ -50,7 +50,7 @@ renderSettings=(function(prev){ return function(){ const r=prev.apply(this,argum
 activators.unshift(el=>{ if(el.id!=="maGo") return false; maInstall(maMissing(),true); return true });
 // phone: read / change the list (the phone keeps a copy and sends it back after a reset)
 remoteCmd=(function(prev){ return function(m){ m=m||{};
-  if(m.cmd==="myApps"){ if(Array.isArray(m.list)){ S.myApps=m.list.filter(a=>a&&/^https?:\/\//.test(String(a.url||""))).slice(0,30).map(a=>({name:String(a.name||"App").slice(0,40),url:String(a.url).trim(),pkg:String(a.pkg||"").trim()}));
+  if(m.cmd==="myApps"){ if(Array.isArray(m.list)){ S.myApps=m.list.filter(a=>a&&/^https?:\/\//.test(String(a.url||""))).slice(0,30).map(a=>({name:String(a.name||"App").slice(0,40),url:String(a.url).trim(),pkg:String(a.pkg||"").trim(),auto:!!a.auto}));
       if(m.install) setTimeout(()=>maInstall(maMissing(),true),300) }
     return {list:S.myApps||[],builtin:MA_BUILTIN.map(a=>a.name),missing:maMissing().map(a=>a.name)} }
   return prev.apply(this,arguments) } })(remoteCmd);
