@@ -141,7 +141,11 @@ nav button span{font-size:11px}
     <h2>Telegram bot token / توكن بوت تيليجرام</h2><div class="search"><input id="tgToken" dir="ltr" placeholder="123456789:AA..."><button class="ib" data-save="tgToken">💾</button></div>
     <h2 data-t="adhan"></h2><div class="search"><input id="adhanUrl" dir="ltr" placeholder="https://.../adhan.mp3"><button class="ib" data-save="adhanUrl">💾</button></div>
   </section>
-  <section class="tab" id="t-apps"><h2 data-t="favOrder"></h2><div id="favs"></div><h2 data-t="favCh"></h2><div id="favCh"></div><h2 data-t="apps"></h2><button class="wide" id="apkBtn">📦 نزّل تطبيق على الشاشة (ملف APK من موبايلك)</button><input type="file" id="apkFile" accept=".apk,application/vnd.android.package-archive,*/*" style="display:none"><div id="apkProg" style="display:none;margin:8px 0;font-size:14px"></div><div class="search"><input id="appQ" data-ph="findApp"></div><div id="apps" style="margin-top:10px"></div></section>
+  <section class="tab" id="t-apps"><h2 data-t="favOrder"></h2><div id="favs"></div><h2 data-t="favCh"></h2><div id="favCh"></div><h2>📲 تطبيقاتي (بتنزل لوحدها على البوكس)</h2><div id="maList"></div>
+    <div class="row" style="flex-wrap:nowrap"><input id="maName" style="flex:0 0 34%" placeholder="الاسم (الأسطورة)"><input id="maUrl" dir="ltr" placeholder="https://.../app.apk"></div>
+    <div class="row"><button class="btn" id="maAdd"><b>➕</b><span>ضيف التطبيق</span></button><button class="btn pri" id="maGo"><b>⬇️</b><span>نزّل الناقص دلوقتي</span></button></div>
+    <p class="note">حط لينك ملف الـ APK مرة واحدة. لو التطبيق اتمسح أو البوكس اتعمله فورمات، هينزل لوحده تاني (من غير ما تدوس لو Shizuku شغال).</p>
+    <h2 data-t="apps"></h2><button class="wide" id="apkBtn">📦 نزّل تطبيق على الشاشة (ملف APK من موبايلك)</button><input type="file" id="apkFile" accept=".apk,application/vnd.android.package-archive,*/*" style="display:none"><div id="apkProg" style="display:none;margin:8px 0;font-size:14px"></div><div class="search"><input id="appQ" data-ph="findApp"></div><div id="apps" style="margin-top:10px"></div></section>
   <section class="tab" id="t-files"><h2>📁 ملفات البوكس</h2><div class="row"><button class="btn" id="fUp"><b>⬆️</b><span>رجوع لفوق</span></button><button class="btn pri" id="fSend"><b>📤</b><span>ابعت ملف هنا</span></button></div>
     <p class="note" id="fPath" dir="ltr"></p><div id="fProg" class="note" style="display:none"></div><div id="fList"></div><input type="file" id="fFile" multiple style="display:none"></section>
   <section class="tab" id="t-watch"><h2 data-t="watch"></h2><div id="watch"></div></section>
@@ -399,6 +403,25 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
         x.upload.onprogress=function(ev){ if(ev.lengthComputable) pr.textContent="📤 "+f.name+" — "+Math.round(ev.loaded*100/ev.total)+"%" };
         x.onload=x.onerror=function(){ pr.textContent=x.status===200?"✓ "+f.name:"✗ "+f.name; res() }; x.send(f) }) }
     setTimeout(function(){ pr.style.display="none" },4000); ls(fCur) });
+})();
+</script>
+<script>
+(function(){ var $=function(i){ return document.getElementById(i) }, ma={list:[],builtin:[],missing:[]};
+  function keep(l){ try{ localStorage.setItem("myApps",JSON.stringify(l)) }catch(e){} }
+  function draw(){ var miss=ma.missing||[];
+    $("maList").innerHTML=(ma.builtin||[]).map(function(n){ return '<div class="item"><div class="t"><b>'+(miss.indexOf(n)>=0?"⬜ ":"✓ ")+esc(n)+'</b><small>تلقائي</small></div></div>' }).join("")+
+      ma.list.map(function(a,i){ return '<div class="item"><div class="t"><b>'+(miss.indexOf(a.name)>=0?"⬜ ":"✓ ")+esc(a.name)+'</b><small dir="ltr">'+esc(a.url)+'</small></div><button class="ib" data-mad="'+i+'">🗑</button></div>' }).join("") }
+  async function load(){ var r=await api("myApps"); if(!r) return; var mine=[]; try{ mine=JSON.parse(localStorage.getItem("myApps")||"[]") }catch(e){}
+    // the box lost its list (reset / new install) but the phone remembers it → give it back and install
+    if(!r.list.length&&mine.length){ r=await api("myApps",{list:mine,install:true})||r; toast("📲 رجّعت قايمة تطبيقاتك للبوكس") }
+    ma=r; keep(r.list); draw() }
+  async function save(l,inst){ var r=await api("myApps",{list:l,install:!!inst}); if(r){ ma=r; keep(r.list); draw() } }
+  $("maAdd").onclick=function(){ var n=$("maName").value.trim(), u=$("maUrl").value.trim(); if(!/^https?:\/\//.test(u)){ toast("حط لينك يبدأ بـ http"); return }
+    save(ma.list.concat([{name:n||"App",url:u}]),true); $("maName").value=$("maUrl").value=""; toast("✓ اتضاف وبينزل على البوكس") };
+  $("maGo").onclick=function(){ save(ma.list,true); toast("⏳ بصّ على الشاشة") };
+  document.addEventListener("click",function(e){ var b=e.target.closest("button"); if(!b) return; if(b.dataset.mad!=null){ var l=ma.list.slice(); l.splice(+b.dataset.mad,1); save(l,false) }
+    if(b.dataset.tab==="apps") load() });
+  setTimeout(function(){ if(code) load() },2500);
 })();
 </script>
 </body>
