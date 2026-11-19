@@ -2,11 +2,11 @@
 // SmartTube and Downloader are built in (official sources); any other app is added once from the phone with its APK link.
 Object.assign(T.ar,{maTitle:"📲 تطبيقاتي (بتنزل لوحدها)",maMissing:"تطبيقات ناقصة",maInst:"بينزّل",maDone:"اتسطّب",maFail:"ماعرفش ينزّل",maTap:"وافق على التثبيت على الشاشة",maAll:"⬇️ نزّل الناقص دلوقتي",maNone:"كل تطبيقاتك متسطبة ✓",maWeb:"اللينك ده مش ملف مباشر — فتحته في المتصفح، نزّله من هناك"});
 Object.assign(T.en,{maTitle:"📲 My apps (install by themselves)",maMissing:"Missing apps",maInst:"Installing",maDone:"Installed",maFail:"Couldn't install",maTap:"Confirm the install on screen",maAll:"⬇️ Install missing now",maNone:"All your apps are installed ✓",maWeb:"Not a direct APK link — opened it in the browser, download it there"});
-const MA_BUILTIN=[{name:"Shizuku",pkg:"moe.shizuku.privileged.api",url:"https://github.com/Mahmoud-Elgamal2026/TVLauncher/raw/main/dist/Shizuku.apk"},{name:"TizenTube",src:"gh:reisxd/TizenTubeCobalt"},{name:"Downloader",pkg:"com.esaba.downloader",src:"play"}];
+const MA_BUILTIN=[{name:"TizenTube",src:"gh:reisxd/TizenTubeCobalt"},{name:"Downloader",pkg:"com.esaba.downloader",src:"play"}];
 Object.assign(DEF,{myApps:[],maAuto:true});
 const maList=()=>{ const mine=(S.myApps||[]).filter(a=>a&&a.url&&!MA_BUILTIN.some(b=>b.pkg&&b.pkg===a.pkg||b.name.toLowerCase()===String(a.name).toLowerCase()||b.url===a.url));
   // order: Shizuku first (it makes the rest silent), then your apps, then GitHub ones, the Play Store one last
-  return MA_BUILTIN.slice(0,1).concat(mine,MA_BUILTIN.slice(1)) };
+  return mine.concat(MA_BUILTIN) };
 const userPkgs=()=>{ try{ return JSON.parse(nat("userApps")||"[]") }catch(e){ return [] } };
 // installed? its package (or the package we learned last time), or an installed app with the same name
 const maHas=a=>(a.pkg&&!!nat("hasPkg",a.pkg))||(S.maPkgs&&S.maPkgs[a.name]&&!!nat("hasPkg",S.maPkgs[a.name]))||(()=>{ const n=String(a.name||"").toLowerCase().replace(/\s+/g,"");

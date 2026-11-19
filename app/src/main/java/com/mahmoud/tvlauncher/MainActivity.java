@@ -463,7 +463,14 @@ public class MainActivity extends Activity {
         RemoteIME k = RemoteIME.inst;
         if (k != null && IME_ID.equals(cur)) { ui.post(() -> { if (!k.write(t, submit)) { RemoteIME.pending = t; RemoteIME.pendingSubmit = submit; } }); }
         else {
-            if (!shizukuOk()) return "need";
+            if (!shizukuOk()) {
+                // no Shizuku on this box: the Accessibility helper writes the text (turned on once, stays on)
+                RemoteA11y a = RemoteA11y.inst; if (a == null) return "a11y";
+                final boolean[] r = {false}; final Object lock = new Object();
+                ui.post(() -> { boolean w = a.write(t, submit); synchronized (lock) { r[0] = w; lock.notifyAll(); } });
+                synchronized (lock) { try { lock.wait(800); } catch (InterruptedException ignored) {} }
+                return r[0] ? "ok" : "nofield";
+            }
             if (cur != null && !cur.equals(IME_ID)) prevIme = cur;
             RemoteIME.pending = t; RemoteIME.pendingSubmit = submit;
             new Thread(() -> { shRun("ime", "enable", IME_ID); shRun("ime", "set", IME_ID); }).start();
@@ -485,6 +492,8 @@ public class MainActivity extends Activity {
             if (android.os.Build.VERSION.SDK_INT >= 26) startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName())).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             else startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); }
             catch (Exception e) { try { startActivity(new Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); } catch (Exception ignored) {} } }); }
+        @JavascriptInterface public boolean a11yOn() { return RemoteA11y.inst != null; }
+        @JavascriptInterface public void openA11ySettings() { ui.post(() -> { try { startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); } catch (Exception ignored) {} }); }
         @JavascriptInterface public String imeText(String t, boolean submit) { return imeWrite(t, submit); }
 
         /** Apps the user installed (not system ones): for the phone's full backup. */

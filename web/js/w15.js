@@ -21,7 +21,7 @@ setTimeout(()=>{ const at=+store.get("bkAt",0); if(at&&Date.now()-at>7*86400000&
 // ---- (2) start-up check: what's missing, with the fix one press away
 function health(){ const l=[]; if(navigator.onLine===false) l.push(["🌐",L("hcNet"),()=>nat("openSettings","android.settings.WIFI_SETTINGS")]);
   if(!unkOk()) l.push(["🔓",L("hcUnk"),()=>nat("openInstallSettings")]);
-  if(typeof shz==="function"&&shz()!=="ok"&&store.get("shzEver",0)) l.push(["⚙️",L("hcShz"),()=>{ showPage("settings"); setTimeout(()=>{ const e=$("suSec"); if(e){ e.scrollIntoView(); const b=e.querySelector(".f"); if(b) focus(b) } },300) }]);
+  if(S.useShz&&typeof shz==="function"&&shz()!=="ok") l.push(["⚙️",L("hcShz"),()=>{ showPage("settings"); setTimeout(()=>{ const e=$("suSec"); if(e){ e.scrollIntoView(); const b=e.querySelector(".f"); if(b) focus(b) } },300) }]);
   const s=storeInfo(); if(s.free&&s.free<500e6) l.push(["💾",L("hcDisk")+" · "+gb(s.free),()=>nat("openSettings","android.settings.INTERNAL_STORAGE_SETTINGS")]);
   return l }
 function healthCheck(show){ const l=health(); if(!l.length){ if(show) A.toast(L("hcOk")); return }

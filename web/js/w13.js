@@ -2,14 +2,18 @@
 Object.assign(T.ar,{imeNeed:"عشان تكتب جوه أي تطبيق من الموبايل، Shizuku لازم يكون شغال",imeNeedSub:"شغّله من تطبيق Shizuku أو من الإعدادات ← 🤫 التحديث من غير ما تدوس",
   shzStop:"Shizuku وقف",shzStopSub:"التحديث الصامت والكتابة في التطبيقات مش هيشتغلوا لحد ما تشغّله تاني",shzBack:"Shizuku رجع يشتغل ✓",
   stNeed:"اسمح للانشر يشوف الملفات",stNeedSub:"وافق على الطلب اللي على الشاشة، وبعدين افتح الملفات من الموبايل تاني",
+  a11yNeed:"عشان تكتب جوه أي تطبيق من الموبايل: فعّل «Elgamal TV — الكتابة من الموبايل» مرة واحدة",a11ySub:"الإعدادات ← ⌨️ الكتابة في التطبيقات ← فعّل",a11yNoField:"دوس بالريموت على خانة الكتابة الأول، وبعدين اكتب",
   lowLabel:"وضع البوكس الضعيف (أنيميشن وتأثيرات أقل)",lowAuto:"تلقائي",acctHint:"اكتب إيميلك والباسورد بنفسك هنا"});
 Object.assign(T.en,{imeNeed:"Typing into any app from the phone needs Shizuku running",imeNeedSub:"Start it in the Shizuku app or Settings → 🤫 Updates with no prompt",
   shzStop:"Shizuku stopped",shzStopSub:"Silent updates and typing into apps won't work until it runs again",shzBack:"Shizuku is running again ✓",
   stNeed:"Allow the launcher to see files",stNeedSub:"Accept the prompt on screen, then open Files on the phone again",
+  a11yNeed:"To type into any app from the phone, turn on “Elgamal TV — phone typing” once",a11ySub:"Settings → ⌨️ Typing in apps → turn on",a11yNoField:"Select the text box with the remote first, then type",
   lowLabel:"Weak-box mode (fewer animations & effects)",lowAuto:"Auto",acctHint:"Type your email and password yourself here"});
 
 // ---- (3)(4) text and voice from the phone: inside the launcher as before; inside another app through the hidden phone keyboard
 function imeSend(t,submit){ const r=NA&&NA.imeText?nat("imeText",String(t||""),!!submit):"need";
+  if(r==="a11y"){ if(!imeSend.warned||Date.now()-imeSend.warned>60000){ imeSend.warned=Date.now(); banner("⌨️",L("a11yNeed"),L("a11ySub"),10000) } return false }
+  if(r==="nofield"){ banner("⌨️",L("a11yNoField"),"",4000); return false }
   if(r==="need"){ if(!imeSend.warned||Date.now()-imeSend.warned>60000){ imeSend.warned=Date.now(); banner("⌨️",L("imeNeed"),L("imeNeedSub"),8000) } return false } return true }
 remoteCmd=(function(prev){ return function(m){ m=m||{};
   if(window.__bg&&(m.cmd==="text"||m.cmd==="voice")){ const ok=imeSend(m.t,m.cmd==="voice"||!!m.submit); return ok?{ok:1,to:"app"}:{error:"ime"} }
@@ -24,7 +28,7 @@ remoteCmd=(function(prev){ return function(m){ m=m||{};
 
 // ---- (6) tell me when Shizuku stops (it stops after every restart of the box unless it's started again)
 let shzLast=null;
-function shzWatch(){ if(typeof shz!=="function") return; const s=shz();
+function shzWatch(){ if(typeof shz!=="function"||!S.useShz) return; const s=shz();
   if(shzLast==="ok"&&s!=="ok") banner("⚠️",L("shzStop"),L("shzStopSub"),12000);
   else if(shzLast&&shzLast!=="ok"&&s==="ok") banner("✅",L("shzBack"),"",4000);
   if(s==="ok") store.set("shzEver",1);
