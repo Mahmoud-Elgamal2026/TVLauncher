@@ -165,6 +165,8 @@ public class MainActivity extends Activity {
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
         if (level >= TRIM_MEMORY_RUNNING_LOW) js("window.onLowMem&&onLowMem(" + level + ")");
+        // the launcher is behind another app (Ostora, YouTube…): give its memory back so the app in front has more
+        if (level >= TRIM_MEMORY_UI_HIDDEN && web != null) ui.postDelayed(() -> { if (web != null) web.freeMemory(); }, 4000);
     }
 
     /** Called on a server thread: hands the phone's command to the page and waits for its answer. */

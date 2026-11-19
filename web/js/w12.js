@@ -26,12 +26,11 @@ Object.assign(DEF,{closeOthers:true});
 Object.assign(T.ar,{coLabel:"لما أفتح أي تطبيق، اقفل الباقي لوحده"}); Object.assign(T.en,{coLabel:"When I open an app, close the others"});
 const CO_KEEP=/^(moe\.shizuku|com\.android\.(systemui|inputmethod|providers)|com\.google\.android\.(inputmethod|gms)|android$)/;
 launch=(function(prev){ return function(pkg){
-  // the apps you opened get a real close; every other installed app gets Android's background close too
-  const mine=[].concat(typeof openedApps!=="undefined"?openedApps:[],S.recent||[]).filter((p,i,a)=>a.indexOf(p)===i);
-  let all=[]; try{ all=visibleApps().map(a=>a.pkg) }catch(e){}
-  const bad=p=>!p||p===pkg||p===NA_PKG||CO_KEEP.test(p); const r=prev.apply(this,arguments);
-  if(S.closeOthers) setTimeout(()=>{ mine.filter(p=>!bad(p)).forEach(p=>{ try{ closeOne(p) }catch(e){} });
-    all.filter(p=>!bad(p)&&mine.indexOf(p)<0).forEach(p=>{ try{ nat("closeApp",p) }catch(e){} }) },1500);
+  const r=prev.apply(this,arguments); // the app starts first; the clean-up of the others happens after, so opening isn't slowed down
+  if(S.closeOthers) setTimeout(()=>{ const mine=[].concat(typeof openedApps!=="undefined"?openedApps:[],S.recent||[]).filter((p,i,a)=>a.indexOf(p)===i);
+    let all=[]; try{ all=visibleApps().map(a=>a.pkg) }catch(e){} const bad=p=>!p||p===pkg||p===NA_PKG||CO_KEEP.test(p);
+    mine.filter(p=>!bad(p)).forEach(p=>{ try{ closeOne(p) }catch(e){} });
+    all.filter(p=>!bad(p)&&mine.indexOf(p)<0).forEach(p=>{ try{ nat("closeApp",p) }catch(e){} }) },2500);
   return r } })(launch);
 renderSettings=(function(prev){ return function(){ const r=prev.apply(this,arguments); const a=document.querySelector('[data-hv="autoCloseApps:on"]'), f=a&&a.closest(".field");
   if(f&&!$("coOn")) f.insertAdjacentHTML("afterend",`<div class="field"><label>${esc(L("coLabel"))}</label><div class="inline"><button class="btn f${S.closeOthers?" pri":""}" id="coOn">${esc(L("on"))}</button><button class="btn f${!S.closeOthers?" pri":""}" id="coOff">${esc(L("off"))}</button></div></div>`); return r } })(renderSettings);
