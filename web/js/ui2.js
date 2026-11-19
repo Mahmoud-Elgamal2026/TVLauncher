@@ -44,7 +44,7 @@ const T={ar:{home:"الرئيسية",mt:"الماتشات",yt:"يوتيوب",set
   maInst:"بينزّل",maDone:"اتسطّب",maFail:"ماعرفش ينزّل",maTap:"وافق على التثبيت على الشاشة",maWeb:"اللينك مش ملف مباشر — فتحته في المتصفح",maMissing:"تطبيقات ناقصة",
   a11yNeed:"عشان تكتب جوه التطبيقات من الموبايل، فعّل الكتابة من الإعدادات",noField:"دوس بالريموت على خانة الكتابة الأول",
   bedNow:"🌙 وقت النوم — التطبيقات هتتقفل والشاشة هتطفي بعد دقيقة",awake:"لسه صاحي",diskLow:"المساحة قربت تخلص",ramDone:"اتقفلت تطبيقات في الخلفية عشان البوكس يخف",
-  qm:"⚡ قايمة سريعة",qOstora:"📺 الأسطورة",qYt:"▶️ TizenTube",qMt:"⚽ الماتشات",cleaned:"🧽 اتعمل تنضيف أسبوعي",prayNow:"حان الآن موعد",wallNew:"خلفية جديدة من الموبايل",hidden:"مخفي",notInst:"التطبيق مش متسطّب"},
+  qm:"⚡ قايمة سريعة",qOstora:"📺 الأسطورة",qYt:"▶️ TizenTube",qMt:"⚽ الماتشات",cleaned:"🧽 اتعمل تنضيف أسبوعي",prayNow:"حان الآن موعد",wallNew:"خلفية جديدة من الموبايل",sHij:"📅 التاريخ الهجري",hidden:"مخفي",notInst:"التطبيق مش متسطّب"},
  en:{home:"Home",mt:"Matches",yt:"YouTube",set:"Settings",favs:"Favourites",apps:"All apps",noFav:"Hold OK on any app to add it to favourites",
   am:"AM",pm:"PM",days:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],months:["January","February","March","April","May","June","July","August","September","October","November","December"],
   prayers:["Fajr","Sunrise","Dhuhr","Asr","Maghrib","Isha"],pTime:"Time & date",pWeather:"Weather",pPrayer:"Next prayer",pMatch:"Match",pPerf:"Box health",
@@ -62,14 +62,22 @@ const T={ar:{home:"الرئيسية",mt:"الماتشات",yt:"يوتيوب",set
   maInst:"Installing",maDone:"Installed",maFail:"Couldn't install",maTap:"Confirm the install on screen",maWeb:"Not a direct link — opened it in the browser",maMissing:"Missing apps",
   a11yNeed:"To type into apps from the phone, turn typing on in Settings",noField:"Select the text box with the remote first",
   bedNow:"🌙 Bedtime — apps close and the screen goes dark in a minute",awake:"Still awake",diskLow:"Storage almost full",ramDone:"Closed background apps to keep the box light",
-  qm:"⚡ Quick menu",qOstora:"📺 Ostora",qYt:"▶️ TizenTube",qMt:"⚽ Matches",cleaned:"🧽 Weekly clean-up done",prayNow:"It's time for",wallNew:"New wallpaper from the phone",hidden:"hidden",notInst:"App not installed"}};
+  qm:"⚡ Quick menu",qOstora:"📺 Ostora",qYt:"▶️ TizenTube",qMt:"⚽ Matches",cleaned:"🧽 Weekly clean-up done",prayNow:"It's time for",wallNew:"New wallpaper from the phone",sHij:"📅 Hijri date",hidden:"hidden",notInst:"App not installed"}};
 const L=k=>{ const t=T[S.lang]||T.ar; return t[k]!=null?t[k]:(T.en[k]!=null?T.en[k]:k) };
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const pad=n=>(n<10?"0":"")+n;
 const fmtTime=(d,noSfx)=>{ const h=d.getHours(), m=pad(d.getMinutes()); return S.h24?pad(h)+":"+m:(h%12||12)+":"+m+(noSfx?"":" "+(h<12?L("am"):L("pm"))) };
 const fmtDate=d=>S.lang==="ar"?`${L("days")[d.getDay()]}، ${d.getDate()} ${L("months")[d.getMonth()]}`:`${L("days")[d.getDay()]}, ${L("months")[d.getMonth()]} ${d.getDate()}`;
-function hijri(d){ try{ return new Intl.DateTimeFormat((S.lang==="ar"?"ar":"en")+"-u-ca-islamic-umalqura",{day:"numeric",month:"long",year:"numeric"}).format(d) }catch(e){ return "" } }
+// Hijri date: the browser's calendar when it has one; old TV browsers (Chrome 55) often don't → arithmetic (tabular) calendar
+const HM_AR=["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"],
+  HM_EN=["Muharram","Safar","Rabi I","Rabi II","Jumada I","Jumada II","Rajab","Sha'ban","Ramadan","Shawwal","Dhu al-Qadah","Dhu al-Hijjah"];
+function hijriCalc(d){ const jd=Math.floor(julian(d.getFullYear(),d.getMonth()+1,d.getDate())+0.5), l0=jd-1948440+10632, n=Math.floor((l0-1)/10631), l1=l0-10631*n+354,
+    j=Math.floor((10985-l1)/5316)*Math.floor(50*l1/17719)+Math.floor(l1/5670)*Math.floor(43*l1/15238), l2=l1-Math.floor((30-j)/15)*Math.floor(17719*j/50)-Math.floor(j/16)*Math.floor(15238*j/43)+29,
+    m=Math.floor(24*l2/709), day=l2-Math.floor(709*m/24), y=30*n+j-30; return {y,m,day} }
+function hijri(d){ d=new Date(d.getTime()+(+store.get("hijriAdj",0)||0)*86400000); try{ const t=new Intl.DateTimeFormat((S.lang==="ar"?"ar-EG":"en")+"-u-ca-islamic-umalqura-nu-latn",{day:"numeric",month:"long",year:"numeric"}).format(d);
+    if(t&&!/20\d\d|19\d\d/.test(t)) return t.replace(/\s?(هـ|AH)$/,"")+(S.lang==="ar"?" هـ":" AH") }catch(e){}
+  const h=hijriCalc(d); return `${h.day} ${(S.lang==="ar"?HM_AR:HM_EN)[h.m-1]} ${h.y}${S.lang==="ar"?" هـ":" AH"}` }
 const hijriMemo={}; const hijriDay=d=>{ const k=d.toDateString()+S.lang; return hijriMemo[k]||(hijriMemo[k]=hijri(d)) };
 let idleAt=Date.now(); const bootT0=Date.now();
 document.documentElement.lang=S.lang; document.documentElement.dir=S.lang==="ar"?"rtl":"ltr";
@@ -115,7 +123,8 @@ function move(dir){ const all=focusables(); if(!all.length) return; if(!focused|
   all.forEach(e=>{ if(e===focused) return; const b=e.getBoundingClientRect(), bx=b.left+b.width/2, by=b.top+b.height/2, dx=bx-ax, dy=by-ay;
     const ok=dir==="l"?dx<-2&&b.right<=a.left+a.width*0.6:dir==="r"?dx>2&&b.left>=a.right-a.width*0.6:dir==="u"?dy<-2&&b.bottom<=a.top+a.height*0.6:dy>2&&b.top>=a.bottom-a.height*0.6;
     if(!ok) return; const main=dir==="l"||dir==="r"?Math.abs(dx):Math.abs(dy), side=dir==="l"||dir==="r"?Math.abs(dy):Math.abs(dx); const d=main+side*2.5; if(d<bd){ bd=d; best=e } });
-  if(best) focus(best) }
+  if(best) return focus(best);
+  if(dir==="u"&&!$("dlg").classList.contains("on")){ const t=document.querySelector("#tabs .tab.on")||document.querySelector("#tabs .f"); if(t&&t!==focused) focus(t) } }
 const actions=[]; const onAct=f=>actions.unshift(f);
 function activate(el){ if(!el) return; idleAt=Date.now(); for(const f of actions){ try{ if(f(el)) return }catch(e){ console.log(e) } } }
 const longActs=[]; function longPress(el){ for(const f of longActs){ try{ if(f(el)) return }catch(e){} } }
@@ -165,7 +174,7 @@ let wx=null, prayers=[], prayersT=[];
 async function weather(){ try{ let loc=S.loc; if(!loc||loc.city!==S.city){ const g=await fetchJSON("https://geocoding-api.open-meteo.com/v1/search?count=1&name="+encodeURIComponent(S.city)); const p=g.results&&g.results[0]; if(!p) return; loc={lat:p.latitude,lon:p.longitude,name:p.name,city:S.city}; S.loc=loc }
     const w=await fetchJSON(`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`);
     wx={t:Math.round(w.current.temperature_2m),i:WMO(w.current.weather_code),hi:w.daily?Math.round(w.daily.temperature_2m_max[0]):null,lo:w.daily?Math.round(w.daily.temperature_2m_min[0]):null,city:loc.name};
-    $("hWeather").textContent=wx.i+" "+wx.t+"°"; computePrayers(); refreshCombo() }catch(e){} }
+    store.set("wxLast",wx); $("hWeather").textContent=wx.i+" "+wx.t+"°"; computePrayers(); refreshCombo() }catch(e){} }
 const rad=d=>d*Math.PI/180, deg=r=>r*180/Math.PI, dsin=d=>Math.sin(rad(d)), dcos=d=>Math.cos(rad(d)), dtan=d=>Math.tan(rad(d));
 const darcsin=x=>deg(Math.asin(x)), darccos=x=>deg(Math.acos(Math.max(-1,Math.min(1,x)))), darctan2=(y,x)=>deg(Math.atan2(y,x)), darccot=x=>deg(Math.atan(1/x));
 const fixA=a=>a-360*Math.floor(a/360), fixH=a=>a-24*Math.floor(a/24);
@@ -200,7 +209,7 @@ async function loadDay(off){ const day=dayKey(off), out=[];
       mtCache[k]={at:Date.now(),l}; out.push(...l) }catch(e){ if(c) out.push(...c.l) } }));
   return out.sort((a,b)=>(a.st==="live"?0:1)-(b.st==="live"?0:1)||(mFav(b)?1:0)-(mFav(a)?1:0)||a.t-b.t) }
 let todayMatches=[];
-async function refreshToday(){ try{ todayMatches=await loadDay(0); refreshCombo() }catch(e){} }
+async function refreshToday(){ try{ todayMatches=await loadDay(0); store.set("mtLast",{d:dayKey(0),l:todayMatches}); refreshCombo() }catch(e){} }
 const logo=u=>u?`<img src="${esc(u)}" alt="">`:`<i class="nologo">⚽</i>`;
 function mMid(m){ return m.st==="ns"?`<b>${esc(fmtTime(new Date(m.t),true))}</b><small>${esc(m.tv)}</small>`:`<b class="${m.st==="live"?"live":""}" dir="ltr">${esc(m.hs)} - ${esc(m.as)}</b><small class="${m.st==="live"?"live":""}">${m.st==="live"?"● "+esc(m.clock||L("live")):esc(L("ft"))}</small>` }
 function mCard(m){ return `<div class="mcard f${mFav(m)?" fav":""}" data-m="${esc(m.id)}"><div class="mhead"><span>${mFav(m)?"⭐ ":""}${esc(compName(m.lg))}</span></div><div class="mbody"><div class="mteam">${logo(m.hl)}<span>${esc(teamAr(m.home))}</span></div><div class="mmid">${mMid(m)}</div><div class="mteam">${logo(m.al)}<span>${esc(teamAr(m.away))}</span></div></div></div>` }
@@ -260,7 +269,7 @@ function comboHtml(){ const parts=PARTS.filter(p=>S.comboParts.indexOf(p[0])>=0)
   return `<div class="combo f" id="comboCard"${S.heroImg&&S.wallPic?` style="background-image:linear-gradient(rgba(8,12,24,.5),rgba(8,12,24,.78)),url('${esc(S.heroImg)}')"`:""}><div class="cbgrid">${parts.map(([p,k])=>`<div class="cbcell cb-${p}"><div class="cbh">${esc(L(k))}</div><div class="cbb">${partHtml(p)}</div></div>`).join("")}</div></div>` }
 function refreshCombo(){ if(curPage!=="home"||window.__bg) return; const c=$("comboCard"); if(!c){ $("combo").innerHTML=comboHtml(); return }
   const fc=focused===c; const t=document.createElement("div"); t.innerHTML=comboHtml(); const n=t.firstChild; c.parentNode.replaceChild(n,c); if(fc) focus(n) }
-const tile=(a,i)=>`<div class="app f" data-pkg="${esc(a.pkg)}">${a.icon?`<img src="${esc(a.icon)}" alt="">`:`<i class="noicon">📦</i>`}<span>${i!=null&&i<9?`<em>${i+1}</em>`:""}${esc(a.name)}</span></div>`;
+const tile=(a,i)=>`<div class="app f" data-pkg="${esc(a.pkg)}">${a.icon?`<img src="${esc(a.icon)}" alt="" onerror="this.outerHTML='<i class=noicon>📦</i>'">`:`<i class="noicon">📦</i>`}<span>${i!=null&&i<9?`<em>${i+1}</em>`:""}${esc(a.name)}</span></div>`;
 function renderHome(){ const keep=focused&&focused.dataset&&focused.dataset.pkg, inHome=focused&&focused.closest("#home"), kf=focused&&focused.id==="comboCard";
   $("combo").innerHTML=comboHtml(); const hid=S.hidden, favs=S.favs.map(byPkg).filter(Boolean);
   $("favH").textContent="⭐ "+L("favs"); $("favs").innerHTML=favs.length?favs.map(tile).join(""):`<p class="hint">${esc(L("noFav"))}</p>`;
@@ -350,6 +359,7 @@ function renderSet(){ const ty=!!nat("a11yOn"), unk=NA&&NA.unknownSources?!!nat(
   $("setList").innerHTML=[
     row(L("sLang"),btn("العربية",`data-lang="ar"`,S.lang==="ar")+btn("English",`data-lang="en"`,S.lang==="en")),
     row(L("sCity"),btn(S.city||"—",`data-act="city"`)),
+    row(L("sHij")+": "+hijriDay(new Date()),[-1,0,1].map(n=>btn((n>0?"+":"")+n,`data-hadj="${n}"`,(+store.get("hijriAdj",0)||0)===n)).join("")),
     row(L("sClose"),onOff("closeOthers")),
     row(L("sRam"),onOff("ramAuto")),
     row(L("sPic"),onOff("wallPic")),
@@ -366,6 +376,7 @@ function renderSet(){ const ty=!!nat("a11yOn"), unk=NA&&NA.unknownSources?!!nat(
     row(L("sOld"),btn(L("oldGo"),`data-act="old"`))].join("") }
 onAct(el=>{ const d=el.dataset;
   if(d.set){ S[d.set]=d.v==="1"; renderSet(); const f=$("setList").querySelector(`[data-set="${d.set}"][data-v="${d.v}"]`)||$("setList").querySelector(`[data-set="${d.set}"]`); if(f) focus(f); return true }
+  if(d.hadj!=null){ store.set("hijriAdj",+d.hadj); for(const k in hijriMemo) delete hijriMemo[k]; tick(); renderSet(); focus($("setList").querySelector(`[data-hadj="${d.hadj}"]`)); return true }
   if(d.lang){ S.lang=d.lang; location.reload(); return true }
   if(d.bed!=null){ S.bedTime=d.bed; renderSet(); focus($("setList").querySelector(`[data-bed="${d.bed}"]`)); return true }
   const a=d.act; if(!a) return false;
