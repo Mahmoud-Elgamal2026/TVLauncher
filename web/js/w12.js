@@ -28,7 +28,7 @@ const CO_KEEP=/^(moe\.shizuku|com\.android\.(systemui|inputmethod|providers)|com
 launch=(function(prev){ return function(pkg){
   const r=prev.apply(this,arguments); // the app starts first; the clean-up of the others happens after, so opening isn't slowed down
   if(S.closeOthers) setTimeout(()=>{ const mine=[].concat(typeof openedApps!=="undefined"?openedApps:[],S.recent||[]).filter((p,i,a)=>a.indexOf(p)===i);
-    let all=[]; try{ all=visibleApps().map(a=>a.pkg) }catch(e){} const bad=p=>!p||p===pkg||p===NA_PKG||CO_KEEP.test(p);
+    let all=[]; try{ all=visibleApps().map(a=>a.pkg) }catch(e){} const bad=p=>!p||p===pkg||p===NA_PKG||CO_KEEP.test(p)||(S.favs||[]).indexOf(p)>=0; // favourites (TizenTube, Ostora…) stay warm: they reopen faster
     mine.filter(p=>!bad(p)).forEach(p=>{ try{ closeOne(p) }catch(e){} });
     all.filter(p=>!bad(p)&&mine.indexOf(p)<0).forEach(p=>{ try{ nat("closeApp",p) }catch(e){} }) },2500);
   return r } })(launch);

@@ -13,7 +13,10 @@ Object.assign(T.en,{imeNeed:"Typing into any app from the phone needs Shizuku ru
 // ---- (3)(4) text and voice from the phone: inside the launcher as before; inside another app through the hidden phone keyboard
 function imeSend(t,submit){ const r=NA&&NA.imeText?nat("imeText",String(t||""),!!submit):"need";
   if(r==="a11y"){ if(!imeSend.warned||Date.now()-imeSend.warned>60000){ imeSend.warned=Date.now(); banner("⌨️",L("a11yNeed"),L("a11ySub"),10000) } return false }
-  if(r==="nofield"){ banner("⌨️",L("a11yNoField"),"",4000); return false }
+  if(r==="nofield"){ // TizenTube draws its own search box (no real text field): send the words to it as a YouTube search instead
+    const tp=(S.maPkgs||{}).TizenTube, front=(S.recent||[])[0];
+    if(tp&&front===tp&&submit!==false&&String(t||"").trim()){ if(nat("openUriIn","https://www.youtube.com/results?search_query="+encodeURIComponent(String(t).trim()),tp)) return true }
+    banner("⌨️",L("a11yNoField"),"",4000); return false }
   if(r==="need"){ if(!imeSend.warned||Date.now()-imeSend.warned>60000){ imeSend.warned=Date.now(); banner("⌨️",L("imeNeed"),L("imeNeedSub"),8000) } return false } return true }
 remoteCmd=(function(prev){ return function(m){ m=m||{};
   if(window.__bg&&(m.cmd==="text"||m.cmd==="voice")){ const ok=imeSend(m.t,m.cmd==="voice"||!!m.submit); return ok?{ok:1,to:"app"}:{error:"ime"} }
