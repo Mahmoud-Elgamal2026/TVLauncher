@@ -1126,3 +1126,10 @@ body.lowram *,body.lowram *::before,body.lowram *::after{-webkit-backdrop-filter
 body.lowram .hw,body.lowram .tile,body.lowram .card,body.lowram .mtc,body.lowram .dlg,body.lowram #dbox{box-shadow:none!important}
 body.lowram .hw,body.lowram .dlg,body.lowram #dbox{background-color:rgba(18,20,30,.92)!important}
 #contWrap{margin:6px 0 4px}.contbar .btn{font-size:1.05em;padding:.55em 1.2em}
+/* the big widget: half the screen, parts in a grid */
+.hw.hw-combo{min-height:46vh}
+.hw-combo .cbgrid{display:flex;flex-wrap:wrap;gap:1vw;margin-top:.6vh}
+.hw-combo .cbcell{flex:1 1 30%;min-width:30%;box-sizing:border-box;background:rgba(255,255,255,.05);border-radius:14px;padding:1vh 1vw;min-height:18vh;overflow:hidden}
+.hw-combo .cbh{font-size:.8em;opacity:.7;margin-bottom:.5vh}
+.hw-combo .cbclock{font-size:3.2em;font-weight:700;line-height:1.1}
+.hw-combo .cbb .mcbig{transform:scale(.9);transform-origin:top center}
