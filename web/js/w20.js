@@ -41,3 +41,8 @@ setInterval(()=>{ /* weekly clean */ const h=new Date().getHours(); if(h<2||h>5|
   try{ Object.keys(localStorage).filter(k=>/^fc:/.test(k)).forEach(k=>localStorage.removeItem(k)); localStorage.removeItem("fc:idx") }catch(e){}
   store.set("cleanMsg",1) },10*60000);
 setTimeout(()=>{ if(store.get("cleanMsg",0)){ store.set("cleanMsg",0); banner("🧽",L("cleanDone"),"",4000) } },20000);
+
+// ---- try the new clean interface (same settings; a button there brings you back here)
+renderSettings=(function(prev){ return function(){ const r=prev.apply(this,arguments); const a=$("pfSec")||$("suSec");
+  if(a&&!$("ui2Sec")) a.insertAdjacentHTML("beforebegin",`<div class="field" id="ui2Sec"><label>${S.lang==="ar"?"✨ الواجهة الجديدة (أخف وأسرع)":"✨ New interface (lighter, faster)"}</label><div class="inline"><button class="btn f pri" id="ui2Go">${S.lang==="ar"?"جرّبها":"Try it"}</button></div></div>`); return r } })(renderSettings);
+activators.unshift(el=>{ if(el.id!=="ui2Go") return false; if(!nat("setUi",2)) location.href="index2.html"; return true });

@@ -112,7 +112,7 @@ public class MainActivity extends Activity {
         web.setFocusable(true);
         web.requestFocus(View.FOCUS_DOWN);
         setContentView(web);
-        web.loadUrl("file:///android_asset/index.html");
+        web.loadUrl(uiPage());
         String code = prefs.getString("remoteCode", null);
         if (code == null) { code = newCode(); prefs.edit().putString("remoteCode", code).apply(); }
         RemoteServer.ctx = getApplicationContext();
@@ -253,7 +253,7 @@ public class MainActivity extends Activity {
     /** Reloads the web interface: stops playback and frees everything the page held. */
     void restartUi(String why) {
         try { stopRadioMp(); } catch (Throwable ignored) {}
-        ui.post(() -> { try { web.stopLoading(); web.loadUrl("file:///android_asset/index.html"); Toast.makeText(this, "↻", Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {} });
+        ui.post(() -> { try { web.stopLoading(); web.loadUrl(uiPage()); Toast.makeText(this, "↻", Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {} });
         lastPing = System.currentTimeMillis() + 20000;
     }
     // Watchdog: the page pings every 2 s; if it stops answering for 12 s while on screen, reload it.
@@ -437,6 +437,9 @@ public class MainActivity extends Activity {
     private void stopRadioMp(){ try{ if(radioMp!=null){ radioMp.release(); } }catch(Exception ignored){} radioMp=null; }
 
 
+    /** which interface to show: the old one (index.html) or the new clean one (index2.html) */
+    String uiPage() { return "file:///android_asset/" + ("2".equals(prefs.getString("ui", "1")) ? "index2.html" : "index.html"); }
+
     // ---------- typing from the phone into any app, through the hidden RemoteIME keyboard ----------
     static final String IME_ID = "com.mahmoud.tvlauncher/.RemoteIME";
     String prevIme = null;
@@ -492,6 +495,8 @@ public class MainActivity extends Activity {
             if (android.os.Build.VERSION.SDK_INT >= 26) startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName())).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             else startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); }
             catch (Exception e) { try { startActivity(new Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); } catch (Exception ignored) {} } }); }
+        @JavascriptInterface public boolean setUi(int n) { prefs.edit().putString("ui", String.valueOf(n == 2 ? 2 : 1)).apply(); ui.post(() -> { if (web != null) web.loadUrl(uiPage()); }); return true; }
+        @JavascriptInterface public int getUi() { return "2".equals(prefs.getString("ui", "1")) ? 2 : 1; }
         @JavascriptInterface public boolean a11yOn() { return RemoteA11y.inst != null; }
         @JavascriptInterface public void openA11ySettings() { ui.post(() -> { try { startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); } catch (Exception ignored) {} }); }
         @JavascriptInterface public String imeText(String t, boolean submit) { return imeWrite(t, submit); }

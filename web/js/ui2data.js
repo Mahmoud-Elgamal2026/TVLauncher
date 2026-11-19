@@ -1,0 +1,28 @@
+"use strict";
+// data for the new interface (leagues, Arabic team names) — taken from the old interface
+const COMPS=[
+ ["egy.1","الدوري المصري","Egyptian Premier League","l"],["egy.cup","كأس مصر وكأس الرابطة (العاصمة)","Egypt Cup & League Cup","l"],["ksa.1","الدوري السعودي","Saudi Pro League","l"],["eng.1","الدوري الإنجليزي","Premier League","l"],["esp.1","الدوري الإسباني","La Liga","l"],
+ ["ita.1","الدوري الإيطالي","Serie A","l"],["ger.1","الدوري الألماني","Bundesliga","l"],["fra.1","الدوري الفرنسي","Ligue 1","l"],["tur.1","الدوري التركي","Turkish Süper Lig","l"],
+ ["por.1","الدوري البرتغالي","Primeira Liga","l"],["ned.1","الدوري الهولندي","Eredivisie","l"],["uae.1","الدوري الإماراتي","UAE Pro League","l"],["qat.1","الدوري القطري","Qatar Stars League","l"],
+ ["mar.1","الدوري المغربي","Botola Pro","l"],["usa.1","الدوري الأمريكي","MLS","l"],["eng.2","التشامبيونشيب","Championship","l"],["eng.fa","كأس إنجلترا","FA Cup","l"],["esp.copa_del_rey","كأس ملك إسبانيا","Copa del Rey","l"],
+ ["uefa.champions","دوري أبطال أوروبا","Champions League","c"],["uefa.europa","الدوري الأوروبي","Europa League","c"],["uefa.europa.conf","دوري المؤتمر","Conference League","c"],
+ ["caf.champions","دوري أبطال أفريقيا","CAF Champions League","c"],["caf.confed","الكونفدرالية الأفريقية","CAF Confederation Cup","c"],["afc.champions","دوري أبطال آسيا","AFC Champions League","c"],
+ ["conmebol.libertadores","كوبا ليبرتادوريس","Copa Libertadores","c"],["fifa.cwc","كأس العالم للأندية","Club World Cup","c"],
+ ["fifa.world","كأس العالم","World Cup","n"],["fifa.worldq.caf","تصفيات كأس العالم - أفريقيا","WC Qualifiers - Africa","n"],["fifa.worldq.afc","تصفيات كأس العالم - آسيا","WC Qualifiers - Asia","n"],
+ ["fifa.worldq.uefa","تصفيات كأس العالم - أوروبا","WC Qualifiers - Europe","n"],["caf.nations","كأس الأمم الأفريقية","Africa Cup of Nations","n"],["caf.nations_qual","تصفيات أمم أفريقيا","AFCON Qualifiers","n"],
+ ["afc.asian.cup","كأس آسيا","Asian Cup","n"],["uefa.euro","كأس أمم أوروبا","EURO","n"],["uefa.nations","دوري الأمم الأوروبية","Nations League","n"],["fifa.friendly","مباريات ودية دولية","International friendlies","n"],
+ ["fifa.arab","كأس العرب","Arab Cup","n"]];
+const TEAM_AR={"al ahly":"الأهلي","zamalek":"الزمالك","pyramids":"بيراميدز","al masry":"المصري","ismaily":"الإسماعيلي","smouha":"سموحة","future":"فيوتشر","modern sport":"مودرن سبورت","modern future":"مودرن سبورت",
+ "el gouna":"الجونة","ceramica cleopatra":"سيراميكا كليوباترا","enppi":"إنبي","petrojet":"بتروجت","national bank of egypt":"البنك الأهلي","al ittihad alexandria":"الاتحاد السكندري","al ittihad":"الاتحاد","ittihad alexandria":"الاتحاد السكندري",
+ "ghazl el mahalla":"غزل المحلة","el gaish":"طلائع الجيش","tala'ea el gaish":"طلائع الجيش","zed":"زد","pharco":"فاركو","haras el hodoud":"حرس الحدود","el mokawloon":"المقاولون العرب","arab contractors":"المقاولون العرب","wadi degla":"وادي دجلة",
+ "petrol asyut":"بترول أسيوط","el qanah":"القناة","abu qir fertilizers":"أبوقير للأسمدة","kahrabaa ismailia":"كهرباء الإسماعيلية","sharkia":"الشرقية","el sharkia":"الشرقية",
+ "al hilal":"الهلال","al nassr":"النصر","al ittihad jeddah":"الاتحاد","al ahli":"الأهلي السعودي","al ahli saudi":"الأهلي السعودي","al shabab":"الشباب","al qadsiah":"القادسية","al taawoun":"التعاون","al fateh":"الفتح","al ettifaq":"الاتفاق","al khaleej":"الخليج","al riyadh":"الرياض","al hazem":"الحزم","al kholood":"الخلود","neom":"نيوم","al diriyah":"الدرعية",
+ "shabab al ahli":"شباب الأهلي","al ain":"العين","al wahda":"الوحدة","al jazira":"الجزيرة","sharjah":"الشارقة","al sadd":"السد","al duhail":"الدحيل","al gharafa":"الغرافة","al rayyan":"الريان","al shamal":"الشمال","esteghlal":"الاستقلال","persepolis":"برسبوليس",
+ "wydad":"الوداد","raja casablanca":"الرجاء","esperance":"الترجي","esperance de tunis":"الترجي","mamelodi sundowns":"صن داونز",
+ "real madrid":"ريال مدريد","barcelona":"برشلونة","atletico madrid":"أتلتيكو مدريد","villarreal":"فياريال","sevilla":"إشبيلية","real betis":"ريال بيتيس","athletic club":"أتلتيك بلباو",
+ "manchester city":"مانشستر سيتي","manchester united":"مانشستر يونايتد","liverpool":"ليفربول","arsenal":"آرسنال","chelsea":"تشيلسي","tottenham hotspur":"توتنهام","aston villa":"أستون فيلا","newcastle united":"نيوكاسل",
+ "bayern munich":"بايرن ميونخ","borussia dortmund":"دورتموند","bayer leverkusen":"ليفركوزن","rb leipzig":"لايبزيج","vfb stuttgart":"شتوتجارت","stuttgart":"شتوتجارت",
+ "paris saint-germain":"باريس سان جيرمان","psg":"باريس سان جيرمان","marseille":"مارسيليا","monaco":"موناكو","lille":"ليل","lyon":"ليون",
+ "inter milan":"إنتر ميلان","internazionale":"إنتر ميلان","ac milan":"ميلان","juventus":"يوفنتوس","napoli":"نابولي","as roma":"روما","roma":"روما","lazio":"لاتسيو","atalanta":"أتالانتا",
+ "galatasaray":"جالاتا سراي","fenerbahce":"فنربخشة","besiktas":"بشكتاش","trabzonspor":"طرابزون سبور","benfica":"بنفيكا","porto":"بورتو","sporting cp":"سبورتينج","ajax":"أياكس","psv eindhoven":"آيندهوفن","feyenoord":"فيينورد","shakhtar donetsk":"شاختار دونيتسك","bodo/glimt":"بودو جليمت","slovan bratislava":"سلوفان براتيسلافا",
+ "egypt":"مصر","saudi arabia":"السعودية","morocco":"المغرب","algeria":"الجزائر","tunisia":"تونس","qatar":"قطر","jordan":"الأردن","iraq":"العراق","uae":"الإمارات","united arab emirates":"الإمارات"};
