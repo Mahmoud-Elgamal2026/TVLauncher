@@ -81,3 +81,4 @@ h2{font-size:2.2vh;color:var(--dim);margin:2.4vh 0 1vh;font-weight:600}
 .mteam img,.mteam .nologo,.tcard img{margin-bottom:.6vh}
 .kv b{margin-inline-start:1vw}
 .cbm .mmid{margin:0 .6vw}
+#bg.img{background-size:cover;background-position:center}

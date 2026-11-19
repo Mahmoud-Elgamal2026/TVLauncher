@@ -44,7 +44,7 @@ const T={ar:{home:"الرئيسية",mt:"الماتشات",yt:"يوتيوب",set
   maInst:"بينزّل",maDone:"اتسطّب",maFail:"ماعرفش ينزّل",maTap:"وافق على التثبيت على الشاشة",maWeb:"اللينك مش ملف مباشر — فتحته في المتصفح",maMissing:"تطبيقات ناقصة",
   a11yNeed:"عشان تكتب جوه التطبيقات من الموبايل، فعّل الكتابة من الإعدادات",noField:"دوس بالريموت على خانة الكتابة الأول",
   bedNow:"🌙 وقت النوم — التطبيقات هتتقفل والشاشة هتطفي بعد دقيقة",awake:"لسه صاحي",diskLow:"المساحة قربت تخلص",ramDone:"اتقفلت تطبيقات في الخلفية عشان البوكس يخف",
-  qm:"⚡ قايمة سريعة",qOstora:"📺 الأسطورة",qYt:"▶️ TizenTube",qMt:"⚽ الماتشات",cleaned:"🧽 اتعمل تنضيف أسبوعي",prayNow:"حان الآن موعد",hidden:"مخفي",notInst:"التطبيق مش متسطّب"},
+  qm:"⚡ قايمة سريعة",qOstora:"📺 الأسطورة",qYt:"▶️ TizenTube",qMt:"⚽ الماتشات",cleaned:"🧽 اتعمل تنضيف أسبوعي",prayNow:"حان الآن موعد",wallNew:"خلفية جديدة من الموبايل",hidden:"مخفي",notInst:"التطبيق مش متسطّب"},
  en:{home:"Home",mt:"Matches",yt:"YouTube",set:"Settings",favs:"Favourites",apps:"All apps",noFav:"Hold OK on any app to add it to favourites",
   am:"AM",pm:"PM",days:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],months:["January","February","March","April","May","June","July","August","September","October","November","December"],
   prayers:["Fajr","Sunrise","Dhuhr","Asr","Maghrib","Isha"],pTime:"Time & date",pWeather:"Weather",pPrayer:"Next prayer",pMatch:"Match",pPerf:"Box health",
@@ -62,7 +62,7 @@ const T={ar:{home:"الرئيسية",mt:"الماتشات",yt:"يوتيوب",set
   maInst:"Installing",maDone:"Installed",maFail:"Couldn't install",maTap:"Confirm the install on screen",maWeb:"Not a direct link — opened it in the browser",maMissing:"Missing apps",
   a11yNeed:"To type into apps from the phone, turn typing on in Settings",noField:"Select the text box with the remote first",
   bedNow:"🌙 Bedtime — apps close and the screen goes dark in a minute",awake:"Still awake",diskLow:"Storage almost full",ramDone:"Closed background apps to keep the box light",
-  qm:"⚡ Quick menu",qOstora:"📺 Ostora",qYt:"▶️ TizenTube",qMt:"⚽ Matches",cleaned:"🧽 Weekly clean-up done",prayNow:"It's time for",hidden:"hidden",notInst:"App not installed"}};
+  qm:"⚡ Quick menu",qOstora:"📺 Ostora",qYt:"▶️ TizenTube",qMt:"⚽ Matches",cleaned:"🧽 Weekly clean-up done",prayNow:"It's time for",wallNew:"New wallpaper from the phone",hidden:"hidden",notInst:"App not installed"}};
 const L=k=>{ const t=T[S.lang]||T.ar; return t[k]!=null?t[k]:(T.en[k]!=null?T.en[k]:k) };
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -425,14 +425,19 @@ function remoteCmd(m){ m=m||{}; switch(m.cmd){
     return {list:S.myApps||[],builtin:MA_BUILTIN.map(a=>a.name),missing:maMissing().map(a=>a.name)};
   case "action": if(m.a==="home") showPage("home"); return {ok:1};
   case "checkUpd": checkUpd(true); return {ok:1};
-  case "lists": case "photo": case "photoReset": case "watchRemove": case "profile": case "play": return {ok:0,ui:2};
+  case "photo": { const u=nat("saveImageB64",String(m.data||"")); if(!u) return {error:"photo"}; S.wallImg=u; applyWall(); banner("🖼",L("wallNew"),"",3000); return {ok:1} }
+  case "photoReset": S.wallImg=""; applyWall(); return {ok:1};
+  case "lists": case "watchRemove": case "profile": case "play": return {ok:0,ui:2};
  } return {error:"cmd"} }
 window.onRemote=(id,json)=>{ let res; try{ res=remoteCmd(JSON.parse(json)) }catch(e){ res={error:String(e&&e.message||e)} } nat("remoteReply",id,JSON.stringify(res)) };
 window.onLowMem=()=>{ document.querySelectorAll("#ytList img").forEach(i=>i.removeAttribute("src")) };
 
+// ---------- wallpaper sent from the phone (the whole screen's background) ----------
+function applyWall(){ const b=$("bg"), u=S.wallImg; b.style.backgroundImage=u?`linear-gradient(rgba(6,9,18,.55),rgba(6,9,18,.8)),url('${String(u).replace(/'/g,"%27")}')`:""; b.classList.toggle("img",!!u) }
+
 // ---------- start ----------
 let bootMs=0;
-renderTabs(); tick(); setInterval(tick,15000); showPage("home"); bootMs=Math.round(performance.now());
+applyWall(); renderTabs(); tick(); setInterval(tick,15000); showPage("home"); bootMs=Math.round(performance.now());
 { const h=store.get("bootHist",[]); h.unshift(bootMs); store.set("bootHist",h.slice(0,10)) }
 focus($("comboCard")||document.querySelector("#tabs .f"));
 setTimeout(weather,800); setTimeout(refreshToday,1500); setTimeout(dailyPic,4000);

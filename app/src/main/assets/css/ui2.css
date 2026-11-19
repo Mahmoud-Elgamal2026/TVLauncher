@@ -89,3 +89,4 @@ html[dir=rtl] .sv>*{margin-right:.7vw}
 html[dir=ltr] .kv b{margin-left:1vw}
 html[dir=rtl] .kv b{margin-right:1vw}
 .cbm .mmid{margin:0 .6vw}
+#bg.img{background-size:cover;background-position:center}
