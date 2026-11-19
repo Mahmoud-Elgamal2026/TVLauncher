@@ -99,6 +99,7 @@ nav button span{font-size:11px}
 <main>
   <section class="tab on" id="t-remote">
     <div id="alerts"></div>
+    <div class="row" style="margin:6px 0 10px"><button class="btn pri" id="qOstora" style="flex:1;min-height:64px;font-size:18px"><b>📺</b><span>الأسطورة</span></button><button class="btn pri" id="qYt" style="flex:1;min-height:64px;font-size:18px"><b>▶️</b><span>TizenTube</span></button></div>
     <div class="pad">
       <button class="u" data-k="up"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button class="d" data-k="down"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
       <button class="l" data-k="left"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><button class="r" data-k="right"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -378,7 +379,8 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
       for(var t=0;t<60;t++){ await new Promise(function(r){ setTimeout(r,3000) }); var x=await api("hasApp",{pkg:a.pkg}); if(x&&x.has){ put++; break } } }
     prog("⚙️ بيرجّع الإعدادات…"); if(bk.settings) await api("restore",{data:bk.settings});
     busy=false; prog("✓ خلصت: "+put+" تطبيق اتثبت والإعدادات رجعت. سجّل حساب جوجل من الزرار اللي تحت."); setTimeout(refresh,3000) }
-  $("bkNow").onclick=function(){ backupNow(false) }; $("bkAll").onclick=restoreAll;
+  $("bkNow").onclick=function(){ backupNow(false) };
+  $("qOstora").onclick=function(){ api("quick",{which:"ostora"}); toast("📺") }; $("qYt").onclick=function(){ api("quick",{which:"yt"}); toast("▶️") }; $("bkAll").onclick=restoreAll;
   $("acctBtn").onclick=async function(){ if(await api("addAccount")) toast("بصّ على الشاشة") };
   bkLine();
   // automatic: once a day while the app is open

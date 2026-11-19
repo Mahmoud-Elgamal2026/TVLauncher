@@ -1323,3 +1323,11 @@ html.nofg .hw-combo .cbgrid > *{margin-bottom:1vw}
 .hw-combo .cbh{font-size:.8em;opacity:.7;margin-bottom:.5vh}
 .hw-combo .cbclock{font-size:3.2em;font-weight:700;line-height:1.1}
 .hw-combo .cbb .mcbig{transform:scale(.9);transform-origin:top center}
+.hw-combo .cbm{display:flex;align-items:center;justify-content:space-between;gap:.6vw}
+html[dir=ltr].nofg .hw-combo .cbm > * + *{margin-left:.6vw}
+html[dir=rtl].nofg .hw-combo .cbm > * + *{margin-right:.6vw}
+.hw-combo .cbmt{display:flex;flex-direction:column;align-items:center;gap:.4vh;flex:1;text-align:center;font-size:.85em}
+html.nofg .hw-combo .cbmt > * + *{margin-top:.4vh}
+.hw-combo .cbmt img,.hw-combo .cbmt .mnol{width:3.2vw;height:3.2vw;object-fit:contain}
+.hw-combo .cbmm{text-align:center;display:flex;flex-direction:column}.hw-combo .cbmm b{font-size:1.3em}
+.hw-combo .live{color:#ff6b6b}
