@@ -2,7 +2,7 @@
 // SmartTube and Downloader are built in (official sources); any other app is added once from the phone with its APK link.
 Object.assign(T.ar,{maTitle:"📲 تطبيقاتي (بتنزل لوحدها)",maMissing:"تطبيقات ناقصة",maInst:"بينزّل",maDone:"اتسطّب",maFail:"ماعرفش ينزّل",maTap:"وافق على التثبيت على الشاشة",maAll:"⬇️ نزّل الناقص دلوقتي",maNone:"كل تطبيقاتك متسطبة ✓",maWeb:"اللينك ده مش ملف مباشر — فتحته في المتصفح، نزّله من هناك"});
 Object.assign(T.en,{maTitle:"📲 My apps (install by themselves)",maMissing:"Missing apps",maInst:"Installing",maDone:"Installed",maFail:"Couldn't install",maTap:"Confirm the install on screen",maAll:"⬇️ Install missing now",maNone:"All your apps are installed ✓",maWeb:"Not a direct APK link — opened it in the browser, download it there"});
-const MA_BUILTIN=[{name:"Shizuku",pkg:"moe.shizuku.privileged.api",url:"https://github.com/Mahmoud-Elgamal2026/TVLauncher/raw/main/dist/Shizuku.apk"},{name:"SmartTube",pkg:"com.teamsmart.videomanager.tv",src:"gh:yuliskov/SmartTube"},{name:"Downloader",pkg:"com.esaba.downloader",src:"play"}];
+const MA_BUILTIN=[{name:"Shizuku",pkg:"moe.shizuku.privileged.api",url:"https://github.com/Mahmoud-Elgamal2026/TVLauncher/raw/main/dist/Shizuku.apk"},{name:"TizenTube",src:"gh:reisxd/TizenTubeCobalt"},{name:"Downloader",pkg:"com.esaba.downloader",src:"play"}];
 Object.assign(DEF,{myApps:[],maAuto:true});
 const maList=()=>{ const mine=(S.myApps||[]).filter(a=>a&&a.url&&!MA_BUILTIN.some(b=>b.pkg&&b.pkg===a.pkg||b.name.toLowerCase()===String(a.name).toLowerCase()||b.url===a.url));
   // order: Shizuku first (it makes the rest silent), then your apps, then GitHub ones, the Play Store one last
@@ -15,7 +15,7 @@ const maMissing=()=>maList().filter(a=>!maHas(a));
 // a GitHub release → the APK for this box (32-bit ARM boxes need armeabi-v7a)
 async function maUrl(a){ if(a.url) return a.url; if(!/^gh:/.test(a.src||"")) return "";
   const r=await A.fetchJSON(`https://api.github.com/repos/${a.src.slice(3)}/releases/latest`), l=(r.assets||[]).filter(x=>/\.apk$/i.test(x.name||""));
-  const pick=l.find(x=>/stable/i.test(x.name)&&/armeabi|arm32|universal/i.test(x.name))||l.find(x=>/armeabi|universal/i.test(x.name))||l.find(x=>/stable/i.test(x.name))||l[0];
+  const pick=l.find(x=>/stable/i.test(x.name)&&/armeabi|arm32|universal/i.test(x.name))||l.find(x=>/armeabi|universal/i.test(x.name))||l.find(x=>/stable/i.test(x.name))||l.find(x=>/(^|[-_])arm(eabi)?(-v7a)?\.apk$/i.test(x.name))||l[0];
   return pick?pick.browser_download_url:"" }
 let maBusy=false;
 async function maInstall(list,manual){ if(maBusy){ if(manual) banner("⏳",L("maTitle"),L("maInst")+"…",4000); return } maBusy=true;
@@ -81,3 +81,7 @@ if(!HW_TYPES.some(t=>t[0]==="hero")) HW_TYPES.unshift(["hero","🌄","hwHero"]);
 setTimeout(()=>{ try{ if(!S.heroBack){ S.heroBack=1; const l=hwList(); if(!l.some(w=>w.t==="hero")) hwSave([{id:"hero",t:"hero",sz:4,st:"clear"}].concat(l)) } }catch(e){} },5500);
 // YouTube (the official TV app) is one of the apps that must always be there
 // (the official YouTube TV app says "not compatible" on this box: SmartTube is the YouTube app here)
+
+// TizenTube is the YouTube app now: videos from the YouTube tab open in it first (its package is learned when it installs)
+openYt=(function(prev){ return function(id){ const tp=(S.maPkgs||{}).TizenTube;
+  if(tp&&nat("hasPkg",tp)){ if(nat("openUriIn","https://www.youtube.com/watch?v="+id,tp)) return; launch(tp); return } return prev.apply(this,arguments) } })(openYt);
