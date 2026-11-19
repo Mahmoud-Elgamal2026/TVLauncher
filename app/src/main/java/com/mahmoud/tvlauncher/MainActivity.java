@@ -471,6 +471,18 @@ public class MainActivity extends Activity {
     }
     class Bridge {
 
+
+        /** Can apps from outside the Play Store be installed? (Android 7: the global "Unknown sources" switch; 8+: per app) */
+        @JavascriptInterface
+        public boolean unknownSources() {
+            try { if (android.os.Build.VERSION.SDK_INT >= 26) return getPackageManager().canRequestPackageInstalls();
+                return Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS, 0) == 1; } catch (Exception e) { return true; }
+        }
+        @JavascriptInterface
+        public void openInstallSettings() { ui.post(() -> { try {
+            if (android.os.Build.VERSION.SDK_INT >= 26) startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName())).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            else startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); }
+            catch (Exception e) { try { startActivity(new Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); } catch (Exception ignored) {} } }); }
         @JavascriptInterface public String imeText(String t, boolean submit) { return imeWrite(t, submit); }
 
         /** Apps the user installed (not system ones): for the phone's full backup. */

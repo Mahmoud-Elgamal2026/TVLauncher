@@ -364,7 +364,7 @@ if(location.hash==="#tg"){ setTimeout(function(){ var i=document.getElementById(
       var todo=apps.filter(function(a){ return !a.split&&a.size<300e6&&sv[a.pkg]!==a.ver }), done=0, skipped=apps.filter(function(a){ return a.split }).length;
       for(var i=0;i<todo.length;i++){ var a=todo[i]; prog("💾 بيحفظ "+a.name+" ("+(i+1)+" من "+todo.length+") · "+sz(a.size));
         var ok=await new Promise(function(res){ waitSaved[a.pkg]=res; P.pullApk(q("/pkg?p="+encodeURIComponent(a.pkg)),a.pkg,a.ver) }); if(ok) done++ }
-      prog(""); bkLine(); if(!silent) toast("✓ اتحفظت النسخة"+(todo.length?" · "+done+" تطبيق جديد":"")+(skipped?" · "+skipped+" تطبيق مقسوم مااتحفظش":""));
+      prog(""); bkLine(); try{ api("bkDone",{n:Object.keys(JSON.parse(P.savedApks())).length}) }catch(e){} if(!silent) toast("✓ اتحفظت النسخة"+(todo.length?" · "+done+" تطبيق جديد":"")+(skipped?" · "+skipped+" تطبيق مقسوم مااتحفظش":""));
     }catch(e){ prog("") } busy=false }
   async function restoreAll(){ if(busy||!P) return; var raw=P.loadBackup(); if(!raw){ toast("مفيش نسخة محفوظة على الموبايل ده"); return }
     var bk; try{ bk=JSON.parse(raw) }catch(e){ toast("النسخة بايظة"); return }

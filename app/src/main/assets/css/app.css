@@ -1312,3 +1312,4 @@ body.lite #quickRow,body.lite h2[data-row="quickRow"],body.lite #recentRow,body.
 body.lowram *,body.lowram *::before,body.lowram *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;animation-duration:0s!important;animation-iteration-count:1!important;transition-duration:0s!important}
 body.lowram .hw,body.lowram .tile,body.lowram .card,body.lowram .mtc,body.lowram .dlg,body.lowram #dbox{box-shadow:none!important}
 body.lowram .hw,body.lowram .dlg,body.lowram #dbox{background-color:rgba(18,20,30,.92)!important}
+#contWrap{margin:6px 0 4px}.contbar .btn{font-size:1.05em;padding:.55em 1.2em}

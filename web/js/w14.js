@@ -80,4 +80,4 @@ if(LITE_HW.indexOf("hero")<0) LITE_HW.unshift("hero");
 if(!HW_TYPES.some(t=>t[0]==="hero")) HW_TYPES.unshift(["hero","🌄","hwHero"]);
 setTimeout(()=>{ try{ if(!S.heroBack){ S.heroBack=1; const l=hwList(); if(!l.some(w=>w.t==="hero")) hwSave([{id:"hero",t:"hero",sz:4,st:"clear"}].concat(l)) } }catch(e){} },5500);
 // YouTube (the official TV app) is one of the apps that must always be there
-MA_BUILTIN.splice(1,0,{name:"YouTube",pkg:"com.google.android.youtube.tv",src:"play"});
+// (the official YouTube TV app says "not compatible" on this box: SmartTube is the YouTube app here)
