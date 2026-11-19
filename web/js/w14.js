@@ -8,7 +8,9 @@ const maList=()=>{ const mine=(S.myApps||[]).filter(a=>a&&a.url&&!MA_BUILTIN.som
   // order: Shizuku first (it makes the rest silent), then your apps, then GitHub ones, the Play Store one last
   return MA_BUILTIN.slice(0,1).concat(mine,MA_BUILTIN.slice(1)) };
 const userPkgs=()=>{ try{ return JSON.parse(nat("userApps")||"[]") }catch(e){ return [] } };
-const maHas=a=>(a.pkg&&!!nat("hasPkg",a.pkg))||(()=>{ try{ const n=String(a.name).toLowerCase(); return n!=="app"&&visibleApps().some(x=>appName(x).toLowerCase()===n) }catch(e){ return false } })();
+// installed? its package (or the package we learned last time), or an installed app with the same name
+const maHas=a=>(a.pkg&&!!nat("hasPkg",a.pkg))||(S.maPkgs&&S.maPkgs[a.name]&&!!nat("hasPkg",S.maPkgs[a.name]))||(()=>{ const n=String(a.name||"").toLowerCase().replace(/\s+/g,"");
+    return n.length>2&&n!=="app"&&userPkgs().some(x=>{ const m=String(x.name||"").toLowerCase().replace(/\s+/g,""); return m===n||m.indexOf(n)>=0||n.indexOf(m)>=0&&m.length>3 }) })()||(()=>{ try{ const n=String(a.name).toLowerCase(); return n!=="app"&&visibleApps().some(x=>appName(x).toLowerCase()===n) }catch(e){ return false } })();
 const maMissing=()=>maList().filter(a=>!maHas(a));
 // a GitHub release → the APK for this box (32-bit ARM boxes need armeabi-v7a)
 async function maUrl(a){ if(a.url) return a.url; if(!/^gh:/.test(a.src||"")) return "";
@@ -28,6 +30,7 @@ async function maInstall(list,manual){ if(maBusy){ if(manual) banner("⏳",L("ma
     const id="my:"+a.name, pr=await new Promise(res=>{ maProbe[id]=res; nat("probeApk",url,id); setTimeout(()=>res({error:"timeout"}),300000) });
     if(pr.error){ if(manual){ banner("🌐",a.name,L("maWeb"),10000); nat("openUri",url) } continue }
     if(!MA_BUILTIN.includes(a)) S.myApps=(S.myApps||[]).map(x=>x.url===a.url?Object.assign({},x,{pkg:pr.pkg,name:(x.auto||/^app$/i.test(x.name))&&pr.name?pr.name:x.name,auto:false}):x);
+    S.maPkgs=Object.assign({},S.maPkgs||{},{[a.name]:pr.pkg});
     if(pr.installed!=null&&pr.installed>=pr.ver){ banner("✅",pr.name||a.name,L("maDone"),3000); continue }
     if(silent){ await new Promise(res=>{ maWait[id]=res; nat("silentInstall","",id); setTimeout(res,180000) }) }
     else if(manual){ nat("installLocal"); banner("📲",pr.name||a.name,L("maTap"),10000);
