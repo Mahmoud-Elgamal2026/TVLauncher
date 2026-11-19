@@ -19,7 +19,8 @@ let maBusy=false;
 async function maInstall(list,manual){ if(maBusy){ if(manual) banner("⏳",L("maTitle"),L("maInst")+"…",4000); return } maBusy=true;
   const silent=typeof canSilent==="function"&&canSilent();
   for(const a of list){
-    if(a.src==="play"){ if(manual) nat("openUri","market://details?id="+a.pkg); continue }
+    if(a.src==="play"){ if(manual){ nat("openUri","market://details?id="+a.pkg); banner("▶️",a.name,L("maTap"),8000);
+        for(let t=0;t<40&&!nat("hasPkg",a.pkg);t++) await new Promise(r=>setTimeout(r,3000)) } continue } // one Play Store page at a time
     let url=""; try{ url=await maUrl(a) }catch(e){}
     if(!url){ banner("⚠️",a.name,L("maFail"),5000); continue }
     banner("📲",a.name,L("maInst")+"…",5000);
@@ -68,5 +69,12 @@ applyHomeLook=(function(prev){ return function(){ const r=prev.apply(this,argume
 try{ applyHomeLook() }catch(e){}
 // a fresh box (or one left with only the old empty "hero" card) gets the basic widgets — after the older first-run seeding (3 s) is done
 setTimeout(()=>{ try{ const all=hwList(), l=all.filter(w=>LITE_HW.indexOf(w.t)>=0);
-  if(!l.length&&!S.wDefMig){ S.wDefMig=1; hwSave([{id:"weather",t:"weather",sz:2,st:"glass"},{id:"prayer",t:"prayer",sz:2,st:"glass"},{id:"mcard",t:"mcard",sz:2,st:"glass"},{id:"ytnew",t:"ytnew",sz:2,st:"glass"}]) }
+  if(!l.filter(w=>w.t!=="hero").length&&!S.wDefMig){ S.wDefMig=1; hwSave(l.filter(w=>w.t==="hero").concat([{id:"weather",t:"weather",sz:2,st:"glass"},{id:"prayer",t:"prayer",sz:2,st:"glass"},{id:"mcard",t:"mcard",sz:2,st:"glass"},{id:"ytnew",t:"ytnew",sz:2,st:"glass"}])) }
   else if(l.length!==all.length) hwSave(l); applyHomeLook() }catch(e){} },4500);
+
+// ---- the big picture card (hero: time + photo) is back on top of Home, and in the widget picker
+if(LITE_HW.indexOf("hero")<0) LITE_HW.unshift("hero");
+if(!HW_TYPES.some(t=>t[0]==="hero")) HW_TYPES.unshift(["hero","🌄","hwHero"]);
+setTimeout(()=>{ try{ if(!S.heroBack){ S.heroBack=1; const l=hwList(); if(!l.some(w=>w.t==="hero")) hwSave([{id:"hero",t:"hero",sz:4,st:"clear"}].concat(l)) } }catch(e){} },5500);
+// YouTube (the official TV app) is one of the apps that must always be there
+MA_BUILTIN.splice(1,0,{name:"YouTube",pkg:"com.google.android.youtube.tv",src:"play"});
