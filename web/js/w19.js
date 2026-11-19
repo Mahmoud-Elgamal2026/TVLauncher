@@ -16,7 +16,7 @@ hwBody=(function(prev){ return function(w){ if(w.t!=="combo") return prev.apply(
 setInterval(()=>{ /* combo widget */ if(window.__bg||!document.querySelector("#home.on")) return; document.querySelectorAll(".hw-combo").forEach(c=>{ const b=c.querySelector(".hwb"), w=hwGet(c.dataset.hw); if(b&&w) b.innerHTML=hwBody(w) }) },30000);
 // OK on it: open matches / YouTube, or choose the parts
 activators.unshift(el=>{ if(!el.dataset||!el.dataset.hw) return false; const w=hwGet(el.dataset.hw); if(!w||w.t!=="combo") return false;
-  dialog("🧩 "+L("w_combo"),[{label:L("cbOpenMt"),pri:1,fn:()=>{ mtCat="d0"; showPage("mt") }},{label:L("cbOpenYt"),fn:()=>showPage("ytp")},{label:L("cbParts"),fn:cbChoose},{label:L("cancel"),fn:()=>{}}],{}); return true });
+  dialog("🧩 "+L("w_combo"),[{label:L("cbOpenMt"),pri:1,fn:()=>{ mtCat="d0"; showPage("mt") }},{label:L("cbParts"),fn:cbChoose},{label:L("cancel"),fn:()=>{}}],{}); return true });
 function cbChoose(){ const cur=S.comboParts||CB_ALL;
   dialog(L("cbParts"),CB_ALL.map(p=>({label:(cur.indexOf(p)>=0?"✓ ":"⬜ ")+L("cbP_"+p),fn:()=>{ const l=(S.comboParts||CB_ALL).slice(), i=l.indexOf(p); if(i>=0) l.splice(i,1); else l.push(p);
     S.comboParts=CB_ALL.filter(x=>l.indexOf(x)>=0); try{ renderHW() }catch(e){} setTimeout(cbChoose,60) }})).concat([{label:"✓",pri:1,fn:()=>{}}]),{sub:L("cbPick"),grid:2}) }

@@ -28,6 +28,6 @@ if(bootN>=3){ store.set("bootN",0);
   setTimeout(()=>{ hwList=_hwSafe; },10*60000) }
 
 // ---- (6) remote: digits 1–4 = the tabs that exist now; on Home 1, 2, 3… open your favourites — TizenTube and Ostora go first when you have none
-TAB_KEYS["1"]="home"; TAB_KEYS["2"]="ytp"; TAB_KEYS["3"]="mt"; TAB_KEYS["4"]="settings"; delete TAB_KEYS["5"];
+TAB_KEYS["1"]="home"; TAB_KEYS["2"]="mt"; TAB_KEYS["3"]="settings"; delete TAB_KEYS["4"]; delete TAB_KEYS["5"];
 setTimeout(()=>{ try{ if((S.favs||[]).length) return; const want=[(S.maPkgs||{}).TizenTube].concat(userPkgs().filter(a=>/ostora|الأسطورة|oscar|أوسكار/i.test(a.name+" "+a.pkg)).map(a=>a.pkg)).filter(p=>p&&nat("hasPkg",p));
   if(want.length){ S.favs=want.filter((p,i,a)=>a.indexOf(p)===i); try{ renderHome() }catch(e){} } }catch(e){} },8000);

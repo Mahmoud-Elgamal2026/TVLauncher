@@ -137,7 +137,7 @@ document.addEventListener("keydown",e=>{ idleAt=Date.now(); if($("blackout").cla
   else if(k==="Enter"&&!NA){ e.preventDefault(); activate(focused) } // on the box OK comes through onShortOk / onLongOk
   else if(k==="Escape"||k==="GoBack"||k==="BrowserBack"){ e.preventDefault(); back() }
   else if(k==="ContextMenu"||k==="Menu"){ e.preventDefault(); longPress(focused) }
-  else if(/^[1-9]$/.test(k)&&!inInput&&!$("dlg").classList.contains("on")){ const p=S.favs[+k-1]; if(curPage==="home"&&p) launch(p); else showPage(["home","yt","mt","set"][+k-1]||curPage) } });
+  else if(/^[1-9]$/.test(k)&&!inInput&&!$("dlg").classList.contains("on")){ const p=S.favs[+k-1]; if(curPage==="home"&&p) launch(p); else showPage(["home","mt","set"][+k-1]||curPage) } });
 window.onShortOk=()=>{ idleAt=Date.now(); if($("blackout").classList.contains("on")){ $("blackout").classList.remove("on"); return } const a=document.activeElement; if(a&&a.tagName==="INPUT"&&focused===a){ dlgSubmit(); return } activate(focused) };
 window.onLongOk=()=>{ idleAt=Date.now(); longPress(focused) };
 window.onBack=()=>{ idleAt=Date.now(); back() };
@@ -156,7 +156,7 @@ onAct(el=>{ if(el.id!=="dIn") return false; el.focus(); return true });
 const lastFocus={};
 
 // ---------- pages ----------
-const TABS=[["home","🏠"],["mt","⚽"],["yt","▶️"],["set","⚙️"]];
+const TABS=[["home","🏠"],["mt","⚽"],["set","⚙️"]]; // YouTube tab removed (TizenTube is the YouTube app)
 function renderTabs(){ $("tabs").innerHTML=TABS.map(([id,ic])=>`<button class="tab f${id===curPage?" on":""}" data-tab="${id}">${ic} ${esc(L(id))}</button>`).join("") }
 function showPage(id,fromTab){ if(!$(id)) id="home"; if(focused&&focused.closest(".page")) lastFocus[curPage]=focused; curPage=id;
   document.querySelectorAll(".page").forEach(p=>p.classList.toggle("on",p.id===id)); document.querySelectorAll("#tabs .tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===id));
@@ -285,7 +285,7 @@ function appMenu(pkg){ const a=byPkg(pkg); if(!a) return; const favs=S.favs, fi=
   items.push({label:L("info"),fn:()=>nat("appInfo",pkg)},{label:L("uninst"),fn:()=>nat("uninstallApp",pkg)},{label:L("cancel"),fn:()=>{}});
   dialog(a.name,items,{grid:2}) }
 longActs.push(el=>{ if(!el||!el.dataset.pkg) return false; appMenu(el.dataset.pkg); return true });
-longActs.push(()=>{ if(curPage!=="home") return false; dialog(L("qm"),[{label:L("qOstora"),pri:1,fn:()=>{ const p=ostoraPkg(); if(p) launch(p); else toast(L("notInst")) }},{label:L("qYt"),fn:()=>{ const p=tizenPkg(); if(p) launch(p); else showPage("yt") }},{label:L("qMt"),fn:()=>showPage("mt")},{label:L("sParts"),fn:partsMenu},{label:L("cancel"),fn:()=>{}}],{grid:2}); return true });
+longActs.push(()=>{ if(curPage!=="home") return false; dialog(L("qm"),[{label:L("qOstora"),pri:1,fn:()=>{ const p=ostoraPkg(); if(p) launch(p); else toast(L("notInst")) }},{label:L("qYt"),fn:()=>{ const p=tizenPkg(); if(p) launch(p); else toast(L("notInst")) }},{label:L("qMt"),fn:()=>showPage("mt")},{label:L("sParts"),fn:partsMenu},{label:L("cancel"),fn:()=>{}}],{grid:2}); return true });
 function partsMenu(){ const cur=S.comboParts; dialog(L("sParts"),PARTS.map(([p,k])=>({label:(cur.indexOf(p)>=0?"✓ ":"⬜ ")+L(k),fn:()=>{ const l=S.comboParts, i=l.indexOf(p); if(i>=0) l.splice(i,1); else l.push(p); S.comboParts=PARTS.map(x=>x[0]).filter(x=>l.indexOf(x)>=0); refreshCombo(); setTimeout(partsMenu,40) }})).concat([{label:L("ok"),pri:1,fn:()=>{}}]),{grid:2}) }
 async function dailyPic(){ const d=new Date().toDateString(); if(S.heroImg&&S.heroDay===d) return;
   try{ const r=await fetchJSON("https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US"), i=r.images&&r.images[0]; if(!i) return; let u="https://www.bing.com"+i.urlbase+"_1366x768.jpg";

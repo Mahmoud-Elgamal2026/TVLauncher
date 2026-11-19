@@ -1,6 +1,6 @@
 // ================= Lite: what Mahmoud doesn't use is taken off the screen; Home keeps only what matters =================
 // removed: free library, files & recording, store, the old sports page, kids / guest / family profiles, hourly suggestions, theme picker & seasonal looks, extra widgets
-const LITE_PAGES=["lib","files","store","sports","nw"];
+const LITE_PAGES=["lib","files","store","sports","nw","ytp"];
 const LITE_HW=["clock","weather","prayer","mcard","ytnew"];
 const LITE_SET=/المكتبة|Library|الملفات والتسجيل|Files & recording|تسجيل|Recording|المتجر|Store|الأطفال|Kids|الضيف|Guest|الملفات الشخصية|Profiles|العيلة|Family|مقترح ليك|Suggest|الثيم|Theme|المواسم|Season/;
 document.body.classList.add("lite");

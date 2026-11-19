@@ -5,7 +5,7 @@ const ostoraPkg=()=>{ const k=Object.keys(S.maPkgs||{}).find(n=>/ostora|أسطو
   const a=userPkgs().find(x=>/ostora|أسطور|اسطور/i.test(x.name+" "+x.pkg)); return a?a.pkg:"" };
 const tizenPkg=()=>{ const p=(S.maPkgs||{}).TizenTube; if(p&&nat("hasPkg",p)) return p; const a=userPkgs().find(x=>/tizentube|cobalt/i.test(x.name+" "+x.pkg)); return a?a.pkg:"" };
 const openOstora=()=>{ const p=ostoraPkg(); if(p) launch(p); else A.toast("📺 Ostora?") };
-const openTizen=()=>{ const p=tizenPkg(); if(p) launch(p); else showPage("ytp") };
+const openTizen=()=>{ const p=tizenPkg(); if(p) launch(p); else A.toast("TizenTube?") };
 
 // ---- (1) match part: your teams first (all matches if you have none), with "in 2 h 15 m"
 function cbMatch(){ let l=[]; try{ l=mcList() }catch(e){} const mine=l.filter(e=>teamFav(e)); const e=(mine.length?mine:l)[0];
