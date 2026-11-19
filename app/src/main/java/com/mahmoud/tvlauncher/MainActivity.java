@@ -1515,7 +1515,19 @@ public class MainActivity extends Activity {
             ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
             am.getMemoryInfo(mi);
             JSONObject o = new JSONObject();
-            try { o.put("avail", mi.availMem); o.put("total", mi.totalMem); o.put("low", mi.lowMemory); } catch (Exception ignored) {}
+            long avail = mi.availMem, total = mi.totalMem;
+            // cheap boxes often report fake (bigger) RAM to Android: the kernel's own numbers are the real ones — use them when smaller
+            try (BufferedReader r = new BufferedReader(new java.io.FileReader("/proc/meminfo"))) {
+                String line; long kt = 0, ka = 0, kf = 0, kc = 0, kb = 0;
+                while ((line = r.readLine()) != null) {
+                    String[] p = line.trim().split("\\s+"); if (p.length < 2) continue; long v = Long.parseLong(p[1]) * 1024L;
+                    if (p[0].equals("MemTotal:")) kt = v; else if (p[0].equals("MemAvailable:")) ka = v; else if (p[0].equals("MemFree:")) kf = v; else if (p[0].equals("Cached:")) kc = v; else if (p[0].equals("Buffers:")) kb = v;
+                }
+                if (ka == 0) ka = kf + kc + kb;
+                if (kt > 0 && kt < total) { total = kt; avail = Math.min(avail, ka > 0 ? ka : avail); }
+            } catch (Exception ignored) {}
+            if (avail > total) avail = total;
+            try { o.put("avail", avail); o.put("total", total); o.put("low", mi.lowMemory); o.put("reported", mi.totalMem); } catch (Exception ignored) {}
             return o.toString();
         }
 
