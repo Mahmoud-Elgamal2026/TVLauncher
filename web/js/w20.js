@@ -16,7 +16,7 @@ function cbMatch(){ let l=[]; try{ l=mcList() }catch(e){} const mine=l.filter(e=
 cbPart=(function(prev){ return function(p){ return p==="mcard"?cbMatch():prev.apply(this,arguments) } })(cbPart);
 // OK on the big widget while one of your teams is playing → straight into Ostora
 activators.unshift(el=>{ if(!el.dataset||!el.dataset.hw) return false; const w=hwGet(el.dataset.hw); if(!w||w.t!=="combo") return false;
-  let live=false; try{ live=mcList().some(e=>evState(e)==="live"&&teamFav(e)) }catch(e){} if(!live) return false; openOstora(); return true });
+  let live=false; try{ live=mcList().some(e=>evState(e)==="live"&&teamFav(e)) }catch(e){} if(!live) return false; { const o=userPkgs().find(x=>/oscar|أوسكار|اوسكار/i.test(x.name+" "+x.pkg)); if(o) launch(o.pkg); else openOstora() } return true });
 
 // ---- (2) a daily picture behind the big widget (the same free daily photo the old big card used); none in weak-box mode
 hwCard=(function(prev){ return function(w){ let h=prev.apply(this,arguments); if(w.t!=="combo") return h;

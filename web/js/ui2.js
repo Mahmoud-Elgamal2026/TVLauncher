@@ -237,7 +237,7 @@ onAct(el=>{ const d=el.dataset;
   if(d.teams){ mtTeamsLg="1"; renderMt().then(()=>{}); return true }
   if(d.tl){ mtTeamsLg=d.tl; renderTeams().then(()=>{ const f=$("mtList").querySelector(`[data-tl="${d.tl}"]`); if(f) focus(f) }); return true }
   if(d.team){ toggleTeam(d.team); const on=isFav(d.team); el.classList.toggle("on",on); const b=el.querySelector("b"); if(on&&!b) el.insertAdjacentHTML("beforeend","<b>⭐</b>"); if(!on&&b) b.remove(); return true }
-  if(d.m){ const p=ostoraPkg(); if(p) launch(p); return true }
+  if(d.m){ const p=oscarPkg(); if(p) launch(p); else toast(L("notInst")); return true }
   return false });
 // 10 minutes before one of your teams plays: a reminder, OK opens Oscar TV
 const mAlerted=store.get("mAlerted",{});
@@ -283,7 +283,7 @@ function renderHome(){ const keep=focused&&focused.dataset&&focused.dataset.pkg,
   $("appsH").textContent=L("apps"); $("apps").innerHTML=allApps().filter(a=>S.showHidden||hid.indexOf(a.pkg)<0).map(a=>tile(a)).join("");
   homeDirty=false; if(inHome){ const f=kf?$("comboCard"):keep&&document.querySelector(`#home [data-pkg="${keep}"]`); if(f) focus(f) } }
 onAct(el=>{ if(!el.dataset.pkg) return false; launch(el.dataset.pkg); return true });
-onAct(el=>{ if(el.id!=="comboCard") return false; const live=todayMatches.some(m=>m.st==="live"&&mFav(m)); if(live){ const p=ostoraPkg(); if(p){ launch(p); return true } } showPage("mt"); return true });
+onAct(el=>{ if(el.id!=="comboCard") return false; const live=todayMatches.some(m=>m.st==="live"&&mFav(m)); if(live){ const p=oscarPkg(); if(p){ launch(p); return true } } showPage("mt"); return true });
 function appMenu(pkg){ const a=byPkg(pkg); if(!a) return; const favs=S.favs, fi=favs.indexOf(pkg), hid=S.hidden.indexOf(pkg)>=0, items=[];
   items.push(fi<0?{label:L("addFav"),pri:1,fn:()=>{ S.favs=favs.concat([pkg]); renderHome() }}:{label:L("remFav"),fn:()=>{ S.favs=favs.filter(p=>p!==pkg); renderHome() }});
   if(fi>0) items.push({label:L("moveL"),fn:()=>{ const l=S.favs; [l[fi-1],l[fi]]=[l[fi],l[fi-1]]; S.favs=l; renderHome(); focus(document.querySelector(`#favs [data-pkg="${pkg}"]`)) }});
