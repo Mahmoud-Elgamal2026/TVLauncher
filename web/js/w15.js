@@ -43,9 +43,7 @@ setTimeout(()=>{ const s=storeInfo(); if(s.free&&s.free<300e6) banner("💾",L("
 // ---- (6) "Continue" on Home: the last app in one press
 function contHtml(){ const p=(S.recent||[]).find(x=>x&&x!==NA_PKG); if(!p) return ""; let a=null; try{ a=visibleApps().find(x=>x.pkg===p) }catch(e){} if(!a) return "";
   return `<div class="contbar"><button class="btn f pri" id="contGo" data-pkg="${esc(p)}">▶ ${esc(L("contLbl"))}: ${esc(appName(a))}</button></div>` }
-renderHome=(function(prev){ return function(){ const r=prev.apply(this,arguments); try{ const old=$("contWrap"); if(old) old.remove(); const h=contHtml(), b=$("hwH")||$("hwBoard");
-    if(h&&b) b.insertAdjacentHTML("beforebegin",`<div id="contWrap">${h}</div>`) }catch(e){} return r } })(renderHome);
-activators.unshift(el=>{ if(el.id!=="contGo") return false; launch(el.dataset.pkg); return true });
+// ("Continue" bar removed: the user found it annoying; favourites 1/2 do the same)
 
 // ---- (7) bedtime: at the time you pick (or after an hour without the remote at night) → close apps, stop video, dark screen
 let bedT=null;

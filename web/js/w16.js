@@ -10,7 +10,6 @@ renderHome=(function(prev){ return function(){ const r=prev.apply(this,arguments
 function perfLine(){ let m={}, s={}; try{ m=JSON.parse(nat("memInfo")||"{}") }catch(e){} try{ s=JSON.parse(nat("storageInfo")||"{}") }catch(e){}
   const h=store.get("bootHist",[]), avg=h.length?h.reduce((a,b)=>a+b,0)/h.length:0;
   return [`${L("pfBoot")} ${(bootMs/1000).toFixed(1)} ${L("pfSec")}${h.length>1?` (${S.lang==="ar"?"المتوسط":"avg"} ${(avg/1000).toFixed(1)})`:""}`,
-    m.total?`${L("pfRam")}: ${Math.round(m.avail/1e6)} / ${Math.round(m.total/1e6)} MB`:"",
     s.free?`${L("pfDisk")}: ${(s.free/1e9).toFixed(1)} GB`:""].filter(Boolean).join(" · ") }
 renderSettings=(function(prev){ return function(){ const r=prev.apply(this,arguments); const a=$("bkSecT");
   if(a&&!$("pfSec")) a.insertAdjacentHTML("beforebegin",`<div class="field" id="pfSec"><label>${esc(L("pfTitle"))}</label><div class="inline"><span class="hint">${esc(perfLine())}</span></div></div>`); return r } })(renderSettings);

@@ -263,7 +263,7 @@ function partHtml(p){ const d=new Date();
     return `<div class="cbm"><div class="mteam">${logo(m.hl)}<span>${esc(teamAr(m.home))}</span></div><div class="mmid">${mMid(m)}</div><div class="mteam">${logo(m.al)}<span>${esc(teamAr(m.away))}</span></div></div><small>${m.st==="live"?`<b class="live">● ${esc(L("live"))}</b>`:m.st==="ns"&&left>0?`${esc(L("inT"))} ${Math.floor(left/3600000)} ${esc(L("hr"))} ${Math.floor(left%3600000/60000)} ${esc(L("mn"))}`:""}</small>` }
   if(p==="perf"){ let m={}, s={}; try{ m=JSON.parse(nat("memInfo")||"{}") }catch(e){} try{ s=JSON.parse(nat("storageInfo")||"{}") }catch(e){} const pct=m.total?Math.round(m.avail*100/m.total):0;
     const row=(k,v,c)=>`<div class="kv"><span>${esc(k)}</span><b${c?` style="color:${c}"`:""}>${esc(v)}</b></div>`;
-    return row(L("ramFree"),m.total?`${Math.round(m.avail/1e6)} MB (${pct}%)`:"—",pct&&pct<15?"#ff6b6b":pct&&pct<30?"#ffc048":"#5ad17a")+row(L("diskFree"),s.free?(s.free/1e9).toFixed(1)+" GB":"—",s.free&&s.free<5e8?"#ff6b6b":"")+row(L("opened"),bootMs?(bootMs/1000).toFixed(1)+" "+L("sec"):"—") }
+    return row(L("diskFree"),s.free?(s.free/1e9).toFixed(1)+" GB":"—",s.free&&s.free<5e8?"#ff6b6b":"")+row(L("opened"),bootMs?(bootMs/1000).toFixed(1)+" "+L("sec"):"—") }
   return "" }
 function comboHtml(){ const parts=PARTS.filter(p=>S.comboParts.indexOf(p[0])>=0);
   return `<div class="combo f" id="comboCard"${S.heroImg&&S.wallPic?` style="background-image:linear-gradient(rgba(8,12,24,.5),rgba(8,12,24,.78)),url('${esc(S.heroImg)}')"`:""}><div class="cbgrid">${parts.map(([p,k])=>`<div class="cbcell cb-${p}"><div class="cbh">${esc(L(k))}</div><div class="cbb">${partHtml(p)}</div></div>`).join("")}</div></div>` }

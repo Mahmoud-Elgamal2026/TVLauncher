@@ -42,7 +42,7 @@ setTimeout(shzWatch,20000); setInterval(()=>{ /* shizuku watch */ shzWatch() },6
 const _onShzW=window.onShizuku; window.onShizuku=function(){ if(_onShzW) try{ _onShzW.apply(this,arguments) }catch(e){} setTimeout(shzWatch,500) };
 
 // ---- (8) weak-box mode: on a 1–1.5 GB box drop blur, shadows and animations (auto by RAM, can be forced on/off)
-Object.assign(DEF,{lowRam:"auto"});
+Object.assign(DEF,{lowRam:"on"}); if(S.lowRam==="auto") S.lowRam="on"; // the box lies about its RAM, so "auto" can't tell
 function lowRamOn(){ if(S.lowRam==="on") return true; if(S.lowRam==="off") return false;
   try{ const m=JSON.parse(nat("memInfo")||"{}"); return !!m.total&&m.total<1.6e9 }catch(e){ return false } }
 function applyLowRam(){ document.body.classList.toggle("lowram",lowRamOn()) }
