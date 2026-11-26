@@ -44,7 +44,7 @@ const T={ar:{home:"الرئيسية",mt:"الماتشات",yt:"يوتيوب",set
   maInst:"بينزّل",maDone:"اتسطّب",maFail:"ماعرفش ينزّل",maTap:"وافق على التثبيت على الشاشة",maWeb:"اللينك مش ملف مباشر — فتحته في المتصفح",maMissing:"تطبيقات ناقصة",
   a11yNeed:"عشان تكتب جوه التطبيقات من الموبايل، فعّل الكتابة من الإعدادات",noField:"دوس بالريموت على خانة الكتابة الأول",
   bedNow:"🌙 وقت النوم — التطبيقات هتتقفل والشاشة هتطفي بعد دقيقة",awake:"لسه صاحي",diskLow:"المساحة قربت تخلص",ramDone:"اتقفلت تطبيقات في الخلفية عشان البوكس يخف",
-  qm:"⚡ قايمة سريعة",qOstora:"📺 الأسطورة",qYt:"▶️ TizenTube",qMt:"⚽ الماتشات",cleaned:"🧽 اتعمل تنضيف أسبوعي",prayNow:"حان الآن موعد",wallNew:"خلفية جديدة من الموبايل",sHij:"📅 التاريخ الهجري",hidden:"مخفي",notInst:"التطبيق مش متسطّب"},
+  qm:"⚡ قايمة سريعة",qOstora:"📺 الأسطورة",qYt:"▶️ TizenTube",qMt:"⚽ الماتشات",cleaned:"🧽 اتعمل تنضيف أسبوعي",prayNow:"حان الآن موعد",wallNew:"خلفية جديدة من الموبايل",openOscar:"📺 افتح أوسكار",sHij:"📅 التاريخ الهجري",hidden:"مخفي",notInst:"التطبيق مش متسطّب"},
  en:{home:"Home",mt:"Matches",yt:"YouTube",set:"Settings",favs:"Favourites",apps:"All apps",noFav:"Hold OK on any app to add it to favourites",
   am:"AM",pm:"PM",days:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],months:["January","February","March","April","May","June","July","August","September","October","November","December"],
   prayers:["Fajr","Sunrise","Dhuhr","Asr","Maghrib","Isha"],pTime:"Time & date",pWeather:"Weather",pPrayer:"Next prayer",pMatch:"Match",pPerf:"Box health",
@@ -62,7 +62,7 @@ const T={ar:{home:"الرئيسية",mt:"الماتشات",yt:"يوتيوب",set
   maInst:"Installing",maDone:"Installed",maFail:"Couldn't install",maTap:"Confirm the install on screen",maWeb:"Not a direct link — opened it in the browser",maMissing:"Missing apps",
   a11yNeed:"To type into apps from the phone, turn typing on in Settings",noField:"Select the text box with the remote first",
   bedNow:"🌙 Bedtime — apps close and the screen goes dark in a minute",awake:"Still awake",diskLow:"Storage almost full",ramDone:"Closed background apps to keep the box light",
-  qm:"⚡ Quick menu",qOstora:"📺 Ostora",qYt:"▶️ TizenTube",qMt:"⚽ Matches",cleaned:"🧽 Weekly clean-up done",prayNow:"It's time for",wallNew:"New wallpaper from the phone",sHij:"📅 Hijri date",hidden:"hidden",notInst:"App not installed"}};
+  qm:"⚡ Quick menu",qOstora:"📺 Ostora",qYt:"▶️ TizenTube",qMt:"⚽ Matches",cleaned:"🧽 Weekly clean-up done",prayNow:"It's time for",wallNew:"New wallpaper from the phone",openOscar:"📺 Open Oscar TV",sHij:"📅 Hijri date",hidden:"hidden",notInst:"App not installed"}};
 const L=k=>{ const t=T[S.lang]||T.ar; return t[k]!=null?t[k]:(T.en[k]!=null?T.en[k]:k) };
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -193,6 +193,8 @@ setInterval(()=>{ if(!prayers.length) return; if(prayers[0].toDateString()!==new
   prayers.forEach((t,i)=>{ if(i===1) return; const k=t.toDateString()+i; if(now>=t&&now<t.getTime()+90000&&!prayFired[k]){ prayFired[k]=1; banner("🕌",L("prayNow")+" "+L("prayers")[i],fmtTime(t),15000) } }) },20000);
 
 // ---------- matches (ESPN public scoreboard) ----------
+const oscarPkg=()=>{ const m=S.maPkgs, k=Object.keys(m).find(n=>/oscar|أوسكار|اوسكار/i.test(n)); if(k&&hasPkg(m[k])) return m[k];
+  const a=allApps().find(x=>/oscar|أوسكار|اوسكار/i.test(x.name+" "+x.pkg)); return a?a.pkg:"" };
 const compName=s=>{ const c=COMPS.find(x=>x[0]===s); return c?(S.lang==="ar"?c[1]:c[2]):s };
 const teamAr=n=>{ if(S.lang!=="ar") return n; const k=String(n||"").toLowerCase().replace(/\s+fc$|^fc\s+/,"").trim(); return TEAM_AR[k]||n };
 const favTeams=()=>String(S.favTeams||"").split(/[,،]/).map(x=>x.trim().toLowerCase()).filter(Boolean);
@@ -237,6 +239,11 @@ onAct(el=>{ const d=el.dataset;
   if(d.team){ toggleTeam(d.team); const on=isFav(d.team); el.classList.toggle("on",on); const b=el.querySelector("b"); if(on&&!b) el.insertAdjacentHTML("beforeend","<b>⭐</b>"); if(!on&&b) b.remove(); return true }
   if(d.m){ const p=ostoraPkg(); if(p) launch(p); return true }
   return false });
+// 10 minutes before one of your teams plays: a reminder, OK opens Oscar TV
+const mAlerted=store.get("mAlerted",{});
+setInterval(()=>{ const now=Date.now(); todayMatches.filter(m=>m.st==="ns"&&mFav(m)&&m.t-now>0&&m.t-now<=10*60000&&!mAlerted[m.id]).slice(0,1).forEach(m=>{
+  mAlerted[m.id]=now; store.set("mAlerted",mAlerted);
+  dialog(`⚽ ${teamAr(m.home)} × ${teamAr(m.away)}`,[{label:L("openOscar"),pri:1,fn:()=>{ const p=oscarPkg(); if(p) launch(p); else toast(L("notInst")) }},{label:L("later"),fn:()=>{}}],{sub:`${compName(m.lg)} · ${fmtTime(new Date(m.t))} · ${L("inT")} ${Math.ceil((m.t-now)/60000)} ${L("mn")}`}) }) },30000);
 setInterval(()=>{ if(window.__bg) return; const live=todayMatches.some(m=>m.st==="live"); if(curPage==="mt"&&mtDay===0&&!mtTeamsLg&&!$("dlg").classList.contains("on")) renderMt(); else if(live||Date.now()%(10*60000)<60000) refreshToday() },60000);
 
 // ---------- YouTube (your channels' latest videos, open in TizenTube) ----------
